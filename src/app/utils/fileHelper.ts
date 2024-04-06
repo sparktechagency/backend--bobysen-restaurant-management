@@ -1,7 +1,7 @@
 import fs from "fs";
 import util from "util";
 const unlinkSync = util.promisify(fs.unlink);
-const deleteFile = async (path: string) => {
+export const deleteFile = async (path: string) => {
   const modifiedPath = `.${path}`;
   try {
     if (fs.existsSync(modifiedPath)) {
@@ -15,8 +15,7 @@ const deleteFile = async (path: string) => {
   }
 };
 
-export { deleteFile };
-export const createFileDetails = (folderName: string, filename: string) => {
+export const storeFile = (folderName: string, filename: string) => {
   console.log(folderName, filename);
   return `/uploads/${folderName}/${filename}`;
 };
