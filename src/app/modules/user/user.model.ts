@@ -3,6 +3,7 @@ import { TUser, UserModel } from "./user.interface";
 import { UserStatus } from "./user.constant";
 import config from "../../config";
 import bcrypt from "bcrypt";
+import { boolean } from "zod";
 const userSchema = new Schema<TUser, UserModel>(
   {
     userName: {
@@ -12,6 +13,10 @@ const userSchema = new Schema<TUser, UserModel>(
     fullName: {
       type: String,
       required: [true, "fullName is required"],
+    },
+    image: {
+      type: String,
+      default: "",
     },
     email: {
       type: String,
@@ -33,11 +38,23 @@ const userSchema = new Schema<TUser, UserModel>(
     status: {
       type: String,
       enum: UserStatus,
-      default: "in-progress",
+      default: "active",
     },
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    verification: {
+      otp: {
+        type: String,
+      },
+      expiresAt: {
+        type: Date,
+      },
+      status: {
+        type: boolean,
+        default: false,
+      },
     },
   },
   {
@@ -60,7 +77,7 @@ userSchema.post("save", function (doc, next) {
   next();
 });
 
-userSchema.statics.isUserExistsByCustomId = async function (email: string) {
+userSchema.statics.IsUserExist = async function (email: string) {
   return await User.findOne({ email }).select("+password");
 };
 userSchema.statics.isPasswordMatched = async function (

@@ -1,5 +1,6 @@
 import { Model } from "mongoose";
 export interface TUser {
+  [x: string]: any;
   id: string;
   email: string;
   password: string;
@@ -8,8 +9,14 @@ export interface TUser {
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
   role: "admin" | "vendor" | "user";
-  status: "in-progress" | "blocked";
+  status: "active" | "blocked";
   isDeleted: boolean;
+  image?: string;
+  verification: {
+    otp: string | number;
+    expiresAt: Date;
+    status: boolean;
+  };
 }
 
 export interface UserModel extends Model<TUser> {
