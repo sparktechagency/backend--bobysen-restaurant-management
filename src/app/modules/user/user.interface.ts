@@ -2,8 +2,9 @@ import { Model } from "mongoose";
 export interface TUser {
   id: string;
   email: string;
+  password: string;
   userName: string;
-  fullName?: string;
+  fullName: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
   role: "admin" | "vendor" | "user";
