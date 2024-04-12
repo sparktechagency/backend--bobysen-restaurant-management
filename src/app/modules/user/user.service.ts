@@ -4,6 +4,7 @@ import { TUser } from "./user.interface";
 import { User } from "./user.model";
 import { generateOtp } from "../../utils/otpGenerator";
 import moment from "moment";
+import { deleteFile } from "../../utils/fileHelper";
 
 const insertUserIntoDb = async (payload: Partial<TUser>): Promise<TUser> => {
   const user = await User.isUserExist(payload.email as string);
@@ -46,6 +47,7 @@ const updateProfile = async (
   id: string,
   payload: Partial<TUser>
 ): Promise<TUser | null> => {
+  const user = await User.findById(id);
   //  email update lagbe na
   if (payload?.email) {
     throw new AppError(httpStatus?.BAD_REQUEST, "email is not for update");
@@ -54,6 +56,10 @@ const updateProfile = async (
     throw new AppError(httpStatus?.BAD_REQUEST, "role is not for update");
   }
   const result = await User.findByIdAndUpdate(id, payload, { new: true });
+
+  if (result && payload?.image) {
+    deleteFile(user?.image!);
+  }
   return result;
 };
 
