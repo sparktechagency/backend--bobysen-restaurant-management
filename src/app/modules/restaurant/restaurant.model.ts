@@ -14,6 +14,16 @@ const RestaurantSchema = new Schema<TRestaurant>(
       type: String,
       required: [true, "description is required"],
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "owner id is required"],
+    },
+    images: [
+      {
+        type: String,
+      },
+    ],
     close: {
       from: Date,
       to: Date,

@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 interface DaySchedule {
   openingTime: string;
   closingTime: string;
@@ -6,9 +8,9 @@ export interface TRestaurant {
   [x: string]: any;
   name: string;
   location: string;
-  owner: string;
+  owner: ObjectId;
   isDeleted: boolean;
-  image?: string[];
+  images?: string[];
   reviewStatus: boolean;
   description: string;
   close?: {
