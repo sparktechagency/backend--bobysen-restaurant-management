@@ -206,7 +206,7 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
   return result;
 };
 
-export const userServices = {
+export const authServices = {
   login,
   changePassword,
   forgotPassword,
