@@ -11,3 +11,7 @@ export type TchangePassword = {
   newPassword: string;
   confirmPassword: string;
 };
+export type TresetPassword = {
+  newPassword: string;
+  confirmPassword: string;
+};
