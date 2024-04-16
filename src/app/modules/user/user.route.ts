@@ -13,6 +13,12 @@ router.post(
   userControllers.insertuserIntoDb
 );
 router.post("/create-vendor", userControllers.insertVendorIntoDb);
-router.get("/", auth(USER_ROLE.all), userControllers.getme);
-router.patch("/", auth(USER_ROLE.all), userControllers.updateProfile);
+router.get("/", auth(USER_ROLE.user), userControllers.getme);
+router.patch(
+  "/",
+  auth(USER_ROLE.user),
+  upload.single("file"),
+  parseData(),
+  userControllers.updateProfile
+);
 export const userRoutes = router;

@@ -8,8 +8,8 @@ import config from "../config/index";
 const auth = (...userRoles: string[]) => {
   return catchAsync(async (req, res, next) => {
     const token = req?.headers?.authorization?.split(" ")[1];
-
     if (!token) {
+      console.log("token");
       throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized!");
     }
     let decode;
