@@ -2,7 +2,11 @@ import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
 import { userServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
+import { storeFile } from "../../utils/fileHelper";
 const insertuserIntoDb = catchAsync(async (req: Request, res: Response) => {
+  if (req?.file) {
+    req.body.image = storeFile("profile", req?.file?.filename);
+  }
   const result = await userServices.insertUserIntoDb(req.body);
   sendResponse(res, {
     statusCode: 200,
@@ -32,6 +36,9 @@ const getme = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
+  if (req?.file) {
+    req.body.image = storeFile("profile", req?.file?.filename);
+  }
   const result = await userServices.updateProfile(req.user.userId, req.body);
   sendResponse(res, {
     statusCode: 200,

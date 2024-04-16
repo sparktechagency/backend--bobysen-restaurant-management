@@ -1,6 +1,7 @@
-import catchAsync from "../utils/catchAsync.js";
+import { Request, Response, NextFunction } from "express";
+import catchAsync from "../utils/catchAsync";
 const parseData = () => {
-  return catchAsync(async (req, res, next) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
   });

@@ -4,4 +4,4 @@ export const USER_ROLE = {
   user: "user",
   all: ["admin", "vendor", "user"].join(","),
 };
-export const UserStatus = ["active", "blocked"];
+export const UserStatus = ["pending", "active", "blocked"];

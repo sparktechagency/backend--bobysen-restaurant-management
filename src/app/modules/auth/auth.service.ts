@@ -16,11 +16,14 @@ const login = async (payload: Tlogin) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
   }
-  if (user?.UserStatus === "blocked") {
+  if (user?.status === "blocked") {
     throw new AppError(httpStatus.FORBIDDEN, "This user is blocked ! !");
   }
   if (user?.isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !");
+  }
+  if (user?.status === "pending") {
+    throw new AppError(httpStatus.BAD_REQUEST, "user is not verified");
   }
   if (!(await User.isPasswordMatched(payload.password, user.password))) {
     throw new AppError(httpStatus.BAD_REQUEST, "password do not match");
@@ -41,9 +44,9 @@ const login = async (payload: Tlogin) => {
     config.jwt_refresh_expires_in as string
   );
   return {
+    user,
     accessToken,
     refreshToken,
-    user,
   };
 };
 // change password

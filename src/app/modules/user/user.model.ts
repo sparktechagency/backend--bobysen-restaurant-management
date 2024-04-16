@@ -47,13 +47,16 @@ const userSchema = new Schema<TUser, UserModel>(
     verification: {
       otp: {
         type: String,
+        select: 0,
       },
       expiresAt: {
         type: Date,
+        select: 0,
       },
       status: {
-        type: boolean,
+        type: Boolean,
         default: false,
+        select: 0,
       },
     },
   },
@@ -77,7 +80,7 @@ userSchema.post("save", function (doc, next) {
   next();
 });
 
-userSchema.statics.IsUserExist = async function (email: string) {
+userSchema.statics.isUserExist = async function (email: string) {
   return await User.findOne({ email }).select("+password");
 };
 userSchema.statics.IsUserExistbyId = async function (id: string) {
@@ -87,6 +90,7 @@ userSchema.statics.isPasswordMatched = async function (
   plainTextPassword,
   hashedPassword
 ) {
+  console.log(plainTextPassword, hashedPassword);
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 

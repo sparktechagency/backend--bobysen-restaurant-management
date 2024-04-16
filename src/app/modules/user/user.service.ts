@@ -5,8 +5,13 @@ import { User } from "./user.model";
 import { generateOtp } from "../../utils/otpGenerator";
 import moment from "moment";
 import { deleteFile } from "../../utils/fileHelper";
+import config from "../../config";
 
-const insertUserIntoDb = async (payload: Partial<TUser>): Promise<TUser> => {
+import jwt, { Secret } from "jsonwebtoken";
+
+const insertUserIntoDb = async (
+  payload: Partial<TUser>
+): Promise<{ user: TUser; token: string }> => {
   const user = await User.isUserExist(payload.email as string);
   if (user) {
     throw new AppError(
@@ -17,13 +22,25 @@ const insertUserIntoDb = async (payload: Partial<TUser>): Promise<TUser> => {
   const formatedData = {
     ...payload,
     role: "user",
+    status: "pending",
     verification: {
       otp: generateOtp(),
       expiresAt: moment().add(1, "minute"),
     },
   };
+
   const result = await User.create(formatedData);
-  return result;
+  const jwtPayload = {
+    email: payload?.email,
+    id: result?._id,
+  };
+  const token = jwt.sign(jwtPayload, config.jwt_access_secret as Secret, {
+    expiresIn: "1m",
+  });
+  return {
+    user: result,
+    token: token,
+  };
 };
 
 const insertVendorIntoDb = async (payload: Partial<TUser>): Promise<TUser> => {
@@ -58,7 +75,7 @@ const updateProfile = async (
   const result = await User.findByIdAndUpdate(id, payload, { new: true });
 
   if (result && payload?.image) {
-    deleteFile(user?.image!);
+    await deleteFile(user?.image!);
   }
   return result;
 };
