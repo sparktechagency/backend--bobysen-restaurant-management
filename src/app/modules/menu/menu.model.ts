@@ -8,6 +8,10 @@ const menuSchema = new Schema<TMenu, MenuModel>(
       ref: "MenuCategory",
       required: [true, "menu category is required"],
     },
+    image: {
+      type: String,
+      required: [true, "menu image is required"],
+    },
     restaurant: {
       type: Schema.Types.ObjectId,
       ref: "Restaurant",

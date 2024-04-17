@@ -1,4 +1,5 @@
 import QueryBuilder from "../../builder/QueryBuilder";
+import { deleteFile } from "../../utils/fileHelper";
 import { TMenu } from "./menu.inteface";
 import { Menu } from "./menu.model";
 
@@ -29,8 +30,15 @@ const getSingleMenu = async (id: string) => {
   const result = await Menu.findById(id).populate("owner");
   return result;
 };
-// update restaurant here
-
+// update menu here
+const updateMenu = async (id: string, payload: Partial<TMenu>) => {
+  const findMenu = await Menu.findById(id);
+  const result = await Menu.findByIdAndUpdate(id, payload, { new: true });
+  if (payload?.image && result) {
+    await deleteFile(findMenu?.image as string);
+  }
+  return result;
+};
 const deleteMenu = async (id: string) => {
   const result = await Menu.findByIdAndUpdate(
     id,
@@ -45,5 +53,6 @@ export const menuServices = {
   insertMenuIntoDb,
   getAllMenu,
   getSingleMenu,
+  updateMenu,
   deleteMenu,
 };

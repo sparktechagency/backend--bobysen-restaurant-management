@@ -3,9 +3,13 @@ import { Request, Response } from "express";
 import { menuCategoryServices } from "./menuCategory.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { storeFile } from "../../utils/fileHelper";
 const insertMenuCategoryIntoDb = catchAsync(
   async (req: Request, res: Response) => {
-    req.body.owner = req?.user?.userId;
+    if (req?.file) {
+      req.body.image = storeFile("category", req?.file?.filename);
+    }
+    req.body.user = req?.user?.userId;
     const result = await menuCategoryServices.insertMenuCategoryIntoDb(
       req.body
     );
@@ -27,6 +31,9 @@ const findAllCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const updateMenuCategory = catchAsync(async (req: Request, res: Response) => {
+  if (req?.file) {
+    req.body.image = storeFile("category", req?.file?.filename);
+  }
   const result = await menuCategoryServices.updateMenuCategory(
     req.params.id,
     req.body

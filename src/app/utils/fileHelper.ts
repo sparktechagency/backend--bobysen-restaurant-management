@@ -2,6 +2,7 @@ import fs from "fs";
 import util from "util";
 const unlinkSync = util.promisify(fs.unlink);
 export const deleteFile = async (path: string) => {
+  console.log(path);
   try {
     if (fs.existsSync(`./public/${path}`)) {
       await unlinkSync(`./public/${path}`);
@@ -15,6 +16,5 @@ export const deleteFile = async (path: string) => {
 };
 
 export const storeFile = (folderName: string, filename: string) => {
-  console.log(folderName, filename);
   return `/uploads/${folderName}/${filename}`;
 };

@@ -4,6 +4,7 @@ import { authRoutes } from "../modules/auth/auth.route";
 import { menuCategoryRoutes } from "../modules/menuCategory/menuCategory.route";
 import { otpRoutes } from "../modules/otp/otp.routes";
 import { restaurantRoutes } from "../modules/restaurant/restaurant.route";
+import { menuRoutes } from "../modules/menu/menu.route";
 const router = Router();
 
 const moduleRoutes = [
@@ -20,12 +21,16 @@ const moduleRoutes = [
     route: otpRoutes,
   },
   {
+    path: "/restaurants",
+    route: restaurantRoutes,
+  },
+  {
     path: "/menu-categories",
     route: menuCategoryRoutes,
   },
   {
-    path: "/restaurants",
-    route: restaurantRoutes,
+    path: "/menu",
+    route: menuRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

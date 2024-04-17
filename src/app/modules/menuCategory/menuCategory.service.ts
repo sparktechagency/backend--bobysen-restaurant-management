@@ -1,3 +1,4 @@
+import { deleteFile } from "../../utils/fileHelper";
 import { TMenuCategory } from "./menuCategory.interface";
 import { MenuCategory } from "./menuCategory.model";
 
@@ -18,6 +19,7 @@ const updateMenuCategory = async (
   const result = await MenuCategory.findByIdAndUpdate(id, payload, {
     new: true,
   });
+
   return result;
 };
 

@@ -1,7 +1,8 @@
 import { ObjectId } from "mongoose";
 
 export interface TMenuCategory {
-  owner: ObjectId;
+  user: ObjectId;
+  image: string;
   title: string;
   isDeleted: boolean;
 }

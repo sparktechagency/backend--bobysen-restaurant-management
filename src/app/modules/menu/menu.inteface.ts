@@ -4,6 +4,7 @@ export interface TMenu {
   category: ObjectId;
   restaurant: ObjectId;
   name: string;
+  image: string;
   description?: string;
   price: number;
   owner: ObjectId;
