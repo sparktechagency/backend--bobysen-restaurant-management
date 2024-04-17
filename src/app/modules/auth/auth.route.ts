@@ -6,12 +6,11 @@ import { USER_ROLE } from "../user/user.constant";
 const router = Router();
 
 router.post("/login", authControllers.login);
-router.post(
+router.patch(
   "/change-password",
-  auth(USER_ROLE.all),
+  auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
   authControllers.changePassword
 );
-router.post("/forgot-password", authControllers.forgotPassword);
-router.post("/verify-otp", authControllers.verifyOtp);
-router.post("/reset-password", authControllers.resetPassword);
+router.patch("/forgot-password", authControllers.forgotPassword);
+router.patch("/reset-password", authControllers.resetPassword);
 export const authRoutes = router;

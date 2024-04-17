@@ -44,14 +44,21 @@ const verifyOtp = async (token: string, otp: string | number) => {
         status: user?.status === "active" ? user?.status : "active",
         verification: {
           otp: 0,
-          expiresAt: new Date(),
+          expiresAt: moment().add(2, "minute"),
           status: true,
         },
       },
     },
     { new: true }
   );
-  return updateUser;
+  const jwtPayload = {
+    email: user?.email,
+    id: user?._id,
+  };
+  const jwtToken = jwt.sign(jwtPayload, config.jwt_access_secret as Secret, {
+    expiresIn: "2m",
+  });
+  return { user: updateUser, token: jwtToken };
 };
 
 const resendOtp = async (email: string) => {

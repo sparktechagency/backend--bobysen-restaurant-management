@@ -12,7 +12,12 @@ router.post(
   parseData(),
   userControllers.insertuserIntoDb
 );
-router.post("/create-vendor", userControllers.insertVendorIntoDb);
+router.post(
+  "/create-vendor",
+  upload.single("file"),
+  parseData(),
+  userControllers.insertVendorIntoDb
+);
 router.get("/", auth(USER_ROLE.user), userControllers.getme);
 router.patch(
   "/",

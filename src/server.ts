@@ -2,7 +2,7 @@ import { Server, createServer } from "http";
 import mongoose from "mongoose";
 import app from "./app";
 import config from "./app/config";
-import initializeSocketIO from "./app/socketIo";
+import initializeSocketIO from "./socketIo";
 let server: Server;
 export const io = initializeSocketIO(createServer(app));
 

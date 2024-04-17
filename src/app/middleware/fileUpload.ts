@@ -29,7 +29,6 @@ const fileUpload = (uploadDirectory: string) => {
     },
 
     fileFilter: function (req: Request, file, cb) {
-      console.log(file);
       if (
         file.mimetype === "image/png" ||
         file.mimetype === "image/jpg" ||

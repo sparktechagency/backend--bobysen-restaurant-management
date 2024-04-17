@@ -13,7 +13,7 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-  const result = await authServices.changePassword(req.user.userId, req.body);
+  const result = await authServices.changePassword(req?.user?.userId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -22,7 +22,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-  const result = await authServices.forgotPassword(req.body);
+  const result = await authServices.forgotPassword(req?.body?.email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -30,18 +30,7 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-const verifyOtp = catchAsync(async (req: Request, res: Response) => {
-  const result = await authServices.verifyOtp(
-    req?.headers?.token as string,
-    req?.body?.otp
-  );
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "otp verfied successfully",
-    data: result,
-  });
-});
+
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.resetPassword(
     req?.headers?.token as string,
@@ -59,6 +48,5 @@ export const authControllers = {
   login,
   changePassword,
   forgotPassword,
-  verifyOtp,
   resetPassword,
 };

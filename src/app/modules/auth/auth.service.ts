@@ -1,5 +1,5 @@
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-import bcrypt from "bcrypt";
+
 import httpStatus from "http-status";
 import AppError from "../../error/AppError";
 import { TUser } from "../user/user.interface";
@@ -10,6 +10,7 @@ import { createToken, verifyToken } from "./auth.utils";
 import { generateOtp } from "../../utils/otpGenerator";
 import moment from "moment";
 import { sendEmail } from "../../utils/mailSender";
+import bcrypt from "bcrypt";
 
 const login = async (payload: Tlogin) => {
   const user = await User.isUserExist(payload?.email);
@@ -69,6 +70,7 @@ const changePassword = async (id: string, payload: TchangePassword) => {
     payload?.newPassword,
     Number(config.bcrypt_salt_rounds)
   );
+  console.log(hashedPassword);
   const result = await User.findByIdAndUpdate(
     id,
     {
@@ -85,6 +87,7 @@ const changePassword = async (id: string, payload: TchangePassword) => {
 
 const forgotPassword = async (email: string) => {
   const user = await User.isUserExist(email);
+  console.log(user, "dfsdfd");
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not found ");
   }
@@ -99,11 +102,11 @@ const forgotPassword = async (email: string) => {
     id: user?._id,
   };
   const token = jwt.sign(jwtPayload, config.jwt_access_secret as Secret, {
-    expiresIn: "1m",
+    expiresIn: "2m",
   });
   const currentTime = new Date();
   const otp = generateOtp();
-  const expiresAt = moment(currentTime).add(1, "minute");
+  const expiresAt = moment(currentTime).add(2, "minute");
   await User.findByIdAndUpdate(user?._id, {
     verification: {
       otp,
@@ -118,57 +121,7 @@ const forgotPassword = async (email: string) => {
     </div>`
   );
   // send the mail here
-  return token;
-};
-
-const verifyOtp = async (token: string, otp: number) => {
-  let decode;
-  try {
-    decode = jwt.verify(
-      token,
-      config.jwt_access_secret as string
-    ) as JwtPayload;
-  } catch (err) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized");
-  }
-
-  const user = await User.findById(decode?.id);
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found");
-  }
-  if (user?.verification?.expiresAt < new Date()) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      "otp has expired. please resend it"
-    );
-  }
-  if (user?.verification?.otp !== Number(otp)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "wrong otp");
-  }
-  const jwtPayload = {
-    email: user?.email,
-    id: user?._id,
-  };
-  const verifiedToken = jwt.sign(
-    jwtPayload,
-    config.jwt_access_secret as Secret,
-    {
-      expiresIn: "1m",
-    }
-  );
-  const result = await User.findByIdAndUpdate(
-    decode?.id,
-    {
-      verification: {
-        status: true,
-      },
-    },
-    { new: true }
-  );
-  return {
-    data: result,
-    token: verifiedToken,
-  };
+  return { token };
 };
 
 const resetPassword = async (token: string, payload: TresetPassword) => {
@@ -179,14 +132,21 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
       config.jwt_access_secret as string
     ) as JwtPayload;
   } catch (err) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized");
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "session has exipired. please try again"
+    );
   }
-  const user = await User.findById(decode?.id);
+  const user = await User.findById(decode?.id).select("isDeleted verification");
+  console.log(user);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not found");
   }
+  if (new Date() > user?.verification?.expiresAt) {
+    throw new AppError(httpStatus.FORBIDDEN, "sessions expired");
+  }
   if (!user?.verification?.status) {
-    throw new AppError(httpStatus.FORBIDDEN, "otp not verified yet!");
+    throw new AppError(httpStatus.FORBIDDEN, "otp is not verified yet!");
   }
   if (payload?.newPassword !== payload?.confirmPassword) {
     throw new AppError(
@@ -194,9 +154,9 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
       "new password and confirm password do not match!"
     );
   }
-  const hashedPassword = bcrypt.hash(
+  const hashedPassword = await bcrypt.hash(
     payload?.newPassword,
-    config.bcrypt_salt_rounds as string
+    Number(config.bcrypt_salt_rounds)
   );
   const result = await User.findByIdAndUpdate(decode?.id, {
     password: hashedPassword,
@@ -213,6 +173,5 @@ export const authServices = {
   login,
   changePassword,
   forgotPassword,
-  verifyOtp,
   resetPassword,
 };

@@ -31,6 +31,10 @@ const userSchema = new Schema<TUser, UserModel>(
     passwordChangedAt: {
       type: Date,
     },
+    needsPasswordChange: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       enum: ["admin", "vendor", "user"],
@@ -81,7 +85,7 @@ userSchema.post("save", function (doc, next) {
 });
 
 userSchema.statics.isUserExist = async function (email: string) {
-  return await User.findOne({ email }).select("+password");
+  return await User.findOne({ email: email }).select("+password");
 };
 userSchema.statics.IsUserExistbyId = async function (id: string) {
   return await User.findById(id).select("+password");
@@ -90,7 +94,6 @@ userSchema.statics.isPasswordMatched = async function (
   plainTextPassword,
   hashedPassword
 ) {
-  console.log(plainTextPassword, hashedPassword);
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
