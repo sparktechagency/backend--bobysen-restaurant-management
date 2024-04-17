@@ -9,7 +9,7 @@ const insertRestaurantIntoDb = async (
   return result;
 };
 
-const getAllRestaurant = async (query: { [key: string]: any }) => {
+const getAllRestaurant = async (query: Record<string, any>) => {
   const RestaurantModel = new QueryBuilder(
     Restaurant.find().populate("owner"),
     query
