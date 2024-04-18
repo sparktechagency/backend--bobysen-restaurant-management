@@ -113,10 +113,7 @@ const RestaurantSchema = new Schema<TRestaurant>(
     timestamps: true,
   }
 );
-RestaurantSchema.post("save", function (doc, next) {
-  doc.password = "";
-  next();
-});
+
 // filter out deleted documents
 RestaurantSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
