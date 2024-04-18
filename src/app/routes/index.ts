@@ -6,6 +6,7 @@ import { otpRoutes } from "../modules/otp/otp.routes";
 import { restaurantRoutes } from "../modules/restaurant/restaurant.route";
 import { menuRoutes } from "../modules/menu/menu.route";
 import { tableRoutes } from "../modules/table/table.route";
+import { bookingRoutes } from "../modules/booking/booking.route";
 const router = Router();
 const moduleRoutes = [
   {
@@ -35,6 +36,10 @@ const moduleRoutes = [
   {
     path: "/tables",
     route: tableRoutes,
+  },
+  {
+    path: "/booking",
+    route: bookingRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
