@@ -2,11 +2,10 @@ import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
 import httpStatus from "http-status";
 import AppError from "../../error/AppError";
-import { TUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import { TchangePassword, Tlogin, TresetPassword } from "./auth.interface";
 import config from "../../config";
-import { createToken, verifyToken } from "./auth.utils";
+import { createToken } from "./auth.utils";
 import { generateOtp } from "../../utils/otpGenerator";
 import moment from "moment";
 import { sendEmail } from "../../utils/mailSender";
@@ -70,7 +69,6 @@ const changePassword = async (id: string, payload: TchangePassword) => {
     payload?.newPassword,
     Number(config.bcrypt_salt_rounds)
   );
-  console.log(hashedPassword);
   const result = await User.findByIdAndUpdate(
     id,
     {
@@ -87,7 +85,7 @@ const changePassword = async (id: string, payload: TchangePassword) => {
 
 const forgotPassword = async (email: string) => {
   const user = await User.isUserExist(email);
-  console.log(user, "dfsdfd");
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not found ");
   }
@@ -138,7 +136,7 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
     );
   }
   const user = await User.findById(decode?.id).select("isDeleted verification");
-  console.log(user);
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not found");
   }
