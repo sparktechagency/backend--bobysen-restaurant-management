@@ -3,8 +3,7 @@ import { TUser, UserModel } from "./user.interface";
 import { UserStatus } from "./user.constant";
 import config from "../../config";
 import bcrypt from "bcrypt";
-import { boolean } from "zod";
-const adminSchema = new Schema<TUser, UserModel>(
+const userSchema = new Schema<TUser, UserModel>(
   {
     userName: {
       type: String,
@@ -69,7 +68,7 @@ const adminSchema = new Schema<TUser, UserModel>(
   }
 );
 
-adminSchema.pre("save", async function (next) {
+userSchema.pre("save", async function (next) {
   const user = this;
   user.password = await bcrypt.hash(
     user.password,
@@ -79,37 +78,37 @@ adminSchema.pre("save", async function (next) {
 });
 
 // set '' after saving password
-adminSchema.post("save", function (doc, next) {
+userSchema.post("save", function (doc, next) {
   doc.password = "";
   next();
 });
 // filter out deleted documents
-adminSchema.pre("find", function (next) {
+userSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-adminSchema.pre("findOne", function (next) {
+userSchema.pre("findOne", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-adminSchema.pre("aggregate", function (next) {
+userSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
 
-adminSchema.statics.isUserExist = async function (email: string) {
+userSchema.statics.isUserExist = async function (email: string) {
   return await User.findOne({ email: email }).select("+password");
 };
-adminSchema.statics.IsUserExistbyId = async function (id: string) {
+userSchema.statics.IsUserExistbyId = async function (id: string) {
   return await User.findById(id).select("+password");
 };
-adminSchema.statics.isPasswordMatched = async function (
+userSchema.statics.isPasswordMatched = async function (
   plainTextPassword,
   hashedPassword
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
-export const User = model<TUser, UserModel>("User", adminSchema);
+export const User = model<TUser, UserModel>("User", userSchema);

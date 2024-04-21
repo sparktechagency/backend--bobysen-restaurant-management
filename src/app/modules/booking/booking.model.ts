@@ -25,6 +25,10 @@ const bookingSchema = new Schema<TBooking>(
       type: String,
       required: [true, "time is required"],
     },
+    status: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

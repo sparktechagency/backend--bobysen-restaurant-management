@@ -104,6 +104,9 @@ const RestaurantSchema = new Schema<TRestaurant>(
         required: [true, "closing time for Saturday is required"],
       },
     },
+    totalReviews: {
+      type: Number,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

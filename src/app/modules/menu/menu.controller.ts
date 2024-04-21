@@ -1,7 +1,7 @@
 import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
 import { storeFile } from "../../utils/fileHelper";
-import { menuServices } from "./menu.service";
+import { menuServices, reviewServices } from "./menu.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
@@ -60,6 +60,26 @@ const deleteMenu = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+// ------------------------- review part-------------------------------
+const insertReviewIntoDb = catchAsync(async (req: Request, res: Response) => {
+  req.body.user = req?.user?.userId;
+  const result = await reviewServices.insertReviewIntoDb(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Thank you for your valuable feedback",
+    data: result,
+  });
+});
+const getAllReviews = catchAsync(async (req: Request, res: Response) => {
+  const result = await reviewServices.getAllReviews(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "reviews retrived successfully",
+    data: result,
+  });
+});
 
 export const menuControllers = {
   insertMenuIntoDb,
@@ -67,4 +87,9 @@ export const menuControllers = {
   getsingleMenu,
   updateMenu,
   deleteMenu,
+};
+
+export const reviewControllers = {
+  insertReviewIntoDb,
+  getAllReviews,
 };

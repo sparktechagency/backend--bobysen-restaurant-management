@@ -11,6 +11,10 @@ const tableSchema = new Schema<Ttable, TableModel>(
       type: String,
       default: "",
     },
+    seats: {
+      type: String,
+      required: [true, "total seat is required"],
+    },
     restaurant: {
       type: Schema.Types.ObjectId,
       ref: "Restaurant",

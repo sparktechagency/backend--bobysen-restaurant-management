@@ -1,7 +1,7 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
 import { USER_ROLE } from "../user/user.constant";
-import { menuControllers } from "./menu.controller";
+import { menuControllers, reviewControllers } from "./menu.controller";
 import fileUpload from "../../middleware/fileUpload";
 import parseData from "../../middleware/parseData";
 const upload = fileUpload("./public/uploads/menu");
@@ -32,5 +32,15 @@ router.patch(
   menuControllers.updateMenu
 );
 router.delete("/:id", auth(USER_ROLE.vendor), menuControllers.deleteMenu);
+router.post(
+  "/review",
+  auth(USER_ROLE.user),
+  reviewControllers.insertReviewIntoDb
+);
+router.post(
+  "/review/:id",
+  auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
+  reviewControllers.getAllReviews
+);
 
 export const menuRoutes = router;

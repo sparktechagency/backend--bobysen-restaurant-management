@@ -3,6 +3,7 @@ import { FilterQuery, Query } from "mongoose";
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
   public query: Record<string, unknown>;
+  private exclusions: string[] = [];
 
   constructor(modelQuery: Query<T[], T>, query: Record<string, unknown>) {
     this.modelQuery = modelQuery;
@@ -59,10 +60,30 @@ class QueryBuilder<T> {
   fields() {
     const fields =
       (this?.query?.fields as string)?.split(",")?.join(" ") || "-__v";
-
     this.modelQuery = this.modelQuery.select(fields);
     return this;
   }
+
+  exclude(fieldString: string) {
+    this.exclusions.push(
+      ...fieldString
+        .split(",")
+        .map((f) => f.trim())
+        .filter((f) => f)
+    );
+    return this;
+  }
+
+  applyExclusions() {
+    if (this.exclusions.length > 0) {
+      const exclusionString = this.exclusions
+        .map((field) => `-${field}`)
+        .join(" ");
+      this.modelQuery = this.modelQuery.select(exclusionString);
+    }
+    return this;
+  }
+
   async countTotal() {
     const totalQueries = this.modelQuery.getFilter();
     const total = await this.modelQuery.model.countDocuments(totalQueries);

@@ -1,7 +1,11 @@
+import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { deleteFile } from "../../utils/fileHelper";
-import { TMenu } from "./menu.inteface";
-import { Menu } from "./menu.model";
+import { TMenu, TReview } from "./menu.inteface";
+import { Menu, Review } from "./menu.model";
+import AppError from "../../error/AppError";
+import httpStatus from "http-status";
+import { Restaurant } from "../restaurant/restaurant.model";
 
 const insertMenuIntoDb = async (payload: TMenu): Promise<TMenu> => {
   const result = await Menu.create(payload);
@@ -49,10 +53,54 @@ const deleteMenu = async (id: string) => {
   );
   return result;
 };
+
+// get Reivew
+
+const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const result = await Review.create([payload], { session });
+    if (!result[0]) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "something went wrong. please try again"
+      );
+    }
+    await Restaurant.findByIdAndUpdate(
+      result[0]?.restaurant,
+      {
+        $inc: {
+          totalReviews: 1,
+        },
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
+    await session.endSession();
+    return result[0];
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+
+const getAllReviews = async (itemId: string) => {
+  const result = Review.find({ item: itemId }).populate("user");
+  return result;
+};
+
 export const menuServices = {
   insertMenuIntoDb,
   getAllMenu,
   getSingleMenu,
   updateMenu,
   deleteMenu,
+};
+
+export const reviewServices = {
+  insertReviewIntoDb,
+  getAllReviews,
 };

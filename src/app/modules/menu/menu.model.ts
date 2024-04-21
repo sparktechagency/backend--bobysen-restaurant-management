@@ -1,6 +1,26 @@
 import { Query, Schema, model } from "mongoose";
-import { MenuModel, TMenu } from "./menu.inteface";
+import { MenuModel, TMenu, TReview } from "./menu.inteface";
+const reviewSchema = new Schema<TReview>({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "user is required"],
+  },
+  menu: {
+    type: Schema.Types.ObjectId,
+    ref: "Item",
+    required: [true, "item is required"],
+  },
+  rating: {
+    type: String,
+    required: [true, "stars is required"],
+  },
 
+  comment: {
+    type: String,
+    required: [true, "comment is required"],
+  },
+});
 const menuSchema = new Schema<TMenu, MenuModel>(
   {
     category: {
@@ -33,6 +53,7 @@ const menuSchema = new Schema<TMenu, MenuModel>(
       type: Boolean,
       default: true,
     },
+
     isDeleted: {
       type: Boolean,
       default: false,
@@ -55,3 +76,4 @@ menuSchema.pre("aggregate", function (next) {
   next();
 });
 export const Menu = model<TMenu, MenuModel>("Menu", menuSchema);
+export const Review = model<TReview>("Review", reviewSchema);

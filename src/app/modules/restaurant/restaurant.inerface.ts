@@ -13,6 +13,7 @@ export interface TRestaurant {
   images?: string[];
   reviewStatus: boolean;
   description: string;
+  totalReviews?: string;
   close?: {
     from: Date;
     to: Date;
