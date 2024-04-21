@@ -6,7 +6,7 @@ const router = Router();
 router.post(
   "/",
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
-  bookingControllers.searchTableForBook
+  bookingControllers.bookAtable
 );
 router.get(
   "/",
