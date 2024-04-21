@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-export interface Tsearch {
+export interface TBook {
   restaurant: ObjectId;
   date: Date;
   time: string;

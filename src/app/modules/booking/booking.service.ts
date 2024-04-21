@@ -8,7 +8,7 @@ import { Types } from "mongoose";
 import notFound from "../../middleware/notfound";
 
 // search booking
-const searchTableForbook = async (payload: TBook) => {
+const bookAtable = async (payload: TBook) => {
   if (Number(payload?.seats) > 10) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
@@ -76,7 +76,7 @@ const getSingleBooking = async (id: string) => {
 };
 
 export const bookingServies = {
-  searchTableForbook,
+  bookAtable,
   getAllBookings,
   getSingleBooking,
 };
