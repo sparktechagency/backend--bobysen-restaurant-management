@@ -138,4 +138,5 @@ export const bookingServies = {
   getAllBookings,
   getAllBookingByOwner,
   getSingleBooking,
+  updateBooking,
 };
