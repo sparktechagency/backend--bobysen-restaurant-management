@@ -4,7 +4,8 @@ export interface TUser {
   id: string;
   email: string;
   password: string;
-  userName: string;
+  phoneNumber: string;
+  userName?: string;
   fullName: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;

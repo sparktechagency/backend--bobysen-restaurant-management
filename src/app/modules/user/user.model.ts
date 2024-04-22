@@ -3,12 +3,13 @@ import { TUser, UserModel } from "./user.interface";
 import { UserStatus } from "./user.constant";
 import config from "../../config";
 import bcrypt from "bcrypt";
+import { string } from "zod";
 const userSchema = new Schema<TUser, UserModel>(
   {
-    userName: {
-      type: String,
-      required: [true, "userName is required"],
-    },
+    // userName: {
+    //   type: String,
+    //   required: [true, "userName is required"],
+    // },
     fullName: {
       type: String,
       required: [true, "fullName is required"],
@@ -46,6 +47,10 @@ const userSchema = new Schema<TUser, UserModel>(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    phoneNumber: {
+      type: String,
+      required: [true, "phoneNumber is required"],
     },
     verification: {
       otp: {
