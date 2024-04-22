@@ -26,8 +26,9 @@ const bookingSchema = new Schema<TBooking>(
       required: [true, "time is required"],
     },
     status: {
-      type: Boolean,
-      default: false,
+      type: String,
+      enum: ["active", "cancelled"],
+      default: "active",
     },
   },
   {

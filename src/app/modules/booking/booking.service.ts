@@ -4,8 +4,9 @@ import AppError from "../../error/AppError";
 import { Table } from "../table/table.model";
 import { TBook } from "./booking.interface";
 import { Booking } from "./booking.model";
-import { Types } from "mongoose";
+import { Schema, Types } from "mongoose";
 import notFound from "../../middleware/notfound";
+import { generateBookingNumber } from "./booking.utils";
 
 // search booking
 const bookAtable = async (payload: TBook) => {
@@ -21,8 +22,7 @@ const bookAtable = async (payload: TBook) => {
   }).countDocuments();
   // retrive book tables
   const bookedTables = await Booking.find({
-    date: payload.date,
-    status: true,
+    date: payload?.date,
   }).countDocuments();
   // conditionally check avilable tables
   if (bookedTables >= totalTables) {
@@ -49,7 +49,13 @@ const bookAtable = async (payload: TBook) => {
       "We couldn't find any tables with the required number of seats. You can increase the number of seat, or  Please contact with  the restaurant owner"
     );
   }
-  return findTable[0];
+  const data = {
+    ...payload,
+    table: findTable[0]?._id,
+    id: generateBookingNumber(),
+  };
+  const result = await Booking.create(data);
+  return result;
 };
 
 // const bookTable = async (payload: TBook) => {
@@ -70,6 +76,44 @@ const getAllBookings = async (query: Record<string, any>) => {
     meta,
   };
 };
+const getAllBookingByOwner = async (query: Record<string, any>) => {
+  const pipeline = [];
+
+  pipeline.push(
+    {
+      $lookup: {
+        from: "tables",
+        localField: "table",
+        foreignField: "_id",
+        as: "table",
+      },
+    },
+    {
+      $unwind: "$table",
+    },
+    {
+      $lookup: {
+        from: "restaurants",
+        localField: "restaurant",
+        foreignField: "tables.restaurant",
+        as: "restaurant",
+      },
+    },
+    {
+      $unwind: "$restaurant",
+    },
+    {
+      $match: {
+        "restaurant.owner": new Schema.Types.ObjectId(
+          "661e58dd2ed150bdebb8fa84"
+        ),
+      },
+    }
+  );
+
+  const result = await Booking.aggregate(pipeline);
+  return result;
+};
 const getSingleBooking = async (id: string) => {
   const result = await Booking.findById(id);
   return result;
@@ -78,5 +122,6 @@ const getSingleBooking = async (id: string) => {
 export const bookingServies = {
   bookAtable,
   getAllBookings,
+  getAllBookingByOwner,
   getSingleBooking,
 };

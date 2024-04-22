@@ -23,6 +23,15 @@ const getAllBooking = catchAsync(async (req: Request, res: Response) => {
     meta: result?.meta,
   });
 });
+const getAllBookingByOwner = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServies.getAllBookingByOwner(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "booking retrived successfully",
+    data: result,
+  });
+});
 const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
   const result = await bookingServies.getSingleBooking(req.params.id);
   sendResponse(res, {
@@ -36,5 +45,6 @@ const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
 export const bookingControllers = {
   bookAtable,
   getAllBooking,
+  getAllBookingByOwner,
   getSingleBooking,
 };

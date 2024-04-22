@@ -6,11 +6,12 @@ export interface TBook {
   user: ObjectId;
   seats: string | number;
 }
+
 export interface TBooking {
   user: ObjectId;
   id: string | number;
   table: ObjectId;
   date: Date;
   time: string;
-  status: boolean;
+  status: "active" | "cancelled";
 }

@@ -14,6 +14,11 @@ router.get(
   bookingControllers.getAllBooking
 );
 router.get(
+  "/owner",
+  auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
+  bookingControllers.getAllBookingByOwner
+);
+router.get(
   "/:id",
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
   bookingControllers.getSingleBooking
