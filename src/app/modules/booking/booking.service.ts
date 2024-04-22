@@ -78,38 +78,19 @@ const getAllBookings = async (query: Record<string, any>) => {
 };
 const getAllBookingByOwner = async (query: Record<string, any>) => {
   const pipeline = [];
+  const user = new mongoose.Types.ObjectId(query.user);
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: "tables",
-        localField: "table",
-        foreignField: "_id",
-        as: "table",
-      },
+  pipeline.push({
+    $lookup: {
+      from: "tables",
+      let: { user: user },
+      pipeline: [
+        {
+          $match,
+        },
+      ],
     },
-    {
-      $unwind: "$table",
-    },
-    {
-      $lookup: {
-        from: "restaurants",
-        localField: "restaurant",
-        foreignField: "tables.restaurant",
-        as: "restaurant",
-      },
-    },
-    {
-      $unwind: "$restaurant",
-    },
-    {
-      $match: {
-        "restaurant.owner": new mongoose.Types.ObjectId(
-          "661e58dd2ed150bdebb8fa84"
-        ),
-      },
-    }
-  );
+  });
 
   const result = await Booking.aggregate(pipeline);
   return result;
