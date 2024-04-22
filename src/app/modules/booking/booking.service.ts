@@ -4,7 +4,7 @@ import AppError from "../../error/AppError";
 import { Table } from "../table/table.model";
 import { TBook } from "./booking.interface";
 import { Booking } from "./booking.model";
-import { Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import notFound from "../../middleware/notfound";
 import { generateBookingNumber } from "./booking.utils";
 
@@ -104,7 +104,7 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
     },
     {
       $match: {
-        "restaurant.owner": new Schema.Types.ObjectId(
+        "restaurant.owner": new mongoose.Types.ObjectId(
           "661e58dd2ed150bdebb8fa84"
         ),
       },
