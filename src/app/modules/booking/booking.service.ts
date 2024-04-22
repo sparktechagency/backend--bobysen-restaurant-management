@@ -20,9 +20,11 @@ const bookAtable = async (payload: TBook) => {
   const totalTables = await Table.find({
     restaurant: payload.restaurant,
   }).countDocuments();
+
   // retrive book tables
   const bookedTables = await Booking.find({
     date: payload?.date,
+    restaurant: payload?.restaurant,
   }).countDocuments();
   // conditionally check avilable tables
   if (bookedTables >= totalTables) {
@@ -52,6 +54,7 @@ const bookAtable = async (payload: TBook) => {
   const data = {
     ...payload,
     table: findTable[0]?._id,
+    restaurant: payload?.restaurant,
     id: generateBookingNumber(),
   };
   const result = await Booking.create(data);
@@ -77,46 +80,56 @@ const getAllBookings = async (query: Record<string, any>) => {
   };
 };
 const getAllBookingByOwner = async (query: Record<string, any>) => {
-  const pipeline = [];
-  const ownerId = new mongoose.Types.ObjectId("661e58dd2ed150bdebb8fa84");
-
-  pipeline.push({
-    $lookup: {
-      from: "tables",
-      let: { ownerId: ownerId },
-      pipeline: [
-        {
-          $lookup: {
-            from: "restaurants",
-            localField: "restaurant",
-            foreignField: "_id",
-            as: "restaurant",
-          },
-        },
-        {
-          $unwind: "$restaurant",
-        },
-        {
-          $project: {
-            name: 1,
-            owner: 1,
-          },
-        },
-        {
-          $match: {
-            $expr: { $eq: ["$$ownerId", "$restaurant.owner"] },
-          },
-        },
-      ],
-      as: "tables",
+  const searchAbleFields = ["fullName", "id"];
+  const pipeline: any[] = [
+    {
+      $lookup: {
+        from: "restaurants",
+        localField: "restaurant",
+        foreignField: "_id",
+        as: "restaurant",
+      },
     },
+    {
+      $unwind: "$restaurant",
+    },
+    {
+      $match: {
+        "restaurant.owner": new mongoose.Types.ObjectId(query?.owner),
+      },
+    },
+  ];
+  Object.keys(query).forEach((key) => {
+    if (key !== "searchTerm" && key !== "owner") {
+      console.log(key);
+      const matchStage: Record<string, any> = {};
+      matchStage[key] = query[key];
+      console.log(query);
+      pipeline.push({ $match: matchStage });
+    }
   });
+  // searchterm
+  if (query?.searchTerm) {
+    const searchRegex = new RegExp(query.searchTerm, "i");
+    const searchMatchStage = {
+      $or: searchAbleFields.map((field) => ({
+        [field]: { $regex: searchRegex },
+      })),
+    };
+
+    pipeline.push({ $match: searchMatchStage });
+  }
 
   const result = await Booking.aggregate(pipeline);
   return result;
 };
 const getSingleBooking = async (id: string) => {
   const result = await Booking.findById(id);
+  return result;
+};
+
+const updateBooking = async (id: string, payload: Record<string, any>) => {
+  const result = await Booking.findByIdAndUpdate(id, payload, { new: true });
   return result;
 };
 

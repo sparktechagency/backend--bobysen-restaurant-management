@@ -12,6 +12,11 @@ const bookingSchema = new Schema<TBooking>(
       type: String,
       required: [true, "id is required"],
     },
+    restaurant: {
+      type: Schema.Types.ObjectId,
+      ref: "Restaurant",
+      required: [true, "table id is required"],
+    },
     table: {
       type: Schema.Types.ObjectId,
       ref: "Table",

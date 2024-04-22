@@ -63,6 +63,7 @@ const verifyOtp = async (token: string, otp: string | number) => {
 
 const resendOtp = async (email: string) => {
   const user = await User.findOne({ email });
+
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, "user not found");
   }

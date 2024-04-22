@@ -11,6 +11,7 @@ export interface TBooking {
   user: ObjectId;
   id: string | number;
   table: ObjectId;
+  restaurant: ObjectId;
   date: Date;
   time: string;
   status: "active" | "cancelled";
