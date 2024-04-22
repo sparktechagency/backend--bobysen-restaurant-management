@@ -11,6 +11,7 @@ import { sendEmail } from "../../utils/mailSender";
 const insertUserIntoDb = async (
   payload: Partial<TUser>
 ): Promise<{ user: TUser; token: string }> => {
+  console.log(payload);
   const user = await User.isUserExist(payload.email as string);
   if (user) {
     throw new AppError(
