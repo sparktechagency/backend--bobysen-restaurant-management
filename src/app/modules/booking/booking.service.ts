@@ -78,17 +78,37 @@ const getAllBookings = async (query: Record<string, any>) => {
 };
 const getAllBookingByOwner = async (query: Record<string, any>) => {
   const pipeline = [];
-  const user = new mongoose.Types.ObjectId(query.user);
+  const ownerId = new mongoose.Types.ObjectId("661e58dd2ed150bdebb8fa84");
 
   pipeline.push({
     $lookup: {
       from: "tables",
-      let: { user: user },
+      let: { ownerId: ownerId },
       pipeline: [
         {
-          $match,
+          $lookup: {
+            from: "restaurants",
+            localField: "restaurant",
+            foreignField: "_id",
+            as: "restaurant",
+          },
+        },
+        {
+          $unwind: "$restaurant",
+        },
+        {
+          $project: {
+            name: 1,
+            owner: 1,
+          },
+        },
+        {
+          $match: {
+            $expr: { $eq: ["$$ownerId", "$restaurant.owner"] },
+          },
         },
       ],
+      as: "tables",
     },
   });
 

@@ -18,13 +18,15 @@ const insertUserIntoDb = async (
       "user already exist with this email"
     );
   }
+  const otp = generateOtp();
+  const expiresAt = moment().add(1, "minute");
   const formatedData = {
     ...payload,
     role: "user",
     status: "pending",
     verification: {
-      otp: generateOtp(),
-      expiresAt: moment().add(1, "minute"),
+      otp,
+      expiresAt,
     },
   };
 
@@ -36,6 +38,13 @@ const insertUserIntoDb = async (
   const token = jwt.sign(jwtPayload, config.jwt_access_secret as Secret, {
     expiresIn: "1m",
   });
+  await sendEmail(
+    payload?.email!,
+    "Your Otp Is",
+    `<div><h5>your otp is: ${otp}</h5>
+    <p>valid for:${expiresAt.toLocaleString()}</p>
+    </div>`
+  );
   return {
     user: result,
     token: token,
