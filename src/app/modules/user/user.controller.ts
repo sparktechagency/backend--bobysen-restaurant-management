@@ -4,9 +4,9 @@ import { userServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 import { storeFile } from "../../utils/fileHelper";
 const insertuserIntoDb = catchAsync(async (req: Request, res: Response) => {
-  if (req?.file) {
-    req.body.image = storeFile("profile", req?.file?.filename);
-  }
+  // if (req?.file) {
+  //   req.body.image = storeFile("profile", req?.file?.filename);
+  // }
   const result = await userServices.insertUserIntoDb(req.body);
   sendResponse(res, {
     statusCode: 200,

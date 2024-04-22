@@ -8,8 +8,8 @@ const upload = fileUpload("./public/uploads/profile/");
 const router = Router();
 router.post(
   "/create-user",
-  upload.single("file"),
-  parseData(),
+  // upload.single("file"),
+  // parseData(),
   userControllers.insertuserIntoDb
 );
 router.post(
