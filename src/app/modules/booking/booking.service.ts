@@ -94,8 +94,44 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
       $unwind: "$restaurant",
     },
     {
+      $lookup: {
+        from: "tables",
+        localField: "table",
+        foreignField: "_id",
+        as: "table",
+      },
+    },
+    {
+      $unwind: "$table",
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+    {
       $match: {
         "restaurant.owner": new mongoose.Types.ObjectId(query?.owner),
+      },
+    },
+    {
+      $project: {
+        userName: "$user.fullName",
+        email: "$user.email",
+        status: "$status",
+        date: "$date",
+        time: "$time",
+        tableId: "$table._id",
+        tableName: "$table.tableName",
+        tableNo: "$table.tableNo",
+        seats: "$table.seats",
+        restaurantName: "$restaurant.name",
       },
     },
   ];
@@ -116,10 +152,10 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
         [field]: { $regex: searchRegex },
       })),
     };
-
     pipeline.push({ $match: searchMatchStage });
   }
-
+  // project
+  pipeline.push();
   const result = await Booking.aggregate(pipeline);
   return result;
 };
@@ -133,10 +169,16 @@ const updateBooking = async (id: string, payload: Record<string, any>) => {
   return result;
 };
 
+const deletebooking = async (id: string) => {
+  const result = await Booking.findByIdAndDelete(id);
+  return result;
+};
+
 export const bookingServies = {
   bookAtable,
   getAllBookings,
   getAllBookingByOwner,
   getSingleBooking,
   updateBooking,
+  deletebooking,
 };

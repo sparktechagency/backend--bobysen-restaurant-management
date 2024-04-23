@@ -50,6 +50,15 @@ const updatebooking = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const deleteBooking = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServies.deletebooking(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "booking deleted successfully",
+    data: result,
+  });
+});
 
 export const bookingControllers = {
   bookAtable,
@@ -57,4 +66,5 @@ export const bookingControllers = {
   getAllBookingByOwner,
   getSingleBooking,
   updatebooking,
+  deleteBooking,
 };

@@ -19,8 +19,30 @@ router.post(
   userControllers.insertVendorIntoDb
 );
 router.get("/", auth(USER_ROLE.user), userControllers.getme);
+router.get(
+  "/all",
+  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  userControllers.getAllUsers
+);
+router.get(
+  "/all",
+  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  userControllers.getAllUsers
+);
+router.get(
+  "/:id",
+  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  userControllers.getsingleUser
+);
+router.get(
+  "/update/:id",
+  auth(USER_ROLE.user),
+  upload.single("file"),
+  parseData(),
+  userControllers.updateUser
+);
 router.patch(
-  "/",
+  "/:id",
   auth(USER_ROLE.user),
   upload.single("file"),
   parseData(),

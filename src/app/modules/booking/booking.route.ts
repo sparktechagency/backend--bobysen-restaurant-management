@@ -28,4 +28,9 @@ router.patch(
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
   bookingControllers.updatebooking
 );
+router.delete(
+  "/:id",
+  auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
+  bookingControllers.updatebooking
+);
 export const bookingRoutes = router;
