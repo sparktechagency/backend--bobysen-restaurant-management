@@ -19,9 +19,14 @@ router.get(
   auth(USER_ROLE.user),
   favoriteListControllers.getAllDataFromFavoriteList
 );
-router.get(
-  "/:id",
+router.patch(
+  "/menu/:id",
   auth(USER_ROLE.user),
-  favoriteListControllers.removedataFromFavoriteList
+  favoriteListControllers.removeMenuFromFavoriteList
+);
+router.patch(
+  "/restaurant/:id",
+  auth(USER_ROLE.user),
+  favoriteListControllers.removeRestaurantFromList
 );
 export const favoriteLisRoutes = router;

@@ -1,15 +1,19 @@
+import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { FavoriteList } from "./favoriteList.model";
 
 const insertMenuIntoFavouriteList = async (payload: {
   id: string;
-  userId: string;
+  user: string;
 }) => {
-  const result = await FavoriteList.findByIdAndUpdate(
-    { user: payload?.userId },
+  const result = await FavoriteList.findOneAndUpdate(
+    { user: payload?.user },
     {
       $addToSet: {
         menu: payload?.id,
+      },
+      $set: {
+        user: payload?.user,
       },
     },
     {
@@ -21,13 +25,16 @@ const insertMenuIntoFavouriteList = async (payload: {
 };
 const insertRestaurantIntoDb = async (payload: {
   id: string;
-  userId: string;
+  user: string;
 }) => {
-  const result = await FavoriteList.findByIdAndUpdate(
-    { user: payload?.userId },
+  const result = await FavoriteList.findOneAndUpdate(
+    { user: payload?.user },
     {
       $addToSet: {
         restaurants: payload?.id,
+      },
+      $set: {
+        user: payload?.user,
       },
     },
     {
@@ -38,29 +45,40 @@ const insertRestaurantIntoDb = async (payload: {
   return result;
 };
 
-const removeFromFavoriteList = async (id: string, payload: any) => {
-  const update: any = {};
-  if (payload?.menu) {
-    update["menu"] = { $pull: payload?.menu };
-  } else if (payload?.restaurant) {
-    update["restaurant"] = { $pull: payload?.restaurant };
-  }
-  const result = await FavoriteList.findByIdAndUpdate(id, update, {
-    new: true,
-  });
+const removeMenuFromFavoriteList = async (id: string, menu: string) => {
+  const result = await FavoriteList.findByIdAndUpdate(
+    id,
+    {
+      $pull: {
+        menu: menu,
+      },
+    },
+    { new: true }
+  );
   return result;
 };
-
+const removeRestaurantFromList = async (id: string, restaurant: string) => {
+  const result = await FavoriteList.findByIdAndUpdate(
+    id,
+    {
+      $pull: {
+        restaurants: restaurant,
+      },
+    },
+    { new: true }
+  );
+  return result;
+};
 const getAllDataFromFavoriteList = async (query: Record<string, any>) => {
   const FavoriteModel = new QueryBuilder(
-    FavoriteList.find().populate("menu restaurants"),
+    FavoriteList.find().populate(query?.fields?.split(",").join(" ")),
     query
   )
     .search([])
     .filter()
     .paginate()
-    .sort()
-    .fields();
+    .fields()
+    .sort();
   const data = await FavoriteModel.modelQuery;
   const meta = await FavoriteModel.countTotal();
   return {
@@ -73,5 +91,6 @@ export const favoriteListServices = {
   insertMenuIntoFavouriteList,
   insertRestaurantIntoDb,
   getAllDataFromFavoriteList,
-  removeFromFavoriteList,
+  removeMenuFromFavoriteList,
+  removeRestaurantFromList,
 };

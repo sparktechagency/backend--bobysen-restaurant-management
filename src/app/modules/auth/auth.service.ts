@@ -119,7 +119,7 @@ const forgotPassword = async (email: string) => {
     </div>`
   );
   // send the mail here
-  return { token };
+  return { email, token };
 };
 
 const resetPassword = async (token: string, payload: TresetPassword) => {

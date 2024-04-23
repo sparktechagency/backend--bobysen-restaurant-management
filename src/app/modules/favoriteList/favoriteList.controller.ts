@@ -6,6 +6,7 @@ import sendResponse from "../../utils/sendResponse";
 
 const insertMenuintoFavriteList = catchAsync(
   async (req: Request, res: Response) => {
+    console.log(req.user);
     req.body.user = req?.user?.userId;
     const result = await favoriteListServices.insertMenuIntoFavouriteList(
       req.body
@@ -40,15 +41,16 @@ const getAllDataFromFavoriteList = catchAsync(
       statusCode: httpStatus.OK,
       success: true,
       message: "restaurant added into favourite list",
-      data: result,
+      data: result?.data,
+      meta: result?.meta,
     });
   }
 );
-const removedataFromFavoriteList = catchAsync(
+const removeMenuFromFavoriteList = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await favoriteListServices.removeFromFavoriteList(
+    const result = await favoriteListServices.removeMenuFromFavoriteList(
       req.params.id,
-      req.body
+      req.body.id
     );
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -58,10 +60,25 @@ const removedataFromFavoriteList = catchAsync(
     });
   }
 );
+const removeRestaurantFromList = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await favoriteListServices.removeRestaurantFromList(
+      req.params.id,
+      req.body.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "restaurant removed from favorite list",
+      data: result,
+    });
+  }
+);
 
 export const favoriteListControllers = {
   insertMenuintoFavriteList,
   insertRestaurantIntoFavoriteList,
   getAllDataFromFavoriteList,
-  removedataFromFavoriteList,
+  removeMenuFromFavoriteList,
+  removeRestaurantFromList,
 };
