@@ -14,7 +14,7 @@ export interface TMenu {
   description?: string;
   price: number;
   owner: ObjectId;
-  avilable: boolean;
+  available: boolean;
   isDeleted: boolean;
   reviews: number;
 }

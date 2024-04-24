@@ -3,8 +3,16 @@ import { Request, Response } from "express";
 import { authServices } from "./auth.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import config from "../../config";
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.login(req.body);
+  const { refreshToken } = result;
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+  });
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -43,10 +51,21 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
+const refreshToken = catchAsync(async (req, res) => {
+  const { refreshToken } = req.cookies;
+  console.log(refreshToken);
+  const result = await authServices.refreshToken(refreshToken);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Access token is retrieved successfully",
+    data: result,
+  });
+});
 export const authControllers = {
   login,
   changePassword,
   forgotPassword,
   resetPassword,
+  refreshToken,
 };

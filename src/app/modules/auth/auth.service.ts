@@ -5,7 +5,7 @@ import AppError from "../../error/AppError";
 import { User } from "../user/user.model";
 import { TchangePassword, Tlogin, TresetPassword } from "./auth.interface";
 import config from "../../config";
-import { createToken } from "./auth.utils";
+import { createToken, verifyToken } from "./auth.utils";
 import { generateOtp } from "../../utils/otpGenerator";
 import moment from "moment";
 import { sendEmail } from "../../utils/mailSender";
@@ -167,9 +167,48 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
   return result;
 };
 
+const refreshToken = async (token: string) => {
+  // checking if the given token is valid
+  console.log("hitted");
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
+  const { userId } = decoded;
+  console.log(decoded);
+  const user = await User.IsUserExistbyId(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "This user is not found !");
+  }
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !");
+  }
+  // checking if the user is blocked
+  const userStatus = user?.status;
+
+  if (userStatus === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked ! !");
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string
+  );
+
+  return {
+    accessToken,
+  };
+};
 export const authServices = {
   login,
   changePassword,
   forgotPassword,
   resetPassword,
+  refreshToken,
 };

@@ -49,7 +49,7 @@ const menuSchema = new Schema<TMenu, MenuModel>(
       type: Schema.Types.ObjectId,
       required: [true, "owner information  is required"],
     },
-    avilable: {
+    available: {
       type: Boolean,
       default: true,
     },
