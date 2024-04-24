@@ -18,7 +18,11 @@ router.post(
   parseData(),
   userControllers.insertVendorIntoDb
 );
-router.get("/", auth(USER_ROLE.user), userControllers.getme);
+router.get(
+  "/",
+  auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
+  userControllers.getme
+);
 router.get(
   "/all",
   auth(USER_ROLE.vendor, USER_ROLE.admin),
