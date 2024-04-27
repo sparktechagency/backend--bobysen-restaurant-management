@@ -39,6 +39,7 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
     req.body.image = storeFile("profile", req?.file?.filename);
   }
+  console.log(req.body);
   const result = await userServices.updateProfile(req.user.userId, req.body);
   sendResponse(res, {
     statusCode: 200,

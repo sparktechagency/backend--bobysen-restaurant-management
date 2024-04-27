@@ -52,10 +52,12 @@ const login = async (payload: Tlogin) => {
 // change password
 
 const changePassword = async (id: string, payload: TchangePassword) => {
+  console.log(payload);
   const user = await User.IsUserExistbyId(id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not found");
   }
+
   if (!(await User.isPasswordMatched(payload?.oldPassword, user.password))) {
     throw new AppError(httpStatus.FORBIDDEN, "old password do not match!");
   }
@@ -123,6 +125,7 @@ const forgotPassword = async (email: string) => {
 };
 
 const resetPassword = async (token: string, payload: TresetPassword) => {
+  console.log(token, payload);
   let decode;
   try {
     decode = jwt.verify(

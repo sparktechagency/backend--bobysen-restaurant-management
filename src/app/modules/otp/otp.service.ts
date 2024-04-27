@@ -8,6 +8,7 @@ import moment from "moment";
 import { sendEmail } from "../../utils/mailSender";
 
 const verifyOtp = async (token: string, otp: string | number) => {
+  console.log(otp, "otp");
   if (!token) {
     throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized!");
   }
@@ -62,6 +63,7 @@ const verifyOtp = async (token: string, otp: string | number) => {
 };
 
 const resendOtp = async (email: string) => {
+  console.log(email);
   const user = await User.findOne({ email });
 
   if (!user) {

@@ -5,7 +5,7 @@ import sendResponse from "../../utils/sendResponse";
 import { Request, Response } from "express";
 const verifyOtp = catchAsync(async (req: Request, res: Response) => {
   const token = req?.headers?.token;
-  console.log(req?.headers);
+
   const result = await otpServices.verifyOtp(token as string, req.body.otp);
   sendResponse(res, {
     statusCode: httpStatus.OK,

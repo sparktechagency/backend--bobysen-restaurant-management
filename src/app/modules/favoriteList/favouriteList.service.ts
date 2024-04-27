@@ -86,7 +86,6 @@ const getAllDataFromFavoriteList = async (query: Record<string, any>) => {
     meta,
   };
 };
-
 export const favoriteListServices = {
   insertMenuIntoFavouriteList,
   insertRestaurantIntoDb,

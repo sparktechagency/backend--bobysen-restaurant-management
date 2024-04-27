@@ -18,6 +18,13 @@ router.post(
   parseData(),
   userControllers.insertVendorIntoDb
 );
+router.patch(
+  "/",
+  auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
+  upload.single("file"),
+  parseData(),
+  userControllers.updateProfile
+);
 router.get(
   "/",
   auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),

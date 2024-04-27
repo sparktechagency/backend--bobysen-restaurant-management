@@ -32,7 +32,8 @@ const getAllRestaurants = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "restaurants retrived successfully",
-    data: result,
+    data: result?.data,
+    meta: result?.meta,
   });
   return result;
 });

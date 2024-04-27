@@ -4,7 +4,7 @@ class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
   public query: Record<string, unknown>;
   private exclusions: string[] = [];
-
+  private populatedFields: string | null = null;
   constructor(modelQuery: Query<T[], T>, query: Record<string, unknown>) {
     this.modelQuery = modelQuery;
     this.query = query;
@@ -80,6 +80,17 @@ class QueryBuilder<T> {
         .map((field) => `-${field}`)
         .join(" ");
       this.modelQuery = this.modelQuery.select(exclusionString);
+    }
+    return this;
+  }
+  populateFields(fields: string) {
+    this.populatedFields = fields;
+    return this;
+  }
+
+  async executePopulate() {
+    if (this.populatedFields) {
+      this.modelQuery.populate(this.populatedFields);
     }
     return this;
   }
