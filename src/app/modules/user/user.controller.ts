@@ -63,7 +63,7 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "user retrived successfully",
+    message: "User retrived successfully",
     data: result,
   });
 });
@@ -75,7 +75,20 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "user retrived successfully",
+    message: "User retrived successfully",
+    data: result,
+  });
+});
+const deleteAccount = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.body, "DD");
+  const result = await userServices.deleteAccount(
+    req?.user?.userId,
+    req?.body?.password
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User deleted successfully",
     data: result,
   });
 });
@@ -88,4 +101,5 @@ export const userControllers = {
   getAllUsers,
   getsingleUser,
   updateUser,
+  deleteAccount,
 };

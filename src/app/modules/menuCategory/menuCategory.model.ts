@@ -10,7 +10,7 @@ const MenuCategorySchema = new Schema<TMenuCategory>(
     },
     image: {
       type: String,
-      required: [true, "image is required"],
+      // required: [true, "image is required"],
     },
     title: {
       type: String,

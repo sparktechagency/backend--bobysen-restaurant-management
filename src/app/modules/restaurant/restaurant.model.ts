@@ -19,6 +19,11 @@ const RestaurantSchema = new Schema<TRestaurant>(
       ref: "User",
       required: [true, "owner id is required"],
     },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
     images: [
       {
         url: {
@@ -32,7 +37,7 @@ const RestaurantSchema = new Schema<TRestaurant>(
     },
     reviewStatus: {
       type: Boolean,
-      required: [true, "review status is required"],
+      default: true,
     },
     sunday: {
       openingTime: {
@@ -104,8 +109,9 @@ const RestaurantSchema = new Schema<TRestaurant>(
         required: [true, "closing time for Saturday is required"],
       },
     },
-    totalReviews: {
+    avgReviews: {
       type: Number,
+      default: 0,
     },
     isDeleted: {
       type: Boolean,

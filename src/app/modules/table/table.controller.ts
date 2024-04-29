@@ -36,9 +36,31 @@ const getSingleTable = catchAsync(async (req: Request, res: Response) => {
   });
   return result;
 });
+const updateTable = catchAsync(async (req: Request, res: Response) => {
+  const result = await tableServices.updateTable(req.params.id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Table updated successfully",
+    data: result,
+  });
+  return result;
+});
+const getVendorAllTables = catchAsync(async (req: Request, res: Response) => {
+  const result = await tableServices.getAllTablesForVendor(req?.user?.userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Tables retrived successfully",
+    data: result,
+  });
+  return result;
+});
 
 export const tableControllers = {
   insertTableIntoDb,
   getAllTables,
   getSingleTable,
+  updateTable,
+  getVendorAllTables,
 };

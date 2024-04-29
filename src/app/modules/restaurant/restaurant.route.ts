@@ -14,19 +14,36 @@ router.post(
   restauranntControllers.insertRestaurantIntDb
 );
 router.get(
-  "/",
+  "/dashboard",
   auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
   restauranntControllers.getAllRestaurants
+);
+router.get(
+  "/",
+  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
+  restauranntControllers.getAllRestaurantsForUser
 );
 router.get(
   "/:id",
   auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
   restauranntControllers.getSingleRestaurant
 );
+router.patch(
+  "/:id",
+  upload.array("files"),
+  parseData(),
+  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  restauranntControllers.updateRestaurant
+);
 router.delete(
   "/:id",
   auth(USER_ROLE.vendor, USER_ROLE.admin),
   restauranntControllers.deleteRestaurant
+);
+router.patch(
+  "/files/delete",
+  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  restauranntControllers.deleteFiles
 );
 
 export const restaurantRoutes = router;

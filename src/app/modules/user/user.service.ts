@@ -9,6 +9,7 @@ import config from "../../config";
 import jwt, { Secret } from "jsonwebtoken";
 import { sendEmail } from "../../utils/mailSender";
 import QueryBuilder from "../../builder/QueryBuilder";
+import bcrypt from "bcrypt";
 const insertUserIntoDb = async (
   payload: Partial<TUser>
 ): Promise<{ user: TUser; token: string }> => {
@@ -146,6 +147,28 @@ const updateUser = async (
   return result;
 };
 
+const deleteAccount = async (id: string, password: string) => {
+  console.log(id);
+  const user = await User.IsUserExistbyId(id);
+  console.log(user);
+  const isPasswordMatched = await bcrypt.compare(password, user?.password);
+  if (!isPasswordMatched) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, "Password does not match!");
+  }
+  const result = await User.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        isDeleted: true,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
 export const userServices = {
   insertUserIntoDb,
   insertVendorIntoDb,
@@ -153,5 +176,6 @@ export const userServices = {
   updateProfile,
   getAllusers,
   updateUser,
-  getSingleUser
+  getSingleUser,
+  deleteAccount,
 };

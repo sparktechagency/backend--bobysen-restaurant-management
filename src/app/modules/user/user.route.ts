@@ -59,4 +59,9 @@ router.patch(
   parseData(),
   userControllers.updateProfile
 );
+router.delete(
+  "/",
+  auth(USER_ROLE.vendor, USER_ROLE.user),
+  userControllers.deleteAccount
+);
 export const userRoutes = router;

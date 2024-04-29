@@ -71,7 +71,7 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
       result[0]?.restaurant,
       {
         $inc: {
-          totalReviews: 1,
+          avgReviews: 1,
         },
       },
       { session }
