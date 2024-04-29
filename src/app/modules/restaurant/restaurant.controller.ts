@@ -101,10 +101,25 @@ const deleteFiles = catchAsync(async (req: Request, res: Response) => {
   });
   return result;
 });
+const getSingleRestaurantForOwner = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await restaurantServices.getSingleRestaurantForOwner(
+      req.params.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Restaurant retrived successfully",
+      data: result,
+    });
+    return result;
+  }
+);
 
 export const restauranntControllers = {
   insertRestaurantIntDb,
   getAllRestaurants,
+  getSingleRestaurantForOwner,
   getAllRestaurantsForUser,
   updateRestaurant,
   getSingleRestaurant,

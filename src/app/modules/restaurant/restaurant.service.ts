@@ -122,6 +122,10 @@ const getSingleRestaurant = async (id: string) => {
 
 // update restaurant here
 
+const getSingleRestaurantForOwner = async (id: string) => {
+  const result = await Restaurant.findById(id).populate("owner");
+  return result;
+};
 const deleteRestaurant = async (id: string) => {
   const result = await Restaurant.findByIdAndUpdate(
     id,
@@ -172,6 +176,7 @@ const deleteFiles = async (payload: any) => {
 export const restaurantServices = {
   insertRestaurantIntoDb,
   updateRestaurant,
+  getSingleRestaurantForOwner,
   getAllRestaurant,
   getAllRestaurantsForUser,
   getSingleRestaurant,

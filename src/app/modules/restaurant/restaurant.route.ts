@@ -24,6 +24,11 @@ router.get(
   restauranntControllers.getAllRestaurantsForUser
 );
 router.get(
+  "/owner/:id",
+  auth(USER_ROLE.vendor),
+  restauranntControllers.getSingleRestaurantForOwner
+);
+router.get(
   "/:id",
   auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
   restauranntControllers.getSingleRestaurant
