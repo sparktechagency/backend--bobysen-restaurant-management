@@ -6,15 +6,21 @@ const MenuCategorySchema = new Schema<TMenuCategory>(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
+
       default: "",
     },
     image: {
       type: String,
-      // required: [true, "image is required"],
+      required: [true, "image is required"],
     },
     title: {
       type: String,
       required: [true, "title is required"],
+    },
+    restaurant: {
+      type: Schema.Types.ObjectId,
+      ref: "Restaurant",
+      required: [true, "restaurant is required"],
     },
     isDeleted: {
       type: Boolean,

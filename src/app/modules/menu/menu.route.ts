@@ -14,13 +14,18 @@ router.post(
   menuControllers.insertMenuIntoDb
 );
 router.get(
+  "/owner",
+  auth(USER_ROLE.vendor),
+  menuControllers.getAllMenuForOwner
+);
+router.get(
   "/",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.admin),
+  auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
   menuControllers.getAllMenu
 );
 router.get(
   "/:id",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.admin),
+  auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
   menuControllers.getsingleMenu
 );
 

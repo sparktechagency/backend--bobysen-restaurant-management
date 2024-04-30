@@ -37,6 +37,10 @@ const menuSchema = new Schema<TMenu, MenuModel>(
       ref: "Restaurant",
       required: [true, "restaurant is required"],
     },
+    description: {
+      type: String,
+      required: [true, "description is required"],
+    },
     name: {
       type: String,
       required: [true, "name is required"],

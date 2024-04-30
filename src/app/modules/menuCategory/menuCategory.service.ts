@@ -12,6 +12,10 @@ const findAllCategory = async (query: { [key: string]: any }) => {
   const result = await MenuCategory.find(query);
   return result;
 };
+const getSingleCategory = async (id: string) => {
+  const result = await MenuCategory.findById(id);
+  return result;
+};
 const updateMenuCategory = async (
   id: string,
   payload: Partial<TMenuCategory>
@@ -27,4 +31,5 @@ export const menuCategoryServices = {
   insertMenuCategoryIntoDb,
   findAllCategory,
   updateMenuCategory,
+  getSingleCategory,
 };

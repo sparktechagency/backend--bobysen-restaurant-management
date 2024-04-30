@@ -10,6 +10,7 @@ const insertMenuCategoryIntoDb = catchAsync(
       req.body.image = storeFile("category", req?.file?.filename);
     }
     req.body.user = req?.user?.userId;
+
     const result = await menuCategoryServices.insertMenuCategoryIntoDb(
       req.body
     );
@@ -46,8 +47,22 @@ const updateMenuCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleCategory = catchAsync(async (req: Request, res: Response) => {
+  if (req?.file) {
+    req.body.image = storeFile("category", req?.file?.filename);
+  }
+  const result = await menuCategoryServices.getSingleCategory(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Category retrived successfully",
+    data: result,
+  });
+});
+
 export const categoryControllers = {
   insertMenuCategoryIntoDb,
+  getSingleCategory,
   findAllCategory,
   updateMenuCategory,
 };

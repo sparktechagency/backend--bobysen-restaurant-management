@@ -13,11 +13,8 @@ const insertMenuIntoDb = async (payload: TMenu): Promise<TMenu> => {
 };
 
 const getAllMenu = async (query: { [key: string]: any }) => {
-  const MenuModel = new QueryBuilder(
-    Menu.find().populate("owner category restaurant"),
-    query
-  )
-    .search([])
+  const MenuModel = new QueryBuilder(Menu.find(), query)
+    .search(["name"])
     .filter()
     .paginate()
     .sort()
@@ -34,6 +31,32 @@ const getSingleMenu = async (id: string) => {
   const result = await Menu.findById(id).populate("owner");
   return result;
 };
+// get all menu for vendor
+const getAllTablesForOwner = async (userId: string) => {
+  const result = await Restaurant.aggregate([
+    {
+      $match: {
+        owner: new mongoose.Types.ObjectId(userId),
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+      },
+    },
+    {
+      $lookup: {
+        from: "menus",
+        localField: "_id",
+        foreignField: "restaurant",
+        as: "menus",
+      },
+    },
+  ]);
+
+  return result[0];
+};
+
 // update menu here
 const updateMenu = async (id: string, payload: Partial<TMenu>) => {
   const findMenu = await Menu.findById(id);
@@ -96,6 +119,7 @@ export const menuServices = {
   insertMenuIntoDb,
   getAllMenu,
   getSingleMenu,
+  getAllTablesForOwner,
   updateMenu,
   deleteMenu,
 };

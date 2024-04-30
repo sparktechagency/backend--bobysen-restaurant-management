@@ -14,7 +14,16 @@ router.post(
   categoryControllers.insertMenuCategoryIntoDb
 );
 
-router.get("/", categoryControllers.findAllCategory);
+router.get(
+  "/",
+  auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
+  categoryControllers.findAllCategory
+);
+router.get(
+  "/:id",
+  auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
+  categoryControllers.getSingleCategory
+);
 router.patch(
   "/:id",
   upload.single("file"),

@@ -65,13 +65,16 @@ const bookAtable = async (payload: TBook) => {
 
 // };
 const getAllBookings = async (query: Record<string, any>) => {
-  const bookingModel = new QueryBuilder(Booking.find(), query)
+  const bookingModel = new QueryBuilder(
+    Booking.find().populate("user restaurant table"),
+    query
+  )
     .search([])
     .filter()
     .paginate()
     .sort()
     .fields();
-  const data = bookingModel.modelQuery;
+  const data = await bookingModel.modelQuery;
   const meta = await bookingModel.countTotal();
 
   return {
@@ -160,7 +163,7 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
   return result;
 };
 const getSingleBooking = async (id: string) => {
-  const result = await Booking.findById(id);
+  const result = await Booking.findById(id).populate("table");
   return result;
 };
 
