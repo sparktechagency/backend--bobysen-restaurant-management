@@ -1,7 +1,5 @@
 import { Schema, model } from "mongoose";
 import { TCart } from "./cart.interface";
-import { TMenuCategory } from "../menuCategory/menuCategory.interface";
-
 const cartSchema = new Schema<TCart>(
   {
     user: {
@@ -9,14 +7,14 @@ const cartSchema = new Schema<TCart>(
       ref: "User",
       required: [true, "user information is required"],
     },
-    restaurant: {
+    booking: {
       type: Schema.Types.ObjectId,
-      ref: "Restaurant",
+      ref: "Booking",
       required: [true, "user information is required"],
     },
     items: [
       {
-        item: {
+        menu: {
           type: Schema.Types.ObjectId,
           ref: "Menu",
           required: [true, "menu information is required"],
@@ -25,6 +23,10 @@ const cartSchema = new Schema<TCart>(
         amount: Number,
       },
     ],
+    subTotal: {
+      type: Number,
+      default: 0,
+    },
     totalAmount: {
       type: Number,
       required: [true, "amount information is required"],
@@ -35,7 +37,7 @@ const cartSchema = new Schema<TCart>(
     },
     discount: {
       type: Number,
-      required: [true, "discount amount is required"],
+      default: 0,
     },
     isDeleted: {
       type: Boolean,

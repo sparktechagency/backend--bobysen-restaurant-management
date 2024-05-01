@@ -1,13 +1,12 @@
-import { TCart } from "./cart.interface";
+import { TCart, TRemoveItem } from "./cart.interface";
 import { Cart } from "./cart.model";
 import { FilterQuery } from "mongoose";
 
 const insertItemsIntoCart = async (payload: any) => {
+  console.log(payload);
   const result = await Cart.findOneAndUpdate(
     {
-      user: payload?.user,
-      date: payload?.date,
-      restaurant: payload?.restaurant,
+      booking: payload.booking,
     },
     {
       ...payload,
@@ -19,15 +18,27 @@ const insertItemsIntoCart = async (payload: any) => {
   return result;
 };
 
-const getCartItems = async (query: FilterQuery<any>) => {
-  const result = await Cart.findOne({
-    user: query?.user,
-    date: query?.date,
-    restaurant: query?.restaurant,
-  });
+const getCartItems = async (id: string) => {
+  const result = await Cart.findOne({ booking: id });
+  return result;
+};
+const removeItemFromCart = async (id: string, item: TRemoveItem) => {
+  const result = await Cart.findOneAndUpdate(
+    { booking: id },
+    {
+      $pull: {
+        items: { menu: item?.itemId },
+      },
+      $inc: {
+        totalAmount: -Number(item?.amount), // Correcting the negative value
+      },
+    },
+    { new: true } // To return the updated document
+  );
   return result;
 };
 export const cartServices = {
   insertItemsIntoCart,
   getCartItems,
+  removeItemFromCart,
 };

@@ -8,11 +8,16 @@ interface CartItem {
 
 export interface TCart {
   user: ObjectId;
-  restaurant: ObjectId;
+  booking: ObjectId;
   items: CartItem[];
   date: string;
   totalAmount: number;
+  subTotal: number;
   discount: number;
   isDeleted?: boolean;
   paid?: boolean;
+}
+export interface TRemoveItem {
+  itemId: ObjectId;
+  amount: number;
 }
