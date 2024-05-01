@@ -110,7 +110,7 @@ const updateProfile = async (
 
 const getAllusers = async (query: Record<string, any>) => {
   const userModel = new QueryBuilder(User.find(), query)
-    .search([])
+    .search(["email", "fullName"])
     .filter()
     .paginate()
     .sort()

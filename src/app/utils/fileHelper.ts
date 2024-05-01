@@ -4,8 +4,8 @@ const unlinkSync = util.promisify(fs.unlink);
 export const deleteFile = async (path: string) => {
   console.log(path);
   try {
-    if (fs.existsSync(`./public/${path}`)) {
-      await unlinkSync(`./public/${path}`);
+    if (fs.existsSync(`../public/${path}`)) {
+      await unlinkSync(`../public/${path}`);
     } else {
       console.log("not found");
     }
