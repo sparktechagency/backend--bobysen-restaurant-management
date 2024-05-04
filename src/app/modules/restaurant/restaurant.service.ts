@@ -11,7 +11,6 @@ const insertRestaurantIntoDb = async (
 };
 
 const getAllRestaurant = async (query: Record<string, any>) => {
-  console.log(query);
   const result = await Restaurant.aggregate([
     {
       $match: {

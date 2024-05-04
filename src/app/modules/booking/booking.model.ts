@@ -32,7 +32,7 @@ const bookingSchema = new Schema<TBooking>(
     },
     status: {
       type: String,
-      enum: ["active", "cancelled"],
+      enum: ["active", "cancelled", "closed"],
       default: "active",
     },
   },

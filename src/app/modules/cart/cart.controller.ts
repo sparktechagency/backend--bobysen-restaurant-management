@@ -27,6 +27,19 @@ const getCartItems = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getMYOrders = catchAsync(async (req: Request, res: Response) => {
+  const query = { ...req.query };
+  query["user"] = req?.user?.userId;
+  console.log(req?.user);
+  const result = await cartServices.getAllOrders(query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Orders retrived successfully",
+    data: result?.data,
+    meta: result?.meta,
+  });
+});
 const removeItemFromCart = catchAsync(async (req: Request, res: Response) => {
   const result = await cartServices.removeItemFromCart(req.params.id, req.body);
   sendResponse(res, {
@@ -40,5 +53,6 @@ const removeItemFromCart = catchAsync(async (req: Request, res: Response) => {
 export const cartControllers = {
   insertItemIntoCart,
   getCartItems,
+  getMYOrders,
   removeItemFromCart,
 };

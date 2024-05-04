@@ -5,6 +5,11 @@ interface CartItem {
   quantity: number;
   amount: number;
 }
+export enum statusValue {
+  unpaid = "unpaid",
+  partiallyPaid = "partially_paid",
+  paid = "paid",
+}
 
 export interface TCart {
   user: ObjectId;
@@ -16,6 +21,9 @@ export interface TCart {
   discount: number;
   isDeleted?: boolean;
   paid?: boolean;
+  totalPaid: number;
+  totalDue: number;
+  status: statusValue;
 }
 export interface TRemoveItem {
   itemId: ObjectId;

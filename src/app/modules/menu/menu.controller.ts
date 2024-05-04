@@ -5,7 +5,6 @@ import { menuServices, reviewServices } from "./menu.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.body);
   if (req?.file) {
     req.body.image = storeFile("menu", req?.file?.filename);
   }
@@ -19,6 +18,9 @@ const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllMenu = catchAsync(async (req: Request, res: Response) => {
+  if (req?.user?.role === "vendor") {
+    req.query.owner = req?.user?.userId;
+  }
   const result = await menuServices.getAllMenu(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,

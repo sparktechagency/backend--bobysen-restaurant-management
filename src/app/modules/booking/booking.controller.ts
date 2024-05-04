@@ -24,6 +24,9 @@ const getAllBooking = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllBookingByOwner = catchAsync(async (req: Request, res: Response) => {
+  if (req?.user?.role === "vendor") {
+    req.query.owner = req?.user?.userId;
+  }
   const result = await bookingServies.getAllBookingByOwner(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,

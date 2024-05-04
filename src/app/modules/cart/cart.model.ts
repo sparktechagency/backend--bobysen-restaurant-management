@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { TCart } from "./cart.interface";
+import { statusValue, TCart } from "./cart.interface";
 const cartSchema = new Schema<TCart>(
   {
     user: {
@@ -30,6 +30,15 @@ const cartSchema = new Schema<TCart>(
     totalAmount: {
       type: Number,
       required: [true, "amount information is required"],
+      default: 0,
+    },
+    totalPaid: {
+      type: Number,
+      default: 0,
+    },
+    totalDue: {
+      type: Number,
+      default: 0,
     },
     date: {
       type: String,
@@ -43,9 +52,10 @@ const cartSchema = new Schema<TCart>(
       type: Boolean,
       default: false,
     },
-    paid: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: Object.values(statusValue),
+      default: statusValue.unpaid,
     },
   },
   { timestamps: true }
