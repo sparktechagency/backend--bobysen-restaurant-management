@@ -17,12 +17,15 @@ const insertNotificatonIntoDb = catchAsync(
   }
 );
 const getAllNotification = catchAsync(async (req: Request, res: Response) => {
-  const result = await notificationServices.getAllNotifications(req.query);
+  const query = { ...req.query };
+  query["receiver"] = req?.user?.userId;
+  const result = await notificationServices.getAllNotifications(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Notifications retrived successfully",
-    data: result,
+    data: result?.data,
+    meta: result?.meta,
   });
 });
 const markAsDone = catchAsync(async (req: Request, res: Response) => {

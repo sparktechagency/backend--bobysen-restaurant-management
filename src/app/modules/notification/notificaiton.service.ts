@@ -4,13 +4,16 @@ import { TNotification } from "./notification.interface";
 import { Notification } from "./notification.model";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { notification } from "antd";
+import moment from "moment";
 
-const insertNotificationIntoDb = async (payload: Partial<TNotification>) => {
-  const result = await Notification.create(payload);
+const insertNotificationIntoDb = async (payload: any) => {
+  const result = await Notification.insertMany(payload);
   // @ts-ignore
-  emitMessage(payload?.receiver, { ...payload, createdAt: result?.createdAt });
-  emitMessage("661e58dd2ed150bdebb8fa84", {
-    ...payload,
+  payload?.forEach((element) => {
+    emitMessage(element?.receiver, {
+      ...element,
+      createdAt: moment().format("YYYY-MM-DD"),
+    });
   });
   return result;
 };

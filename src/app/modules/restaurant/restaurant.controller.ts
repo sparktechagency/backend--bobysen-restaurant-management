@@ -8,7 +8,7 @@ import { USER_ROLE } from "../user/user.constant";
 const insertRestaurantIntDb = catchAsync(
   async (req: Request, res: Response) => {
     const images = [];
-    console.log(req.files);
+    console.log(req.body);
     if (req?.files instanceof Array) {
       for (const file of req?.files) {
         images.push({ url: storeFile("restaurant", file?.filename) });

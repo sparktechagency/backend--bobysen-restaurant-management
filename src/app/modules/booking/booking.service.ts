@@ -22,17 +22,18 @@ const bookAtable = async (payload: TBook) => {
     );
   }
   // retrive total tables under the restaurant
-  const totalTables = await Table.find({
+  const tables = await Table.find({
     restaurant: payload.restaurant,
   }).countDocuments();
 
   // retrive book tables
-  const bookedTables = await Booking.find({
+  const bookedTables: any = await Booking.find({
     date: payload?.date,
     restaurant: payload?.restaurant,
-  }).countDocuments();
+  }).populate("restaurant");
+
   // conditionally check avilable tables
-  if (bookedTables >= totalTables) {
+  if (bookedTables.length >= tables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       "no tables avilable for booking during this date"
@@ -64,12 +65,24 @@ const bookAtable = async (payload: TBook) => {
   };
 
   const result = await Booking.create(data);
-  const notificationData = {
-    receiver: payload?.user,
-    message: messages.booking,
-    refference: result?._id,
-    model_type: modeType.Booking,
-  };
+  console.log(moment(payload?.date).format("YYYY-MM-DD HH:mm a"));
+  const notificationData = [
+    {
+      receiver: payload?.user,
+      message: messages.booking,
+      refference: result?._id,
+      model_type: modeType.Booking,
+    },
+    {
+      receiver: bookedTables[0]?.restaurant?.owner,
+      message: messages.bookingForOwner,
+      description: `Date:${moment(payload?.date).format(
+        "YYYY-MM-DD HH:mm a"
+      )},TableNo:${findTable[0]?.tableNo},Seats:${findTable[0]?.seats}`,
+      refference: result?._id,
+      model_type: modeType.Booking,
+    },
+  ];
   await notificationServices.insertNotificationIntoDb(notificationData);
   return result;
 };
