@@ -10,6 +10,7 @@ import { bookingRoutes } from "../modules/booking/booking.route";
 import { favoriteLisRoutes } from "../modules/favoriteList/favouriteList.route";
 import { cartRoutes } from "../modules/cart/cart.route";
 import { notificationRoutes } from "../modules/notification/notificaiton.route";
+import { contentRoues } from "../modules/content/content.route";
 const router = Router();
 const moduleRoutes = [
   {
@@ -55,6 +56,10 @@ const moduleRoutes = [
   {
     path: "/notifications",
     route: notificationRoutes,
+  },
+  {
+    path: "/content",
+    route: contentRoues,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

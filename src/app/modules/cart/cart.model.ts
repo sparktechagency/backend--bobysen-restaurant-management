@@ -21,6 +21,10 @@ const cartSchema = new Schema<TCart>(
         },
         quantity: Number,
         amount: Number,
+        isPaid: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     subTotal: {

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { bookingServies } from "./booking.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import moment from "moment";
 const bookAtable = catchAsync(async (req: Request, res: Response) => {
   req.body.user = req?.user?.userId;
   const result = await bookingServies.bookAtable(req.body);
@@ -53,6 +54,19 @@ const updatebooking = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getBookingDetailsWithMenu = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await bookingServies.getBookingDetailsWithMenuOrder(
+      req.params.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Booking details retrived successfully",
+      data: result,
+    });
+  }
+);
 const deleteBooking = catchAsync(async (req: Request, res: Response) => {
   const result = await bookingServies.deletebooking(req.params.id);
   sendResponse(res, {
@@ -67,6 +81,7 @@ export const bookingControllers = {
   bookAtable,
   getAllBooking,
   getAllBookingByOwner,
+  getBookingDetailsWithMenu,
   getSingleBooking,
   updatebooking,
   deleteBooking,

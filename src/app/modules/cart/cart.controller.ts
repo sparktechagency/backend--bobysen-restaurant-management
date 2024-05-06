@@ -50,9 +50,21 @@ const removeItemFromCart = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleCartItemsUsingId = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await cartServices.getSingleCartItem(req.params.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Order details retrived successfully",
+      data: result,
+    });
+  }
+);
 export const cartControllers = {
   insertItemIntoCart,
   getCartItems,
   getMYOrders,
   removeItemFromCart,
+  getSingleCartItemsUsingId,
 };

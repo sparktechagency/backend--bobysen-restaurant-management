@@ -7,6 +7,7 @@ import { notification } from "antd";
 import moment from "moment";
 
 const insertNotificationIntoDb = async (payload: any) => {
+  console.log(payload);
   const result = await Notification.insertMany(payload);
   // @ts-ignore
   payload?.forEach((element) => {

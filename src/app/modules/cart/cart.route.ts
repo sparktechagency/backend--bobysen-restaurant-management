@@ -15,6 +15,11 @@ router.get(
   cartControllers.getMYOrders
 );
 router.get(
+  "/details/:id",
+  auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
+  cartControllers.getSingleCartItemsUsingId
+);
+router.get(
   "/:id",
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
   cartControllers.getCartItems

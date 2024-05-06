@@ -63,9 +63,8 @@ const bookAtable = async (payload: TBook) => {
     restaurant: payload?.restaurant,
     id: generateBookingNumber(),
   };
-
+  console.log(bookedTables);
   const result = await Booking.create(data);
-  console.log(moment(payload?.date).format("YYYY-MM-DD HH:mm a"));
   const notificationData = [
     {
       receiver: payload?.user,
@@ -73,15 +72,15 @@ const bookAtable = async (payload: TBook) => {
       refference: result?._id,
       model_type: modeType.Booking,
     },
-    {
-      receiver: bookedTables[0]?.restaurant?.owner,
-      message: messages.bookingForOwner,
-      description: `Date:${moment(payload?.date).format(
-        "YYYY-MM-DD HH:mm a"
-      )},TableNo:${findTable[0]?.tableNo},Seats:${findTable[0]?.seats}`,
-      refference: result?._id,
-      model_type: modeType.Booking,
-    },
+    // {
+    //   receiver: bookedTables[0]?.restaurant?.owner,
+    //   message: messages.bookingForOwner,
+    //   description: `Date:${moment(payload?.date).format(
+    //     "YYYY-MM-DD HH:mm a"
+    //   )},TableNo:${findTable[0]?.tableNo},Seats:${findTable[0]?.seats}`,
+    //   refference: result?._id,
+    //   model_type: modeType.Booking,
+    // },
   ];
   await notificationServices.insertNotificationIntoDb(notificationData);
   return result;
@@ -204,6 +203,27 @@ const getSingleBooking = async (id: string) => {
   return result;
 };
 
+const getBookingDetailsWithMenuOrder = async (id: string) => {
+  const result = Booking.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(id),
+      },
+    },
+    {
+      $lookup: {
+        from: "tables",
+        foreignField: "_id",
+        localField: "table",
+        as: "table",
+      },
+    },
+    {
+      $unwind: "$table",
+    },
+  ]);
+  return result;
+};
 const updateBooking = async (id: string, payload: Record<string, any>) => {
   let message;
   const result = await Booking.findByIdAndUpdate(id, payload, { new: true });
@@ -233,5 +253,6 @@ export const bookingServies = {
   getAllBookingByOwner,
   getSingleBooking,
   updateBooking,
+  getBookingDetailsWithMenuOrder,
   deletebooking,
 };

@@ -4,6 +4,7 @@ interface CartItem {
   item: ObjectId;
   quantity: number;
   amount: number;
+  isPaid: boolean;
 }
 export enum statusValue {
   unpaid = "unpaid",

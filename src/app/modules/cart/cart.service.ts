@@ -61,9 +61,17 @@ const removeItemFromCart = async (id: string, item: TRemoveItem) => {
   );
   return result;
 };
+const getSingleCartItem = async (id: string) => {
+  const result = await Cart.findById(id).populate({
+    path: "items.menu",
+    model: "Menu",
+  });
+  return result;
+};
 export const cartServices = {
   insertItemsIntoCart,
   getCartItems,
   getAllOrders,
+  getSingleCartItem,
   removeItemFromCart,
 };
