@@ -74,6 +74,19 @@ const removeRestaurantFromList = catchAsync(
     });
   }
 );
+const getsingleMenuFromFavouriteList = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await favoriteListServices.getSingleFavoriteDetailsByMenuId(
+      req.params.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Menu retrived successfully",
+      data: result,
+    });
+  }
+);
 
 export const favoriteListControllers = {
   insertMenuintoFavriteList,
@@ -81,4 +94,5 @@ export const favoriteListControllers = {
   getAllDataFromFavoriteList,
   removeMenuFromFavoriteList,
   removeRestaurantFromList,
+  getsingleMenuFromFavouriteList,
 };

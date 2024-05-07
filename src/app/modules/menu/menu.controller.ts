@@ -42,7 +42,10 @@ const getAllMenuForOwner = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getsingleMenu = catchAsync(async (req: Request, res: Response) => {
-  const result = await menuServices.getSingleMenu(req.params.id);
+  const result = await menuServices.getSingleMenu(
+    req.params.id,
+    req?.user?.userId
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

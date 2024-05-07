@@ -19,6 +19,11 @@ router.get(
   auth(USER_ROLE.user),
   favoriteListControllers.getAllDataFromFavoriteList
 );
+router.get(
+  "/menu/:id",
+
+  favoriteListControllers.getsingleMenuFromFavouriteList
+);
 router.patch(
   "/menu/:id",
   auth(USER_ROLE.user),

@@ -15,6 +15,10 @@ const contentSchema = new Schema<TContent>(
       type: String,
       default: "",
     },
+    support: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

@@ -12,12 +12,20 @@ const insertContentIntoDb = async (payload: Partial<TContent>) => {
   } else {
     result = await Content.create(payload);
   }
-
   return result;
 };
 
 const getContents = async (query: Record<string, any>) => {
-  const result = await Content.findOne();
+  let selectFields: any = {};
+
+  // Extract select fields from the query
+  if (query.select) {
+    const fields = query.select.split(",");
+    fields.forEach((field: string) => {
+      selectFields[field.trim()] = 1;
+    });
+  }
+  const result = await Content.findOne({}, selectFields);
   return result;
 };
 

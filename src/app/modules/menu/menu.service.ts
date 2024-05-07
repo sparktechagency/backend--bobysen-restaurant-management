@@ -27,10 +27,69 @@ const getAllMenu = async (query: { [key: string]: any }) => {
   };
 };
 
-const getSingleMenu = async (id: string) => {
-  const result = await Menu.findById(id).populate("owner");
-  return result;
+const getSingleMenu = async (id: string, userId: string) => {
+  const result = await Menu.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(id),
+      },
+    },
+    {
+      $lookup: {
+        from: "favouritelists",
+        let: { menuId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$user", new mongoose.Types.ObjectId(userId)] },
+                  { $in: ["$$menuId", "$menu"] },
+                ],
+              },
+            },
+          },
+          {
+            $project: { _id: 0 },
+          },
+        ],
+        as: "isFavourite",
+      },
+    },
+    {
+      $addFields: {
+        isFavourite: {
+          $cond: {
+            if: { $gt: [{ $size: "$isFavourite" }, 0] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    // Project all fields from the Menu collection
+    {
+      $project: {
+        _id: 1,
+        category: 1,
+        image: 1,
+        restaurant: 1,
+        description: 1,
+        name: 1,
+        price: 1,
+        owner: 1,
+        available: 1,
+        isDeleted: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        __v: 1,
+        isFavourite: 1,
+      },
+    },
+  ]);
+  return result[0] ? result[0] : {};
 };
+
 // get all menu for vendor
 const getAllTablesForOwner = async (userId: string) => {
   const result = await Restaurant.aggregate([
