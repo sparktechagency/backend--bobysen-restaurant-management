@@ -6,10 +6,13 @@ import { menuCategoryServices } from "../menuCategory/menuCategory.service";
 import moment from "moment";
 import { cartServices } from "./cart.service";
 const insertItemIntoCart = catchAsync(async (req: Request, res: Response) => {
-  const data: any = { item: req.body };
+  let itemData = { ...req.body };
+  delete itemData.owner;
+  const data: any = { item: itemData };
   data.date = moment().format("YYYY-MM-DD");
   data.booking = req.params.id;
   data.user = req?.user.userId;
+  data.owner = req.body.owner;
   const result = await cartServices.insertItemsIntoCart(data);
   sendResponse(res, {
     statusCode: httpStatus.OK,

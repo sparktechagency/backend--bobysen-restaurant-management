@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { TNotification } from "./notification.interface";
+import { modeType, TNotification } from "./notification.interface";
 
 const NotificationSchema = new Schema<TNotification>(
   {
@@ -16,7 +16,7 @@ const NotificationSchema = new Schema<TNotification>(
     },
     model_type: {
       type: String,
-      enum: ["Cart", "Booking"],
+      enum: Object.values(modeType),
     },
     message: {
       type: String,

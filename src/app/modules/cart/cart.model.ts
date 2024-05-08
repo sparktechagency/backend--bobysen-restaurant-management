@@ -7,6 +7,11 @@ const cartSchema = new Schema<TCart>(
       ref: "User",
       required: [true, "user information is required"],
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "owner information is required"],
+    },
     booking: {
       type: Schema.Types.ObjectId,
       ref: "Booking",
@@ -24,6 +29,28 @@ const cartSchema = new Schema<TCart>(
         isPaid: {
           type: Boolean,
           default: false,
+        },
+      },
+    ],
+    transactions: [
+      {
+        id_form: {
+          type: String,
+        },
+        orderId: {
+          type: String,
+        },
+        checksum: {
+          type: String,
+        },
+        amount: {
+          type: Number,
+        },
+        status: {
+          type: Boolean,
+        },
+        date: {
+          type: Date,
         },
       },
     ],

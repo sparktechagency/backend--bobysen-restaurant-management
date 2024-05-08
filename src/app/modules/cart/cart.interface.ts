@@ -12,8 +12,17 @@ export enum statusValue {
   paid = "paid",
 }
 
+interface TTransactions {
+  id_form?: string;
+  orderId: string;
+  checksum?: string;
+  status: boolean;
+  amount: number;
+  date: Date;
+}
 export interface TCart {
   user: ObjectId;
+  owner: ObjectId;
   booking: ObjectId;
   items: CartItem[];
   date: string;
@@ -25,6 +34,7 @@ export interface TCart {
   totalPaid: number;
   totalDue: number;
   status: statusValue;
+  transactions: [TTransactions];
 }
 export interface TRemoveItem {
   itemId: ObjectId;

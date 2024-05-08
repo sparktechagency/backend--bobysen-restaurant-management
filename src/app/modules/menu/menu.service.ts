@@ -169,8 +169,8 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
   }
 };
 
-const getAllReviews = async (itemId: string) => {
-  const result = Review.find({ item: itemId }).populate("user");
+const getAllReviews = async (restaurantId: string) => {
+  const result = Review.find({ restaurant: restaurantId }).populate("user");
   return result;
 };
 

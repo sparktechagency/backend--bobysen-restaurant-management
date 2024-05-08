@@ -6,16 +6,15 @@ const reviewSchema = new Schema<TReview>({
     ref: "User",
     required: [true, "user is required"],
   },
-  menu: {
+  restaurant: {
     type: Schema.Types.ObjectId,
-    ref: "Item",
-    required: [true, "item is required"],
+    ref: "Restaurant",
+    required: [true, "restaurant id is required"],
   },
   rating: {
     type: String,
     required: [true, "stars is required"],
   },
-
   comment: {
     type: String,
     required: [true, "comment is required"],

@@ -11,9 +11,14 @@ const insertItemsIntoCart = async (payload: any) => {
     {
       ...payload,
       $push: { items: payload.item },
+
       $inc: {
         totalAmount: Number(payload.item.amount),
         totalDue: Number(payload.item.amount),
+      },
+      $set: {
+        status: "unpaid",
+        owner: payload.owner,
       },
     },
     { upsert: true, new: true }

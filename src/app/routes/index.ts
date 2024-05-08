@@ -11,6 +11,9 @@ import { favoriteLisRoutes } from "../modules/favoriteList/favouriteList.route";
 import { cartRoutes } from "../modules/cart/cart.route";
 import { notificationRoutes } from "../modules/notification/notificaiton.route";
 import { contentRoues } from "../modules/content/content.route";
+import { orderRoutes } from "../modules/order/order.route";
+import { walletRoutes } from "../modules/wallet/wallet.route";
+
 const router = Router();
 const moduleRoutes = [
   {
@@ -60,6 +63,14 @@ const moduleRoutes = [
   {
     path: "/content",
     route: contentRoues,
+  },
+  {
+    path: "/orders",
+    route: orderRoutes,
+  },
+  {
+    path: "/wallet",
+    route: walletRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
