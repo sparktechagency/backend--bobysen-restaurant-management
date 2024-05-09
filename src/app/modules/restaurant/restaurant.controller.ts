@@ -11,7 +11,7 @@ const insertRestaurantIntDb = catchAsync(
     console.log(req.body);
     if (req?.files instanceof Array) {
       for (const file of req?.files) {
-        images.push({ url: storeFile("restaurant", file?.filename) });
+        images.push({ url: storeFile("Restaurant", file?.filename) });
       }
     }
     req.body.owner = req?.user?.userId;
@@ -20,7 +20,7 @@ const insertRestaurantIntDb = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "restaurant added successfully",
+      message: "Restaurant added successfully",
       data: result,
     });
     return result;
@@ -55,7 +55,7 @@ const getSingleRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "restaurant retrived successfully",
+    message: "Restaurant retrived successfully",
     data: result,
   });
   return result;
@@ -65,7 +65,7 @@ const updateRestaurant = catchAsync(async (req: Request, res: Response) => {
   console.log(req.files);
   if (req?.files instanceof Array) {
     for (const file of req?.files) {
-      images.push({ url: storeFile("restaurant", file?.filename) });
+      images.push({ url: storeFile("Restaurant", file?.filename) });
     }
   }
   req.body.images = images;
@@ -76,7 +76,7 @@ const updateRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "restaurant updated successfully",
+    message: "Restaurant updated successfully",
     data: result,
   });
   return result;
@@ -86,7 +86,7 @@ const deleteRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "restaurant deleted successfully",
+    message: "Restaurant deleted successfully",
     data: result,
   });
   return result;

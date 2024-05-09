@@ -10,7 +10,7 @@ const bookAtable = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Table Find successfully",
+    message: "Table booked successfully",
     data: result,
   });
 });
@@ -19,7 +19,7 @@ const getAllBooking = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "booking retrived successfully",
+    message: "Booking data retrived successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -32,7 +32,7 @@ const getAllBookingByOwner = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "booking retrived successfully",
+    message: "Booking data retrived successfully",
     data: result,
   });
 });
@@ -41,7 +41,7 @@ const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "booking retrived successfully",
+    message: "Booking data retrived successfully",
     data: result,
   });
 });
@@ -50,7 +50,7 @@ const updatebooking = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "booking updated successfully",
+    message: "Booking data updated successfully",
     data: result,
   });
 });
@@ -72,7 +72,7 @@ const deleteBooking = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "booking deleted successfully",
+    message: "booking  data deleted successfully",
     data: result,
   });
 });

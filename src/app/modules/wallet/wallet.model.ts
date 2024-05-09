@@ -11,6 +11,7 @@ const walletSchema = new Schema<TWallet>(
       ref: "User",
       required: [true, "vendor information is required"], // Added 'required' keyword
     },
+    // amount means total sells by the vendor and we calculate due for avilable balance and withdraw
     amount: {
       type: Number,
       required: [true, "amount is required"],
@@ -25,7 +26,7 @@ const walletSchema = new Schema<TWallet>(
       default: 0,
     },
     lastPaymentDate: {
-      type: Date,
+      type: String,
     },
     isDeleted: {
       type: Boolean,
@@ -33,9 +34,11 @@ const walletSchema = new Schema<TWallet>(
     },
     paymentHistory: [
       {
+        percentage: Number,
+        subTotal: Number,
         method: String,
         amount: Number,
-        date: Date,
+        date: String,
       },
     ],
   },

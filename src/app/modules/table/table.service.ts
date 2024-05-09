@@ -12,7 +12,7 @@ const insertTableIntoDB = async (payload: Ttable) => {
     payload?.tableNo
   );
   if (isUniqueTableNo) {
-    throw new AppError(httpStatus.CONFLICT, "table no should be unique");
+    throw new AppError(httpStatus.CONFLICT, "Table no should be unique.");
   }
   const result = await Table.create(payload);
   return result;

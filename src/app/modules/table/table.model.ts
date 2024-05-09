@@ -5,7 +5,7 @@ const tableSchema = new Schema<Ttable, TableModel>(
     tableNo: {
       type: String,
       required: [true, "table no is requried"],
-      unique: true,
+      // unique: true,
     },
     tableName: {
       type: String,

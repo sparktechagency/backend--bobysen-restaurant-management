@@ -42,7 +42,7 @@ router.post(
   auth(USER_ROLE.user),
   reviewControllers.insertReviewIntoDb
 );
-router.post(
+router.get(
   "/review/:id",
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
   reviewControllers.getAllReviews

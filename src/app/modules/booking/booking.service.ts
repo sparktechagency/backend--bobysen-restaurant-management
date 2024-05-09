@@ -12,6 +12,7 @@ import { notificationServices } from "../notification/notificaiton.service";
 import { modeType } from "../notification/notification.interface";
 import { message } from "antd";
 import { messages } from "../notification/notification.constant";
+import { Restaurant } from "../restaurant/restaurant.model";
 
 // search booking
 const bookAtable = async (payload: TBook) => {
@@ -21,6 +22,21 @@ const bookAtable = async (payload: TBook) => {
       "If you want to book more than 10 seats, please contact the restaurant owner."
     );
   }
+
+  // check if restaurant booked or open
+  const isNotOpenRestaurant = await Restaurant.findOne({
+    $and: [
+      { "close.from": { $lte: payload.date } }, // Check if close.from is less than or equal to payload.date
+      { "close.to": { $gte: payload.date } }, // Check if close.to is greater than or equal to payload.date
+    ],
+  });
+  if (isNotOpenRestaurant) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "Restaurant is closed during this time. Please select another date."
+    );
+  }
+
   // retrive total tables under the restaurant
   const tables = await Table.find({
     restaurant: payload.restaurant,
@@ -30,13 +46,14 @@ const bookAtable = async (payload: TBook) => {
   const bookedTables: any = await Booking.find({
     date: payload?.date,
     restaurant: payload?.restaurant,
+    staus: "active",
   }).populate("restaurant");
 
   // conditionally check avilable tables
   if (bookedTables.length >= tables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "no tables avilable for booking during this date"
+      "No tables avilable for booking during this date"
     );
   }
 
@@ -54,16 +71,17 @@ const bookAtable = async (payload: TBook) => {
   if (!findTable[0]) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "We couldn't find any tables with the required number of seats. You can increase the number of seat, or  Please contact with  the restaurant owner"
+      "We couldn't find any tables with the required number of seats.  Please contact with  the restaurant owner"
     );
   }
+  //
   const data = {
     ...payload,
     table: findTable[0]?._id,
     restaurant: payload?.restaurant,
     id: generateBookingNumber(),
   };
-  console.log(bookedTables);
+
   const result = await Booking.create(data);
   const notificationData = [
     {

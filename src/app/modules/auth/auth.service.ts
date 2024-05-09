@@ -135,7 +135,7 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
   } catch (err) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      "session has exipired. please try again"
+      "Session has exipired. please try again"
     );
   }
   const user = await User.findById(decode?.id).select("isDeleted verification");
@@ -147,12 +147,12 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
     throw new AppError(httpStatus.FORBIDDEN, "sessions expired");
   }
   if (!user?.verification?.status) {
-    throw new AppError(httpStatus.FORBIDDEN, "otp is not verified yet!");
+    throw new AppError(httpStatus.FORBIDDEN, "Otp is not verified yet!");
   }
   if (payload?.newPassword !== payload?.confirmPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "new password and confirm password do not match!"
+      "New password and Confirm password do not match!"
     );
   }
   const hashedPassword = await bcrypt.hash(

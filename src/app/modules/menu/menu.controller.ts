@@ -13,7 +13,7 @@ const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "menu added successfully",
+    message: "Menu added successfully",
     data: result,
   });
 });
@@ -25,7 +25,7 @@ const getAllMenu = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "menu retrived successfully",
+    message: "Menu retrived successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -49,7 +49,7 @@ const getsingleMenu = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "menu retrived successfully",
+    message: "Menu retrived successfully",
     data: result,
   });
 });
@@ -61,7 +61,7 @@ const updateMenu = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "menu updated successfully",
+    message: "Menu updated successfully",
     data: result,
   });
 });
@@ -73,7 +73,7 @@ const deleteMenu = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "menu deleted successfully",
+    message: "Menu deleted successfully",
     data: result,
   });
 });
@@ -93,7 +93,7 @@ const getAllReviews = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "reviews retrived successfully",
+    message: "Reviews retrived successfully",
     data: result,
   });
 });

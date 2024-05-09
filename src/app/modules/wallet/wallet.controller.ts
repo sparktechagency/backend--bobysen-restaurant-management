@@ -33,8 +33,30 @@ const getWalletDetails = catchAsync(async (req: Request, res: Response) => {
     meta: result?.meta,
   });
 });
+const getwalletDetailsByOwner = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await walletServices.getWalletDetailsByOwner();
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Wallet details retrived successfully",
+      data: result,
+    });
+  }
+);
+const getSingleWallet = catchAsync(async (req: Request, res: Response) => {
+  const result = await walletServices.getSingleWallet(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Wallet details retrived successfully",
+    data: result,
+  });
+});
 
 export const walletControllers = {
   sentAmountToTheVendor,
   getWalletDetails,
+  getwalletDetailsByOwner,
+  getSingleWallet,
 };
