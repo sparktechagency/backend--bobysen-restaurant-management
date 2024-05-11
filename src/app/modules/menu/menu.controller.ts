@@ -18,8 +18,11 @@ const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllMenu = catchAsync(async (req: Request, res: Response) => {
+  const query: Record<string, any> = { ...req.query };
   if (req?.user?.role === "vendor") {
     req.query.owner = req?.user?.userId;
+  } else if (req?.user?.role === "user") {
+    query["available"] = true;
   }
   const result = await menuServices.getAllMenu(req.query);
   sendResponse(res, {

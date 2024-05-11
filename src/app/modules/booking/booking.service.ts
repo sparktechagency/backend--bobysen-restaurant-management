@@ -16,27 +16,41 @@ import { Restaurant } from "../restaurant/restaurant.model";
 
 // search booking
 const bookAtable = async (payload: TBook) => {
+  const day = moment(payload?.date).format("dddd");
   if (Number(payload?.seats) > 10) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
       "If you want to book more than 10 seats, please contact the restaurant owner."
     );
   }
-
+  const restaurant: any = await Restaurant.findById(payload?.restaurant);
   // check if restaurant booked or open
-  const isNotOpenRestaurant = await Restaurant.findOne({
-    $and: [
-      { "close.from": { $lte: payload.date } }, // Check if close.from is less than or equal to payload.date
-      { "close.to": { $gte: payload.date } }, // Check if close.to is greater than or equal to payload.date
-    ],
-  });
-  if (isNotOpenRestaurant) {
+  const bookingTime = moment(payload.date);
+  const isClosed = bookingTime.isBetween(
+    moment(restaurant.close.from),
+    moment(restaurant.close.to),
+    undefined,
+    "[]"
+  );
+
+  if (isClosed) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
       "Restaurant is closed during this time. Please select another date."
     );
   }
 
+  // check the restaurant avilable that day
+  const { openingTime, closingTime } = restaurant[day.toLocaleLowerCase()];
+  if (
+    moment(payload?.time, "HH:mm").isBefore(moment(openingTime, "HH:mm")) ||
+    moment(payload?.time, "HH:mm").isAfter(moment(closingTime, "HH:mm"))
+  ) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      `Restaurant is closed at ${payload.time} on ${day}`
+    );
+  }
   // retrive total tables under the restaurant
   const tables = await Table.find({
     restaurant: payload.restaurant,
@@ -248,12 +262,14 @@ const updateBooking = async (id: string, payload: Record<string, any>) => {
 
   if (payload?.status === "cancelled") {
     message = messages.cancelled;
-    const notificationData = {
-      receiver: result?.user,
-      message,
-      refference: result?._id,
-      model_type: modeType.Booking,
-    };
+    const notificationData = [
+      {
+        receiver: result?.user,
+        message,
+        refference: result?._id,
+        model_type: modeType.Booking,
+      },
+    ];
     await notificationServices.insertNotificationIntoDb(notificationData);
   }
 
@@ -264,6 +280,81 @@ const deletebooking = async (id: string) => {
   const result = await Booking.findByIdAndDelete(id);
   return result;
 };
+const getBookingStatics = async (userId: string, year: string) => {
+  console.log("service", userId, year);
+  const monthsOfYear = Array.from({ length: 12 }, (_, i) => i + 1); // Array of month numbers from 1 to 12
+
+  const result = await Booking.aggregate([
+    {
+      $match: {
+        date: {
+          $gte: new Date(`${year}-01-01`),
+          $lt: new Date(`${year}-12-31T23:59:59.999`),
+        },
+        restaurant: { $exists: true }, // Filter out bookings without restaurant
+      },
+    },
+    {
+      $lookup: {
+        from: "restaurants",
+        let: { restaurantId: "$restaurant" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$_id", "$$restaurantId"] },
+                  { $eq: ["$owner", new mongoose.Types.ObjectId(userId)] },
+                ],
+              },
+            },
+          },
+        ],
+        as: "restaurantOwner",
+      },
+    },
+    {
+      $group: {
+        _id: { $month: "$date" },
+        totalBooking: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        month: {
+          $dateToString: {
+            format: "%b", // Use %b for abbreviated month name
+            date: {
+              $dateFromParts: { year: Number(year), month: "$_id", day: 1 },
+            },
+          },
+        },
+        totalBooking: 1,
+        _id: 0,
+      },
+    },
+    {
+      $sort: { _id: 1 },
+    },
+  ]);
+
+  // Left join with monthsOfYear array to include all months in the result
+  const finalResult = monthsOfYear.map((month) => {
+    const match = result.find(
+      (item) =>
+        item.month ===
+        new Date(`${year}-${month}-01`).toLocaleString("en", { month: "short" })
+    );
+    return {
+      month: new Date(`${year}-${month}-01`).toLocaleString("en", {
+        month: "short",
+      }),
+      totalBooking: match ? match.totalBooking : 0,
+    };
+  });
+
+  return finalResult;
+};
 
 export const bookingServies = {
   bookAtable,
@@ -273,4 +364,5 @@ export const bookingServies = {
   updateBooking,
   getBookingDetailsWithMenuOrder,
   deletebooking,
+  getBookingStatics,
 };

@@ -76,6 +76,19 @@ const deleteBooking = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getBookingStatics = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.query);
+  const result = await bookingServies.getBookingStatics(
+    req.user.userId,
+    req?.query?.year as string
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Booking statics retrived successfully",
+    data: result,
+  });
+});
 
 export const bookingControllers = {
   bookAtable,
@@ -85,4 +98,5 @@ export const bookingControllers = {
   getSingleBooking,
   updatebooking,
   deleteBooking,
+  getBookingStatics,
 };

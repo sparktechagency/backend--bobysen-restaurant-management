@@ -13,7 +13,9 @@ import moment from "moment";
 
 const sendAmountToVendor = async (id: string, payload: any) => {
   const { amount, method, percentage } = payload || {};
-  const subTotal = (Number(amount) * (100 - Number(percentage))) / 100;
+  const subTotal = Math.ceil(
+    (Number(amount) * (100 - Number(percentage))) / 100
+  );
 
   const findWallet = await Wallet.findById(id).populate("owner");
   const date = moment().format("YYYY-MM-DD");

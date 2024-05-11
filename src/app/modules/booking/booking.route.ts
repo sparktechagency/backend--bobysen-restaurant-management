@@ -11,6 +11,11 @@ router.post(
 );
 
 router.get(
+  "/statics",
+  auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
+  bookingControllers.getBookingStatics
+);
+router.get(
   "/",
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
   bookingControllers.getAllBooking
