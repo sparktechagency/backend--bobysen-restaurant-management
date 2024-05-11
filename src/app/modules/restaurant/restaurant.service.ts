@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { TRestaurant } from "./restaurant.inerface";
 import { Restaurant } from "./restaurant.model";
+import { RessearchAbleFields } from "./restaurant.constant";
 
 const insertRestaurantIntoDb = async (
   payload: TRestaurant
@@ -138,7 +139,7 @@ const deleteRestaurant = async (id: string) => {
 
 const updateRestaurant = async (id: string, payload: Partial<TRestaurant>) => {
   const { images, ...update } = payload;
-  console.log("updated value", update);
+
   const result = await Restaurant.findByIdAndUpdate(
     id,
     {
@@ -172,6 +173,53 @@ const deleteFiles = async (payload: any) => {
   );
   return result;
 };
+
+const getAllRestaurantForAdmin = async (query: Record<string, any>) => {
+  const pipeline: any[] = [
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+      },
+    },
+    {
+      $unwind: "$owner",
+    },
+    {
+      $addFields: {
+        formattedDate: {
+          $dateToString: {
+            format: "%Y-%m-%d", // specify the desired format
+            date: "$createdAt", // the date field you want to format
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        owner: "$owner.fullName",
+        email: "$owner.email",
+        location: 1,
+        createdAt: "$formattedDate",
+        status: 1,
+      },
+    },
+  ];
+  if (query?.searchTerm) {
+    const searchRegex = new RegExp(query.searchTerm, "i");
+    const searchMatchStage = {
+      $or: RessearchAbleFields.map((field) => ({
+        [field]: { $regex: searchRegex },
+      })),
+    };
+    pipeline.push({ $match: searchMatchStage });
+  }
+  const result = await Restaurant.aggregate(pipeline);
+  return result;
+};
 export const restaurantServices = {
   insertRestaurantIntoDb,
   updateRestaurant,
@@ -180,5 +228,6 @@ export const restaurantServices = {
   getAllRestaurantsForUser,
   getSingleRestaurant,
   deleteRestaurant,
+  getAllRestaurantForAdmin,
   deleteFiles,
 };

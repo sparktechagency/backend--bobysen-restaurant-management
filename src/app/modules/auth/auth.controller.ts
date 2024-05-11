@@ -7,11 +7,18 @@ import config from "../../config";
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.login(req.body);
   const { refreshToken } = result;
-  res.cookie("refreshToken", refreshToken, {
+  const cookieOptions = {
+    secure: false,
     httpOnly: true,
-    sameSite: "none",
-    maxAge: 1000 * 60 * 60 * 24 * 365,
-  });
+    // maxAge: parseInt(config.jwt.refresh_expires_in || '31536000000'),
+    maxAge: 31536000000,
+  };
+
+  if (config.NODE_ENV === "production") {
+    //@ts-ignore
+    cookieOptions.sameSite = "none";
+  }
+  res.cookie("refreshToken", refreshToken, cookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

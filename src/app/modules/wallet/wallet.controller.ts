@@ -24,6 +24,7 @@ const getWalletDetails = catchAsync(async (req: Request, res: Response) => {
   if (role === USER_ROLE.vendor) {
     query["owner"] = userId;
   }
+  console.log(query);
   const result = await walletServices.getAllWalletDetails(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -35,7 +36,8 @@ const getWalletDetails = catchAsync(async (req: Request, res: Response) => {
 });
 const getwalletDetailsByOwner = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await walletServices.getWalletDetailsByOwner();
+    console.log(req.query);
+    const result = await walletServices.getWalletDetailsByOwner(req.query);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -53,10 +55,20 @@ const getSingleWallet = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getWalletStatics = catchAsync(async (req: Request, res: Response) => {
+  const result = await walletServices.getWalletStatics();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Wallet details retrived successfully",
+    data: result,
+  });
+});
 
 export const walletControllers = {
   sentAmountToTheVendor,
   getWalletDetails,
   getwalletDetailsByOwner,
   getSingleWallet,
+  getWalletStatics,
 };

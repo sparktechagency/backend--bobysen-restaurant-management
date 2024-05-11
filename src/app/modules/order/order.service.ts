@@ -6,7 +6,6 @@ import { Wallet } from "../wallet/wallet.model";
 
 const insertOrderIntoDb = async (payload: any) => {
   const { cart, amount, id_order, status, id_form, checksum } = payload || {};
-  console.log(cart);
   //   const formatedAmount = Number(amount) / 100;
   const session = await mongoose.startSession();
 
@@ -45,6 +44,7 @@ const insertOrderIntoDb = async (payload: any) => {
       {
         $inc: {
           amount: Number(amount),
+          due: Number(amount),
         },
       },
       { upsert: true, new: true, session }

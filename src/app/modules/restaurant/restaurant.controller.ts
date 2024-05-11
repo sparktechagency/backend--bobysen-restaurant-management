@@ -115,6 +115,18 @@ const getSingleRestaurantForOwner = catchAsync(
     return result;
   }
 );
+const getAllRestaurantForAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await restaurantServices.getAllRestaurantForAdmin(req.query);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Restaurant retrived successfully",
+      data: result,
+    });
+    return result;
+  }
+);
 
 export const restauranntControllers = {
   insertRestaurantIntDb,
@@ -125,4 +137,5 @@ export const restauranntControllers = {
   getSingleRestaurant,
   deleteRestaurant,
   deleteFiles,
+  getAllRestaurantForAdmin,
 };

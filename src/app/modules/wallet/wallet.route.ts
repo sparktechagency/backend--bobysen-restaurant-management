@@ -16,6 +16,11 @@ router.get(
   walletControllers.getwalletDetailsByOwner
 );
 router.get(
+  "/admin/statics",
+  auth(USER_ROLE.admin),
+  walletControllers.getWalletStatics
+);
+router.get(
   "/",
   auth(USER_ROLE.admin, USER_ROLE.vendor),
   walletControllers.getWalletDetails

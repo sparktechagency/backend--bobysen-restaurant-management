@@ -10,6 +10,7 @@ import { messages } from "../notification/notification.constant";
 import parseData from "../../middleware/parseData";
 import { notificationServices } from "../notification/notificaiton.service";
 import moment from "moment";
+import { WalletSearchableFields } from "./wallet.constant";
 
 const sendAmountToVendor = async (id: string, payload: any) => {
   const { amount, method, percentage } = payload || {};
@@ -58,7 +59,6 @@ const sendAmountToVendor = async (id: string, payload: any) => {
 };
 
 const getAllWalletDetails = async (query: Record<string, any>) => {
-  console.log(query);
   const walletModel = new QueryBuilder(Wallet.find().populate("owner"), query)
     .search([])
     .filter()
@@ -74,8 +74,9 @@ const getAllWalletDetails = async (query: Record<string, any>) => {
   };
 };
 
-const getWalletDetailsByOwner = async () => {
-  const result = await Wallet.aggregate([
+const getWalletDetailsByOwner = async (query: Record<string, any>) => {
+  const pipeline: any[] = [];
+  pipeline.push(
     {
       $lookup: {
         from: "users",
@@ -107,11 +108,42 @@ const getWalletDetailsByOwner = async () => {
         due: 1,
         paymentHistory: 1,
       },
-    },
-  ]);
+    }
+  );
+
+  if (query?.searchTerm) {
+    const searchRegex = new RegExp(query.searchTerm, "i");
+    const searchMatchStage = {
+      $or: WalletSearchableFields.map((field) => ({
+        [field]: { $regex: searchRegex },
+      })),
+    };
+    pipeline.push({ $match: searchMatchStage });
+  }
+  const result = await Wallet.aggregate(pipeline);
   return result;
 };
 
+const getWalletStatics = async () => {
+  const result = await Wallet.aggregate([
+    {
+      $group: {
+        _id: null, // Group all documents
+        totalDue: { $sum: "$due" }, // Calculate total due
+        totalPaid: { $sum: "$totalPaid" }, // Calculate total paid
+      },
+    },
+    {
+      $project: {
+        _id: 0, // Exclude _id field
+        totalDue: 1, // Include totalDue
+        totalPaid: 1, // Include totalPaid
+        totalBalance: { $subtract: ["$totalDue", "$totalPaid"] }, // Calculate total balance (due - totalPaid)
+      },
+    },
+  ]);
+  return result[0];
+};
 const getSingleWallet = async (id: string) => {
   const result = await Wallet.findById(id);
   return result;
@@ -120,5 +152,6 @@ export const walletServices = {
   getAllWalletDetails,
   sendAmountToVendor,
   getWalletDetailsByOwner,
+  getWalletStatics,
   getSingleWallet,
 };
