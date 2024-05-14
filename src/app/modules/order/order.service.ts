@@ -3,7 +3,7 @@ import { Cart } from "../cart/cart.model";
 import AppError from "../../error/AppError";
 import httpStatus from "http-status";
 import { Wallet } from "../wallet/wallet.model";
-
+import axios from "axios";
 const insertOrderIntoDb = async (payload: any) => {
   const { cart, amount, id_order, status, id_form, checksum } = payload || {};
   //   const formatedAmount = Number(amount) / 100;
@@ -63,6 +63,45 @@ const insertOrderIntoDb = async (payload: any) => {
   }
 };
 
+const getImnCallback = async (received_crypted_data: any) => {
+  const obj = {
+    authentify: {
+      id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
+      id_entity: "w3QAeoMtLJROmlIyXVgnx1R6y7BgNo8t",
+      id_operator: "oeRH43c5RoQockXajPTo0TA5YW0KReio",
+      operator_password: "NUvxccs0R0rzKPoLlIPeet21rarpX0rk",
+    },
+    salt: "SQt1DtGZceeCjO59cDAL82sAQcyj8uxocTxMkLeC6mzvfjILIq",
+    cipher_key:
+      "aAUJIcMPgVpK9zAB9tVjDWLIglibzgerTeiSU1ACEgu2GXIl1mYMj0wVNjs9XUEdIEysG2G7GNAxYpaGpqveDgVMaNzVZsHNrNdZ",
+    received_crypted_data: received_crypted_data,
+  };
+
+  try {
+    const response = await axios.post(
+      "https://api.mips.mu/api/decrypt_imn_data",
+      obj,
+      {
+        headers: {
+          Authorization:
+            "Basic " +
+            Buffer.from(
+              "datamation_8a9ft5:kqK1hvT5Mhwu7t0KavYaJctDW5M8xruW"
+            ).toString("base64"),
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Decrypted data:", response.data);
+    // Handle the decrypted data as needed
+  } catch (error) {
+    console.error("Error:", error);
+    // Handle the error
+  }
+};
+
 export const orderServices = {
   insertOrderIntoDb,
+  getImnCallback,
 };

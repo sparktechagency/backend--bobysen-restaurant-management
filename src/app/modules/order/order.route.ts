@@ -5,6 +5,7 @@ import { orderControllers } from "./order.controller";
 
 const router = Router();
 
+router.post("/decrypt-data", orderControllers.getimnCallback);
 router.post(
   "/",
   auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
