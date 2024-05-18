@@ -23,7 +23,7 @@ const bookingSchema = new Schema<TBooking>(
       required: [true, "table id is required"],
     },
     date: {
-      type: Date,
+      type: String,
       required: [true, "date is required"],
     },
     time: {

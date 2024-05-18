@@ -23,12 +23,13 @@ const bookAtable = async (payload: TBook) => {
       "If you want to book more than 10 seats, please contact the restaurant owner."
     );
   }
+
   const restaurant: any = await Restaurant.findById(payload?.restaurant);
   // check if restaurant booked or open
   const bookingTime = moment(payload.date);
   const isClosed = bookingTime.isBetween(
-    moment(restaurant.close.from),
-    moment(restaurant.close.to),
+    moment(restaurant?.close?.from),
+    moment(restaurant?.close?.to),
     undefined,
     "[]"
   );
@@ -41,7 +42,7 @@ const bookAtable = async (payload: TBook) => {
   }
 
   // check the restaurant avilable that day
-  const { openingTime, closingTime } = restaurant[day.toLocaleLowerCase()];
+  const { openingTime, closingTime } = restaurant[day?.toLocaleLowerCase()];
   if (
     moment(payload?.time, "HH:mm").isBefore(moment(openingTime, "HH:mm")) ||
     moment(payload?.time, "HH:mm").isAfter(moment(closingTime, "HH:mm"))
@@ -54,17 +55,17 @@ const bookAtable = async (payload: TBook) => {
   // retrive total tables under the restaurant
   const tables = await Table.find({
     restaurant: payload.restaurant,
+    seats: payload?.seats,
   }).countDocuments();
 
   // retrive book tables
   const bookedTables: any = await Booking.find({
-    date: payload?.date,
+    date: moment(payload?.date).format("YYYY-MM-DD"),
     restaurant: payload?.restaurant,
-    staus: "active",
+    status: "active",
   }).populate("restaurant");
-
   // conditionally check avilable tables
-  if (bookedTables.length >= tables) {
+  if (bookedTables?.length >= tables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       "No tables avilable for booking during this date"
@@ -91,6 +92,7 @@ const bookAtable = async (payload: TBook) => {
   //
   const data = {
     ...payload,
+    date: moment(payload?.date).format("YYYY-MM-DD"),
     table: findTable[0]?._id,
     restaurant: payload?.restaurant,
     id: generateBookingNumber(),
@@ -180,23 +182,14 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
         "restaurant.owner": new mongoose.Types.ObjectId(query?.owner),
       },
     },
-    {
-      $addFields: {
-        formattedDate: {
-          $dateToString: {
-            format: "%Y-%m-%d", // specify the desired format
-            date: "$date", // the date field you want to format
-          },
-        },
-      },
-    },
+
     {
       $project: {
         userName: "$user.fullName",
         email: "$user.email",
         id: "$id",
         status: "$status",
-        date: "$formattedDate",
+        date: "$date",
         time: "$time",
         tableId: "$table._id",
         tableName: "$table.tableName",
@@ -288,10 +281,17 @@ const getBookingStatics = async (userId: string, year: string) => {
     {
       $match: {
         date: {
-          $gte: new Date(`${year}-01-01`),
-          $lt: new Date(`${year}-12-31T23:59:59.999`),
+          $gte: `${year}-01-01`,
+          $lt: `${year + 1}-01-01`,
         },
         restaurant: { $exists: true }, // Filter out bookings without restaurant
+      },
+    },
+    {
+      $addFields: {
+        dateObj: {
+          $dateFromString: { dateString: "$date", format: "%Y-%m-%d" },
+        },
       },
     },
     {
@@ -315,7 +315,7 @@ const getBookingStatics = async (userId: string, year: string) => {
     },
     {
       $group: {
-        _id: { $month: "$date" },
+        _id: { $month: "$dateObj" },
         totalBooking: { $sum: 1 },
       },
     },
@@ -338,7 +338,7 @@ const getBookingStatics = async (userId: string, year: string) => {
     },
   ]);
 
-  // Left join with monthsOfYear array to include all months in the result
+  // Merge with monthsOfYear array to include all months in the result
   const finalResult = monthsOfYear.map((month) => {
     const match = result.find(
       (item) =>
