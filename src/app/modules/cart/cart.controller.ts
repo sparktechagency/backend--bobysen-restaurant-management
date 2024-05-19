@@ -33,7 +33,6 @@ const getCartItems = catchAsync(async (req: Request, res: Response) => {
 const getMYOrders = catchAsync(async (req: Request, res: Response) => {
   const query = { ...req.query };
   query["user"] = req?.user?.userId;
-  console.log(req?.user);
   const result = await cartServices.getAllOrders(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,

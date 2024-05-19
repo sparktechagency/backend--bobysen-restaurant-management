@@ -60,6 +60,7 @@ const removeItemFromCart = async (id: string, item: TRemoveItem) => {
       },
       $inc: {
         totalAmount: -Number(item?.amount), // Correcting the negative value
+        totalDue: -Number(item?.amount), // Correcting the negative value
       },
     },
     { new: true } // To return the updated document
