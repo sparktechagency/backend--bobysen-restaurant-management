@@ -220,6 +220,39 @@ const getAllRestaurantForAdmin = async (query: Record<string, any>) => {
   const result = await Restaurant.aggregate(pipeline);
   return result;
 };
+const nearByRestaurant = async (query: Record<string, any>) => {
+  const pipeline = [];
+  const { maxDistance } = query;
+
+  // If geospatial data is provided, add $geoNear stage
+  if (query?.longitude && query?.latitude) {
+    pipeline.push({
+      $geoNear: {
+        near: {
+          type: "Point",
+          coordinates: [
+            parseFloat(query?.longitude),
+            parseFloat(query?.latitude),
+          ],
+        },
+        key: "map.coordinates",
+        distanceField: "dist.calculated",
+        maxDistance: parseFloat(maxDistance ?? 5000) * 1609, // Convert maxDistance from miles to meters
+        spherical: true,
+      },
+    });
+  }
+
+  // If searchTerm is provided, add $match stage for name search
+  if (query?.searchTerm) {
+    pipeline.push({
+      $match: {
+        name: new RegExp(query?.searchTerm, "i"), // Case-insensitive regex search
+      },
+    });
+  }
+};
+
 export const restaurantServices = {
   insertRestaurantIntoDb,
   updateRestaurant,
@@ -230,4 +263,5 @@ export const restaurantServices = {
   deleteRestaurant,
   getAllRestaurantForAdmin,
   deleteFiles,
+  nearByRestaurant,
 };

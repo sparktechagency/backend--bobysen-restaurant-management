@@ -11,6 +11,11 @@ const reviewSchema = new Schema<TReview>({
     ref: "Restaurant",
     required: [true, "restaurant id is required"],
   },
+  booking: {
+    type: Schema.Types.ObjectId,
+    ref: "Review",
+    required: [true, "reservation  id is required"],
+  },
   rating: {
     type: String,
     required: [true, "stars is required"],

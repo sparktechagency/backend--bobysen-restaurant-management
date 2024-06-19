@@ -13,6 +13,7 @@ export interface TBooking {
   table: ObjectId;
   restaurant: ObjectId;
   date: string;
+  endTime: string;
   time: string;
   status: "active" | "cancelled" | "closed";
 }

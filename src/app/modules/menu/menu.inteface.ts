@@ -2,6 +2,7 @@ import { Model, ObjectId } from "mongoose";
 export interface TReview {
   user: ObjectId;
   restaurant: ObjectId;
+  booking: ObjectId;
   rating: number | string;
   comment: string;
 }

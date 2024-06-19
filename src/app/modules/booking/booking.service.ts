@@ -10,7 +10,7 @@ import { Restaurant } from "../restaurant/restaurant.model";
 import { Table } from "../table/table.model";
 import { TBook } from "./booking.interface";
 import { Booking } from "./booking.model";
-import { generateBookingNumber } from "./booking.utils";
+import { calculateEndTime, generateBookingNumber } from "./booking.utils";
 
 // search booking
 const bookAtable = async (payload: TBook) => {
@@ -23,6 +23,7 @@ const bookAtable = async (payload: TBook) => {
   }
 
   const restaurant: any = await Restaurant.findById(payload?.restaurant);
+
   // check if restaurant booked or open
   const bookingTime = moment(payload.date);
   const isClosed = bookingTime.isBetween(
@@ -51,19 +52,22 @@ const bookAtable = async (payload: TBook) => {
     );
   }
   // retrive total tables under the restaurant
-  const tables = await Table.find({
+  const totalTables = await Table.find({
     restaurant: payload.restaurant,
     seats: payload?.seats,
   }).countDocuments();
 
+  const expireHours = calculateEndTime(payload?.time);
   // retrive book tables
   const bookedTables: any = await Booking.find({
     date: moment(payload?.date).format("YYYY-MM-DD"),
     restaurant: payload?.restaurant,
     status: "active",
+    arrivalTime: { $lt: expireHours },
+    endTime: { $gt: payload?.time },
   }).populate("restaurant");
   // conditionally check avilable tables
-  if (bookedTables?.length >= tables) {
+  if (bookedTables?.length >= totalTables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       "No tables avilable for booking during this date"
@@ -222,7 +226,51 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
   return result;
 };
 const getSingleBooking = async (id: string) => {
-  const result = await Booking.findById(id).populate("table");
+  const result = await Booking.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(id.toString()) } },
+    {
+      $lookup: {
+        from: "tables",
+        localField: "table",
+        foreignField: "_id",
+        as: "tableDetails",
+      },
+    },
+
+    {
+      $lookup: {
+        from: "reviews",
+        let: { bookingId: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$booking", "$$bookingId"] } } },
+          { $limit: 1 },
+        ],
+        as: "reviewDetails",
+      },
+    },
+    {
+      $addFields: {
+        isReview: {
+          $cond: {
+            if: { $gt: [{ $size: "$reviewDetails" }, 0] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        date: 1,
+        time: 1,
+        status: 1,
+
+        table: { $arrayElemAt: ["$tableDetails", 0] },
+        isReview: 1,
+      },
+    },
+  ]);
   return result;
 };
 

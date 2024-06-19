@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types, PipelineStage } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { deleteFile } from "../../utils/fileHelper";
 import { TMenu, TReview } from "./menu.inteface";
@@ -142,26 +142,55 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const result = await Review.create([payload], { session });
-    if (!result[0]) {
+
+    const review = await Review.create([payload], { session });
+    if (!review[0]) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "something went wrong. please try again"
+        "Something went wrong. Please try again"
       );
     }
-    await Restaurant.findByIdAndUpdate(
-      result[0]?.restaurant,
+
+    const restaurantId = review[0].restaurant;
+
+    // Use aggregation pipeline to calculate new avgRating and totalReviews
+    const pipeline: PipelineStage[] = [
+      { $match: { _id: new Types.ObjectId(restaurantId.toString()) } },
       {
-        $inc: {
-          avgReviews: 1,
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "restaurant",
+          as: "reviews",
         },
       },
-      { session }
-    );
+      {
+        $project: {
+          avgRating: { $avg: "$reviews.rating" },
+          totalReviews: { $size: "$reviews" },
+        },
+      },
+      {
+        $merge: {
+          into: "restaurants",
+          whenMatched: [
+            {
+              $set: {
+                avgRating: "$avgRating",
+                totalReviews: "$totalReviews",
+              },
+            },
+          ],
+          whenNotMatched: "discard",
+        },
+      },
+    ];
+
+    await Restaurant.aggregate(pipeline).session(session);
 
     await session.commitTransaction();
     await session.endSession();
-    return result[0];
+    return review[0];
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();

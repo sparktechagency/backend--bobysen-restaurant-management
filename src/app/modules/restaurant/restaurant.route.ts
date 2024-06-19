@@ -29,6 +29,11 @@ router.get(
   restauranntControllers.getAllRestaurantsForUser
 );
 router.get(
+  "/nearbyRestaurant",
+  // auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
+  restauranntControllers.nearByRestaurant
+);
+router.get(
   "/admin",
   auth(USER_ROLE.vendor),
   restauranntControllers.getSingleRestaurantForOwner

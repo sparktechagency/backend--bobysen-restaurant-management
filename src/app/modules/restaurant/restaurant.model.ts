@@ -10,6 +10,21 @@ const RestaurantSchema = new Schema<TRestaurant>(
       type: String,
       required: [true, "location is required"],
     },
+    helpLineNumber1: {
+      type: Number,
+      required: [true, "helpLine Number is required"],
+    },
+    helpLineNumber2: {
+      type: Number,
+      // required:[true,"helpLine Number is required"]
+    },
+    map: {
+      type: {
+        latitude: Number,
+        longitude: Number,
+        coordinates: [Number],
+      },
+    },
     description: {
       type: String,
       required: [true, "description is required"],
@@ -122,6 +137,7 @@ const RestaurantSchema = new Schema<TRestaurant>(
     timestamps: true,
   }
 );
+RestaurantSchema.index({ "map.coordinates": "2dsphere" });
 
 // filter out deleted documents
 RestaurantSchema.pre("find", function (next) {

@@ -127,6 +127,16 @@ const getAllRestaurantForAdmin = catchAsync(
     return result;
   }
 );
+const nearByRestaurant = catchAsync(async (req: Request, res: Response) => {
+  const result = await restaurantServices.nearByRestaurant(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Restaurant retrived successfully",
+    data: result,
+  });
+  return result;
+});
 
 export const restauranntControllers = {
   insertRestaurantIntDb,
@@ -138,4 +148,5 @@ export const restauranntControllers = {
   deleteRestaurant,
   deleteFiles,
   getAllRestaurantForAdmin,
+  nearByRestaurant,
 };

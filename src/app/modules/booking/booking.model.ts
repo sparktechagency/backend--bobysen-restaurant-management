@@ -30,6 +30,10 @@ const bookingSchema = new Schema<TBooking>(
       type: String,
       required: [true, "time is required"],
     },
+    endTime: {
+      type: String,
+      required: [true, "end time is required"],
+    },
     status: {
       type: String,
       enum: ["active", "cancelled", "closed"],

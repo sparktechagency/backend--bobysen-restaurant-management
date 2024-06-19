@@ -4,6 +4,11 @@ interface DaySchedule {
   openingTime: string;
   closingTime: string;
 }
+interface map {
+  latitude: number;
+  longitude: number;
+  coordinates: [number];
+}
 export interface TRestaurant {
   [x: string]: any;
   name: string;
@@ -14,7 +19,11 @@ export interface TRestaurant {
   reviewStatus: boolean;
   description: string;
   avgReviews?: string;
+  map: map;
   status: "active" | "inactive";
+  helpLineNumber1: String;
+  helpLineNumber2?: String;
+
   close?: {
     from: Date;
     to: Date;

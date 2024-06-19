@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const generateBookingNumber = () => {
   // Get the current timestamp
   const timestamp = Date.now();
@@ -7,3 +9,6 @@ export const generateBookingNumber = () => {
   const randomNumber = Math.floor(seed + Math.random() * (999999 - seed));
   return randomNumber;
 };
+
+export const calculateEndTime = (arrivalTime: string) =>
+  moment(arrivalTime, "HH:mm").add(2, "hours").format("HH:mm");
