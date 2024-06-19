@@ -275,7 +275,7 @@ const getSingleBooking = async (id: string) => {
 };
 
 const getBookingDetailsWithMenuOrder = async (id: string) => {
-  const result = Booking.aggregate([
+  const result = await Booking.aggregate([
     {
       $match: {
         _id: new mongoose.Types.ObjectId(id),
