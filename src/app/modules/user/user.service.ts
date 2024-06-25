@@ -1,15 +1,15 @@
+import bcrypt from "bcrypt";
 import httpStatus from "http-status";
+import jwt, { Secret } from "jsonwebtoken";
+import moment from "moment";
+import QueryBuilder from "../../builder/QueryBuilder";
+import config from "../../config";
 import AppError from "../../error/AppError";
+import { deleteFile } from "../../utils/fileHelper";
+import { sendEmail } from "../../utils/mailSender";
+import { generateOtp } from "../../utils/otpGenerator";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
-import { generateOtp } from "../../utils/otpGenerator";
-import moment from "moment";
-import { deleteFile } from "../../utils/fileHelper";
-import config from "../../config";
-import jwt, { Secret } from "jsonwebtoken";
-import { sendEmail } from "../../utils/mailSender";
-import QueryBuilder from "../../builder/QueryBuilder";
-import bcrypt from "bcrypt";
 const insertUserIntoDb = async (
   payload: Partial<TUser>
 ): Promise<{ user: TUser; token: string }> => {
@@ -22,7 +22,7 @@ const insertUserIntoDb = async (
     );
   }
   const otp = generateOtp();
-  const expiresAt = moment().add(1, "minute");
+  const expiresAt = moment().add(3, "minute");
   const formatedData = {
     ...payload,
     role: "user",

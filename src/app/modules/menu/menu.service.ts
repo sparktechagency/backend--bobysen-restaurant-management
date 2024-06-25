@@ -1,11 +1,11 @@
-import mongoose, { Types, PipelineStage } from "mongoose";
+import httpStatus from "http-status";
+import mongoose, { PipelineStage, Types } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
+import AppError from "../../error/AppError";
 import { deleteFile } from "../../utils/fileHelper";
+import { Restaurant } from "../restaurant/restaurant.model";
 import { TMenu, TReview } from "./menu.inteface";
 import { Menu, Review } from "./menu.model";
-import AppError from "../../error/AppError";
-import httpStatus from "http-status";
-import { Restaurant } from "../restaurant/restaurant.model";
 
 const insertMenuIntoDb = async (payload: TMenu): Promise<TMenu> => {
   const result = await Menu.create(payload);
@@ -151,42 +151,30 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
       );
     }
 
-    const restaurantId = review[0].restaurant;
+    const restaurantId = review[0]?.restaurant;
+    await session.commitTransaction();
+    await session.endSession();
 
-    // Use aggregation pipeline to calculate new avgRating and totalReviews
-    const pipeline: PipelineStage[] = [
-      { $match: { _id: new Types.ObjectId(restaurantId.toString()) } },
+    // Perform aggregation and update outside the transaction
+    const pipeline = [
+      { $match: { restaurant: new Types.ObjectId(restaurantId.toString()) } },
       {
-        $lookup: {
-          from: "reviews",
-          localField: "_id",
-          foreignField: "restaurant",
-          as: "reviews",
-        },
-      },
-      {
-        $project: {
-          avgRating: { $avg: "$reviews.rating" },
-          totalReviews: { $size: "$reviews" },
-        },
-      },
-      {
-        $merge: {
-          into: "restaurants",
-          whenMatched: [
-            {
-              $set: {
-                avgRating: "$avgRating",
-                totalReviews: "$totalReviews",
-              },
-            },
-          ],
-          whenNotMatched: "discard",
+        $group: {
+          _id: null,
+          avgRating: { $avg: "$rating" },
+          totalReviews: { $sum: 1 },
         },
       },
     ];
 
-    await Restaurant.aggregate(pipeline).session(session);
+    const result = await Review.aggregate(pipeline);
+    if (result.length > 0) {
+      const { avgRating, totalReviews } = result[0];
+      await Restaurant.updateOne(
+        { _id: restaurantId },
+        { avgRating, totalReviews }
+      );
+    }
 
     await session.commitTransaction();
     await session.endSession();
@@ -199,7 +187,23 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
 };
 
 const getAllReviews = async (restaurantId: string) => {
-  const result = Review.find({ restaurant: restaurantId }).populate("user");
+  const pipeline: PipelineStage[] = [
+    {
+      $match: {
+        restaurant: new mongoose.Types.ObjectId(restaurantId.toString()),
+      },
+    },
+    {
+      $group: {
+        _id: "$rating",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { _id: 1 },
+    },
+  ];
+  const result = await Review.aggregate(pipeline);
   return result;
 };
 

@@ -1,9 +1,9 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
-import { USER_ROLE } from "../user/user.constant";
-import { restauranntControllers } from "./restaurant.controller";
 import fileUpload from "../../middleware/fileUpload";
 import parseData from "../../middleware/parseData";
+import { USER_ROLE } from "../user/user.constant";
+import { restauranntControllers } from "./restaurant.controller";
 const upload = fileUpload("./public/uploads/restaurant/");
 const router = Router();
 router.post(
@@ -45,7 +45,7 @@ router.get(
 );
 router.get(
   "/:id",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
+  // auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
   restauranntControllers.getSingleRestaurant
 );
 router.patch(

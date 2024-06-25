@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
+import { RessearchAbleFields } from "./restaurant.constant";
 import { TRestaurant } from "./restaurant.inerface";
 import { Restaurant } from "./restaurant.model";
-import { RessearchAbleFields } from "./restaurant.constant";
 
 const insertRestaurantIntoDb = async (
   payload: TRestaurant
@@ -64,6 +64,7 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
   };
 };
 const getSingleRestaurant = async (id: string) => {
+  console.log(id);
   const result = await Restaurant.aggregate([
     {
       $match: {
@@ -94,6 +95,7 @@ const getSingleRestaurant = async (id: string) => {
         status: 1,
         images: 1,
         reviewStatus: 1,
+        map: 1,
         days: {
           $map: {
             input: [
@@ -159,7 +161,6 @@ const updateRestaurant = async (id: string, payload: Partial<TRestaurant>) => {
 
 const deleteFiles = async (payload: any) => {
   const { restaurantId, imageId } = payload;
-  console.log(payload);
   const result = await Restaurant.findByIdAndUpdate(
     restaurantId,
     {

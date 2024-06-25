@@ -1,11 +1,11 @@
+import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
-import { otpServices } from "./otp.service";
 import sendResponse from "../../utils/sendResponse";
-import { Request, Response } from "express";
+import { otpServices } from "./otp.service";
 const verifyOtp = catchAsync(async (req: Request, res: Response) => {
   const token = req?.headers?.token;
-
+  console.log(req.headers);
   const result = await otpServices.verifyOtp(token as string, req.body.otp);
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -1,4 +1,4 @@
-import { Query, Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { MenuModel, TMenu, TReview } from "./menu.inteface";
 const reviewSchema = new Schema<TReview>({
   user: {
