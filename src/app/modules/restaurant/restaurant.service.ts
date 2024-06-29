@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { RessearchAbleFields } from "./restaurant.constant";
 import { TRestaurant } from "./restaurant.inerface";
@@ -50,13 +50,16 @@ const getAllRestaurant = async (query: Record<string, any>) => {
 // get all restaurants for phone
 
 const getAllRestaurantsForUser = async (query: Record<string, any>) => {
+  console.log("query", query);
   const RestaurantModel = new QueryBuilder(Restaurant.find(), query)
-    .search([])
+    .search(["name"])
     .filter()
+    .geospatial()
     .paginate()
     .sort()
     .fields();
   const data = await RestaurantModel.modelQuery;
+  console.log(data);
   const meta = await RestaurantModel.countTotal();
   return {
     data,
@@ -64,7 +67,6 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
   };
 };
 const getSingleRestaurant = async (id: string) => {
-  console.log(id);
   const result = await Restaurant.aggregate([
     {
       $match: {
@@ -93,6 +95,8 @@ const getSingleRestaurant = async (id: string) => {
         location: 1,
         description: 1,
         status: 1,
+        helpLineNumber1: 1,
+        helpLineNumber2: 1,
         images: 1,
         reviewStatus: 1,
         map: 1,
@@ -222,8 +226,8 @@ const getAllRestaurantForAdmin = async (query: Record<string, any>) => {
   return result;
 };
 const nearByRestaurant = async (query: Record<string, any>) => {
-  const pipeline = [];
-  const { maxDistance } = query;
+  const pipeline: PipelineStage[] = [];
+  const { maxDistance = 5000, longitude, latitude } = query;
 
   // If geospatial data is provided, add $geoNear stage
   if (query?.longitude && query?.latitude) {
@@ -231,14 +235,12 @@ const nearByRestaurant = async (query: Record<string, any>) => {
       $geoNear: {
         near: {
           type: "Point",
-          coordinates: [
-            parseFloat(query?.longitude),
-            parseFloat(query?.latitude),
-          ],
+          coordinates: [parseFloat(longitude), parseFloat(latitude)],
+          // coordinates: [90.42308159679541, 23.77634120911962],
         },
-        key: "map.coordinates",
+        key: "map",
+        maxDistance: parseFloat(maxDistance) * 1609,
         distanceField: "dist.calculated",
-        maxDistance: parseFloat(maxDistance ?? 5000) * 1609, // Convert maxDistance from miles to meters
         spherical: true,
       },
     });
@@ -252,6 +254,8 @@ const nearByRestaurant = async (query: Record<string, any>) => {
       },
     });
   }
+  const result = await Restaurant.aggregate(pipeline);
+  return result;
 };
 
 export const restaurantServices = {

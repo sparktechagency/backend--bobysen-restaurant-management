@@ -17,6 +17,10 @@ const bookingSchema = new Schema<TBooking>(
       ref: "Restaurant",
       required: [true, "table id is required"],
     },
+    isReviewed: {
+      type: Boolean,
+      default: false,
+    },
     table: {
       type: Schema.Types.ObjectId,
       ref: "Table",
@@ -36,7 +40,7 @@ const bookingSchema = new Schema<TBooking>(
     },
     status: {
       type: String,
-      enum: ["active", "cancelled", "closed"],
+      enum: ["active", "cancelled", "completed"],
       default: "active",
     },
   },

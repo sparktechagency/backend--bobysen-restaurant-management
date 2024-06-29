@@ -6,6 +6,13 @@ import { USER_ROLE } from "../user/user.constant";
 import { menuControllers, reviewControllers } from "./menu.controller";
 const upload = fileUpload("./public/uploads/menu");
 const router = Router();
+export const reviewrouter = Router();
+reviewrouter.post(
+  "/",
+  auth(USER_ROLE.user),
+  reviewControllers.insertReviewIntoDb
+);
+reviewrouter.get("/:id", reviewControllers.getAllReviews);
 router.post(
   "/",
   upload.single("file"),

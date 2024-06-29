@@ -1,15 +1,15 @@
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
+import bcrypt from "bcrypt";
 import httpStatus from "http-status";
+import moment from "moment";
+import config from "../../config";
 import AppError from "../../error/AppError";
+import { sendEmail } from "../../utils/mailSender";
+import { generateOtp } from "../../utils/otpGenerator";
 import { User } from "../user/user.model";
 import { TchangePassword, Tlogin, TresetPassword } from "./auth.interface";
-import config from "../../config";
 import { createToken, verifyToken } from "./auth.utils";
-import { generateOtp } from "../../utils/otpGenerator";
-import moment from "moment";
-import { sendEmail } from "../../utils/mailSender";
-import bcrypt from "bcrypt";
 
 const login = async (payload: Tlogin) => {
   const user = await User.isUserExist(payload?.email);

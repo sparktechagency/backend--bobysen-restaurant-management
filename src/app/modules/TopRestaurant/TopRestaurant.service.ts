@@ -44,6 +44,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 10;
   const skip = (page - 1) * limit;
+
   pipeline.push(
     {
       $match: {
@@ -60,6 +61,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
     },
     { $unwind: "$restaurant" }
   );
+
   if (query?.searchTerm) {
     pipeline.push({
       $match: {
@@ -69,6 +71,8 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
       },
     });
   }
+
+  // Add geospatial stage if latitude and longitude are provided
 
   // Dynamic filter stage
   const filterConditions = Object.fromEntries(
@@ -82,6 +86,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
       $match: filterConditions,
     });
   }
+
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: limit });
 
@@ -89,9 +94,10 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
   const data = await TopRestaurant.aggregate(pipeline);
 
   // Fetch the total count for pagination meta
+  const total = await TopRestaurant.countDocuments({ isExpired: false });
 
-  const total = data.length;
   const totalPage = Math.ceil(total / limit);
+
   return {
     data,
     meta: {

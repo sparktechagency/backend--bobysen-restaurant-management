@@ -1,9 +1,9 @@
 import QueryBuilder from "../../builder/QueryBuilder";
-import { TCart, TRemoveItem } from "./cart.interface";
+import { TRemoveItem } from "./cart.interface";
 import { Cart } from "./cart.model";
-import { FilterQuery } from "mongoose";
 
 const insertItemsIntoCart = async (payload: any) => {
+  console.log(payload);
   const result = await Cart.findOneAndUpdate(
     {
       booking: payload.booking,

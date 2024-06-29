@@ -1,10 +1,9 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { restaurantServices } from "./restaurant.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
 import { storeFile } from "../../utils/fileHelper";
-import { USER_ROLE } from "../user/user.constant";
+import sendResponse from "../../utils/sendResponse";
+import { restaurantServices } from "./restaurant.service";
 const insertRestaurantIntDb = catchAsync(
   async (req: Request, res: Response) => {
     const images = [];
@@ -62,7 +61,6 @@ const getSingleRestaurant = catchAsync(async (req: Request, res: Response) => {
 });
 const updateRestaurant = catchAsync(async (req: Request, res: Response) => {
   const images = [];
-  console.log(req.files);
   if (req?.files instanceof Array) {
     for (const file of req?.files) {
       images.push({ url: storeFile("Restaurant", file?.filename) });

@@ -12,7 +12,7 @@ const tableSchema = new Schema<Ttable, TableModel>(
       default: "",
     },
     seats: {
-      type: String,
+      type: Number,
       required: [true, "total seat is required"],
     },
     restaurant: {

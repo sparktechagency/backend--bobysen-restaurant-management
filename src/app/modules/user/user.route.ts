@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { userControllers } from "./user.controller";
 import auth from "../../middleware/auth";
-import { USER_ROLE } from "./user.constant";
 import fileUpload from "../../middleware/fileUpload";
 import parseData from "../../middleware/parseData";
+import { USER_ROLE } from "./user.constant";
+import { userControllers } from "./user.controller";
 const upload = fileUpload("./public/uploads/profile/");
 const router = Router();
 router.post(
@@ -34,7 +34,7 @@ router.patch(
 );
 router.get(
   "/all",
-  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
   userControllers.getAllUsers
 );
 router.get(

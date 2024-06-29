@@ -137,7 +137,7 @@ const RestaurantSchema = new Schema<TRestaurant>(
     timestamps: true,
   }
 );
-RestaurantSchema.index({ "map.coordinates": "2dsphere" });
+RestaurantSchema.index({ map: "2dsphere" });
 
 // filter out deleted documents
 RestaurantSchema.pre("find", function (next) {

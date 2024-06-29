@@ -15,5 +15,6 @@ export interface TBooking {
   date: string;
   endTime: string;
   time: string;
-  status: "active" | "cancelled" | "closed";
+  status: "active" | "cancelled" | "completed";
+  isReviewed: boolean;
 }

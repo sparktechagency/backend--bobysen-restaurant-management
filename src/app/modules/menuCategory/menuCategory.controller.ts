@@ -1,9 +1,9 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { menuCategoryServices } from "./menuCategory.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
 import { storeFile } from "../../utils/fileHelper";
+import sendResponse from "../../utils/sendResponse";
+import { menuCategoryServices } from "./menuCategory.service";
 const insertMenuCategoryIntoDb = catchAsync(
   async (req: Request, res: Response) => {
     if (req?.file) {
@@ -23,6 +23,7 @@ const insertMenuCategoryIntoDb = catchAsync(
   }
 );
 const findAllCategory = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.query);
   const result = await menuCategoryServices.findAllCategory(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,

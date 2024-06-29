@@ -54,9 +54,9 @@ const bookAtable = async (payload: TBook) => {
   // retrive total tables under the restaurant
   const totalTables = await Table.find({
     restaurant: payload.restaurant,
-    seats: payload?.seats,
+    seats: payload.seats,
   }).countDocuments();
-
+  console.log(totalTables, payload);
   const expireHours = calculateEndTime(payload?.time);
   // retrive book tables
   const bookedTables: any = await Booking.find({
@@ -66,6 +66,8 @@ const bookAtable = async (payload: TBook) => {
     arrivalTime: { $lt: expireHours },
     endTime: { $gt: payload?.time },
   }).populate("restaurant");
+
+  console.log(bookAtable?.length);
   // conditionally check avilable tables
   if (bookedTables?.length >= totalTables) {
     throw new AppError(
@@ -96,6 +98,7 @@ const bookAtable = async (payload: TBook) => {
     ...payload,
     date: moment(payload?.date).format("YYYY-MM-DD"),
     table: findTable[0]?._id,
+    endTime: calculateEndTime(payload?.time),
     restaurant: payload?.restaurant,
     id: generateBookingNumber(),
   };

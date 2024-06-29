@@ -25,7 +25,7 @@ router.get(
 );
 router.get(
   "/",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
+  // auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
   restauranntControllers.getAllRestaurantsForUser
 );
 router.get(

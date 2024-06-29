@@ -1,9 +1,9 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { bookingServies } from "./booking.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
-import moment from "moment";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { USER_ROLE } from "../user/user.constant";
+import { bookingServies } from "./booking.service";
 const bookAtable = catchAsync(async (req: Request, res: Response) => {
   req.body.user = req?.user?.userId;
   const result = await bookingServies.bookAtable(req.body);
@@ -15,7 +15,13 @@ const bookAtable = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllBooking = catchAsync(async (req: Request, res: Response) => {
-  const result = await bookingServies.getAllBookings(req.query);
+  const { role, userId } = req.user;
+  console.log(userId);
+  const query = { ...req.query };
+  if (role === USER_ROLE.user) {
+    query["user"] = userId;
+  }
+  const result = await bookingServies.getAllBookings(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

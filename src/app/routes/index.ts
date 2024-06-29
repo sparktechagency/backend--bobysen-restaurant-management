@@ -4,7 +4,7 @@ import { bookingRoutes } from "../modules/booking/booking.route";
 import { cartRoutes } from "../modules/cart/cart.route";
 import { contentRoues } from "../modules/content/content.route";
 import { favoriteLisRoutes } from "../modules/favoriteList/favouriteList.route";
-import { menuRoutes } from "../modules/menu/menu.route";
+import { menuRoutes, reviewrouter } from "../modules/menu/menu.route";
 import { menuCategoryRoutes } from "../modules/menuCategory/menuCategory.route";
 import { notificationRoutes } from "../modules/notification/notificaiton.route";
 import { orderRoutes } from "../modules/order/order.route";
@@ -44,6 +44,10 @@ const moduleRoutes = [
   {
     path: "/menu",
     route: menuRoutes,
+  },
+  {
+    path: "/reviews",
+    route: reviewrouter,
   },
   {
     path: "/tables",

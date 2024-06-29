@@ -1,9 +1,9 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
-import { USER_ROLE } from "../user/user.constant";
-import { categoryControllers } from "./menuCategory.controller";
 import fileUpload from "../../middleware/fileUpload";
 import parseData from "../../middleware/parseData";
+import { USER_ROLE } from "../user/user.constant";
+import { categoryControllers } from "./menuCategory.controller";
 const router = Router();
 const upload = fileUpload("./public/uploads/category");
 router.post(
@@ -16,12 +16,12 @@ router.post(
 
 router.get(
   "/",
-  auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
+  // auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
   categoryControllers.findAllCategory
 );
 router.get(
   "/:id",
-  auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
+  // auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
   categoryControllers.getSingleCategory
 );
 router.patch(

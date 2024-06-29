@@ -3,6 +3,7 @@ import mongoose, { PipelineStage, Types } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
 import { deleteFile } from "../../utils/fileHelper";
+import { Booking } from "../booking/booking.model";
 import { Restaurant } from "../restaurant/restaurant.model";
 import { TMenu, TReview } from "./menu.inteface";
 import { Menu, Review } from "./menu.model";
@@ -143,6 +144,17 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
   try {
     session.startTransaction();
 
+    const updateBooking = await Booking.findByIdAndUpdate(
+      payload?.booking,
+      {
+        isReviewed: true,
+      },
+      { session }
+    );
+    if (!updateBooking) {
+      throw new AppError(httpStatus.NOT_ACCEPTABLE, "Something went wrong.");
+    }
+
     const review = await Review.create([payload], { session });
     if (!review[0]) {
       throw new AppError(
@@ -152,8 +164,6 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
     }
 
     const restaurantId = review[0]?.restaurant;
-    await session.commitTransaction();
-    await session.endSession();
 
     // Perform aggregation and update outside the transaction
     const pipeline = [
@@ -187,26 +197,104 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
 };
 
 const getAllReviews = async (restaurantId: string) => {
-  const pipeline: PipelineStage[] = [
+  const pipeline = [
     {
       $match: {
         restaurant: new mongoose.Types.ObjectId(restaurantId.toString()),
       },
     },
     {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "userDetails",
+      },
+    },
+    {
+      $unwind: "$userDetails",
+    },
+    {
       $group: {
         _id: "$rating",
         count: { $sum: 1 },
+        reviews: {
+          $push: {
+            rating: "$rating",
+            comment: "$comment",
+            user: {
+              name: "$userDetails.fullName",
+              image: "$userDetails.image",
+            },
+          },
+        },
       },
     },
     {
       $sort: { _id: 1 },
     },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: "$count" },
+        ratings: {
+          $push: {
+            rating: "$_id",
+            count: "$count",
+            reviews: "$reviews",
+          },
+        },
+      },
+    },
+    {
+      $unwind: "$ratings",
+    },
+    {
+      $addFields: {
+        "ratings.avg": {
+          $multiply: [
+            {
+              $divide: ["$ratings.count", "$total"],
+            },
+            100,
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $first: "$total" },
+        ratingOverview: {
+          $push: {
+            k: { $concat: [{ $toString: "$ratings.rating" }, "star"] },
+            v: {
+              count: "$ratings.count",
+              avg: "$ratings.avg",
+            },
+          },
+        },
+        reviews: { $push: "$ratings.reviews" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        ratingOverview: { $arrayToObject: "$ratingOverview" },
+        reviews: {
+          $reduce: {
+            input: "$reviews",
+            initialValue: [],
+            in: { $concatArrays: ["$$value", "$$this"] },
+          },
+        },
+      },
+    },
   ];
-  const result = await Review.aggregate(pipeline);
-  return result;
-};
 
+  const result = await Review.aggregate(pipeline as PipelineStage[]);
+  return result[0];
+};
 export const menuServices = {
   insertMenuIntoDb,
   getAllMenu,
