@@ -17,8 +17,8 @@ const reviewSchema = new Schema<TReview>({
     required: [true, "reservation  id is required"],
   },
   rating: {
-    type: String,
-    required: [true, "stars is required"],
+    type: Number,
+    required: [true, "rating is required"],
   },
   comment: {
     type: String,

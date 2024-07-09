@@ -1,5 +1,5 @@
 import httpStatus from "http-status";
-import mongoose, { PipelineStage, Types } from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
 import { deleteFile } from "../../utils/fileHelper";
@@ -14,6 +14,7 @@ const insertMenuIntoDb = async (payload: TMenu): Promise<TMenu> => {
 };
 
 const getAllMenu = async (query: { [key: string]: any }) => {
+  console.log(query);
   const MenuModel = new QueryBuilder(Menu.find(), query)
     .search(["name"])
     .filter()
@@ -167,23 +168,25 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
 
     // Perform aggregation and update outside the transaction
     const pipeline = [
-      { $match: { restaurant: new Types.ObjectId(restaurantId.toString()) } },
+      { $match: { restaurant: restaurantId } },
       {
         $group: {
           _id: null,
           avgRating: { $avg: "$rating" },
-          totalReviews: { $sum: 1 },
         },
       },
     ];
 
     const result = await Review.aggregate(pipeline);
+    console.log(result);
     if (result.length > 0) {
-      const { avgRating, totalReviews } = result[0];
-      await Restaurant.updateOne(
+      const { avgRating } = result[0];
+      const submit = await Restaurant.updateOne(
         { _id: restaurantId },
-        { avgRating, totalReviews }
+        { avgReviews: avgRating }
       );
+
+      console.log(submit);
     }
 
     await session.commitTransaction();

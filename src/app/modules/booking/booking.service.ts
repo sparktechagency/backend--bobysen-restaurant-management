@@ -8,9 +8,14 @@ import { messages } from "../notification/notification.constant";
 import { modeType } from "../notification/notification.interface";
 import { Restaurant } from "../restaurant/restaurant.model";
 import { Table } from "../table/table.model";
+import { User } from "../user/user.model";
 import { TBook } from "./booking.interface";
 import { Booking } from "./booking.model";
-import { calculateEndTime, generateBookingNumber } from "./booking.utils";
+import {
+  calculateEndTime,
+  generateBookingNumber,
+  sendMessageToNumber,
+} from "./booking.utils";
 
 // search booking
 const bookAtable = async (payload: TBook) => {
@@ -21,9 +26,7 @@ const bookAtable = async (payload: TBook) => {
       "If you want to book more than 10 seats, please contact the restaurant owner."
     );
   }
-
   const restaurant: any = await Restaurant.findById(payload?.restaurant);
-
   // check if restaurant booked or open
   const bookingTime = moment(payload.date);
   const isClosed = bookingTime.isBetween(
@@ -32,14 +35,12 @@ const bookAtable = async (payload: TBook) => {
     undefined,
     "[]"
   );
-
   if (isClosed) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
       "Restaurant is closed during this time. Please select another date."
     );
   }
-
   // check the restaurant avilable that day
   const { openingTime, closingTime } = restaurant[day?.toLocaleLowerCase()];
   if (
@@ -54,9 +55,8 @@ const bookAtable = async (payload: TBook) => {
   // retrive total tables under the restaurant
   const totalTables = await Table.find({
     restaurant: payload.restaurant,
-    seats: payload.seats,
+    seats: Number(payload.seats),
   }).countDocuments();
-  console.log(totalTables, payload);
   const expireHours = calculateEndTime(payload?.time);
   // retrive book tables
   const bookedTables: any = await Booking.find({
@@ -66,8 +66,7 @@ const bookAtable = async (payload: TBook) => {
     arrivalTime: { $lt: expireHours },
     endTime: { $gt: payload?.time },
   }).populate("restaurant");
-
-  console.log(bookAtable?.length);
+  console.log(bookedTables, "bookedtables");
   // conditionally check avilable tables
   if (bookedTables?.length >= totalTables) {
     throw new AppError(
@@ -80,7 +79,7 @@ const bookAtable = async (payload: TBook) => {
     {
       $match: {
         restaurant: new Types.ObjectId(payload?.restaurant),
-        seats: payload?.seats,
+        seats: Number(payload?.seats),
       },
     },
     {
@@ -103,6 +102,14 @@ const bookAtable = async (payload: TBook) => {
     id: generateBookingNumber(),
   };
 
+  // find user
+  const user = await User.findById(payload?.user).select(
+    "fullName phoneNumber"
+  );
+  console.log(user);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
   const result = await Booking.create(data);
   const notificationData = [
     {
@@ -121,6 +128,17 @@ const bookAtable = async (payload: TBook) => {
     //   model_type: modeType.Booking,
     // },
   ];
+
+  // send message to the customer
+  await sendMessageToNumber(
+    user?.phoneNumber,
+    `Hello ${user.fullName}, your table reservation at ${restaurant?.name}, has been successfully confirmed for ${result?.date} at ${result?.time}. We look forward to hosting you for ${findTable[0]?.seats}  guests. Please arrive within your designated time to ensure your reservation remains valid. Thank you!`
+  );
+  // send message to the vendor
+  await sendMessageToNumber(
+    user?.phoneNumber,
+    `Hello, a customer named ${user.fullName} has booked a table at your restaurant, ${restaurant?.name}, for ${result?.date} at ${result?.time}. They plan to bring ${findTable[0]?.seats} guests. Please note their contact number: ${user.phoneNumber}. We look forward to welcoming them. Thank you!`
+  );
   await notificationServices.insertNotificationIntoDb(notificationData);
   return result;
 };

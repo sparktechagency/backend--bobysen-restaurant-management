@@ -6,7 +6,7 @@ const RestaurantSchema = new Schema<TRestaurant>(
       type: String,
       required: [true, "name is required"],
     },
-    location: {
+    address: {
       type: String,
       required: [true, "location is required"],
     },
@@ -18,12 +18,11 @@ const RestaurantSchema = new Schema<TRestaurant>(
       type: Number,
       // required:[true,"helpLine Number is required"]
     },
-    map: {
-      type: {
-        latitude: Number,
-        longitude: Number,
-        coordinates: [Number],
-      },
+    location: {
+      latitude: Number,
+      longitude: Number,
+      coordinates: [Number],
+      type: { type: String, default: "Point" },
     },
     description: {
       type: String,
@@ -137,9 +136,7 @@ const RestaurantSchema = new Schema<TRestaurant>(
     timestamps: true,
   }
 );
-RestaurantSchema.index({ map: "2dsphere" });
-
-// filter out deleted documents
+// RestaurantSchema.index({ map: "2dsphere" });
 RestaurantSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
@@ -150,8 +147,8 @@ RestaurantSchema.pre("findOne", function (next) {
   next();
 });
 
-RestaurantSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
+// RestaurantSchema.pre("aggregate", function (next) {
+//   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+//   next();
+// });
 export const Restaurant = model<TRestaurant>("Restaurant", RestaurantSchema);

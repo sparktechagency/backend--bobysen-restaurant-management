@@ -41,7 +41,8 @@ const getAllRestaurant = async (query: Record<string, any>) => {
         name: 1,
         location: 1,
         tables: { $size: "$tables" }, // Count total tables
-        menus: { $size: "$menus" }, // Count total menus
+        menus: { $size: "$menus" },
+        address: 1, // Count total menus
       },
     },
   ]);
@@ -50,21 +51,16 @@ const getAllRestaurant = async (query: Record<string, any>) => {
 // get all restaurants for phone
 
 const getAllRestaurantsForUser = async (query: Record<string, any>) => {
-  console.log("query", query);
   const RestaurantModel = new QueryBuilder(Restaurant.find(), query)
     .search(["name"])
     .filter()
-    .geospatial()
-    .paginate()
+    .fields()
     .sort()
-    .fields();
+    .paginate();
+
   const data = await RestaurantModel.modelQuery;
-  console.log(data);
   const meta = await RestaurantModel.countTotal();
-  return {
-    data,
-    meta,
-  };
+  return { data, meta };
 };
 const getSingleRestaurant = async (id: string) => {
   const result = await Restaurant.aggregate([
@@ -226,35 +222,36 @@ const getAllRestaurantForAdmin = async (query: Record<string, any>) => {
   return result;
 };
 const nearByRestaurant = async (query: Record<string, any>) => {
-  const pipeline: PipelineStage[] = [];
-  const { maxDistance = 5000, longitude, latitude } = query;
-
+  // const pipeline: PipelineStage[] = [];
+  const { maxDistance = 10000, longitude, latitude } = query;
   // If geospatial data is provided, add $geoNear stage
-  if (query?.longitude && query?.latitude) {
-    pipeline.push({
+
+  const pipeline: PipelineStage[] = [
+    {
       $geoNear: {
         near: {
           type: "Point",
           coordinates: [parseFloat(longitude), parseFloat(latitude)],
           // coordinates: [90.42308159679541, 23.77634120911962],
         },
-        key: "map",
+        key: "location",
         maxDistance: parseFloat(maxDistance) * 1609,
         distanceField: "dist.calculated",
         spherical: true,
       },
-    });
-  }
+    },
+  ];
 
   // If searchTerm is provided, add $match stage for name search
-  if (query?.searchTerm) {
-    pipeline.push({
-      $match: {
-        name: new RegExp(query?.searchTerm, "i"), // Case-insensitive regex search
-      },
-    });
-  }
+  // if (query?.searchTerm) {
+  //   pipeline.push({
+  //     $match: {
+  //       name: new RegExp(query?.searchTerm, "i"), // Case-insensitive regex search
+  //     },
+  //   });
+  // }
   const result = await Restaurant.aggregate(pipeline);
+  console.log(result);
   return result;
 };
 

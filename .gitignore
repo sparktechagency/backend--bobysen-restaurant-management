@@ -1,1 +1,4 @@
 node_modules
+public
+.wwebjs_auth
+.wwebjs_cache

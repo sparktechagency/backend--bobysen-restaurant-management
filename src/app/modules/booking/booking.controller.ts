@@ -16,7 +16,6 @@ const bookAtable = catchAsync(async (req: Request, res: Response) => {
 });
 const getAllBooking = catchAsync(async (req: Request, res: Response) => {
   const { role, userId } = req.user;
-  console.log(userId);
   const query = { ...req.query };
   if (role === USER_ROLE.user) {
     query["user"] = userId;

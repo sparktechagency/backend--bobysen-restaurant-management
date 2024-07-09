@@ -5,6 +5,7 @@ export interface TBook {
   time: string;
   user: ObjectId;
   seats: string | number;
+  customerNumber: string;
 }
 
 export interface TBooking {

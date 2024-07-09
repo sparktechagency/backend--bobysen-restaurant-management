@@ -17,7 +17,7 @@ router.post(
   "/",
   upload.single("file"),
   parseData(),
-  auth(USER_ROLE.vendor),
+  auth(USER_ROLE.user),
   menuControllers.insertMenuIntoDb
 );
 router.get(
@@ -27,12 +27,12 @@ router.get(
 );
 router.get(
   "/",
-  auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
+  // auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
   menuControllers.getAllMenu
 );
 router.get(
   "/:id",
-  auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
+  // auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
   menuControllers.getsingleMenu
 );
 

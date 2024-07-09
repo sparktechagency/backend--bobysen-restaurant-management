@@ -10,7 +10,7 @@ router.post(
   "/",
   upload.array("files"),
   parseData(),
-  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
   restauranntControllers.insertRestaurantIntDb
 );
 router.get(

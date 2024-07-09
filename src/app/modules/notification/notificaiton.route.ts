@@ -16,4 +16,10 @@ router.patch(
   notificationControllers.markAsDone
 );
 
+router.get("/get-payment-data", async (req, res) => {
+  console.log(req.body);
+  try {
+  } catch (error) {}
+});
+
 export const notificationRoutes = router;

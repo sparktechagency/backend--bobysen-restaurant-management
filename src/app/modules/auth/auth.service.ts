@@ -1,8 +1,8 @@
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-
 import bcrypt from "bcrypt";
 import httpStatus from "http-status";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import moment from "moment";
+
 import config from "../../config";
 import AppError from "../../error/AppError";
 import { sendEmail } from "../../utils/mailSender";
@@ -10,7 +10,6 @@ import { generateOtp } from "../../utils/otpGenerator";
 import { User } from "../user/user.model";
 import { TchangePassword, Tlogin, TresetPassword } from "./auth.interface";
 import { createToken, verifyToken } from "./auth.utils";
-
 const login = async (payload: Tlogin) => {
   const user = await User.isUserExist(payload?.email);
   if (!user) {

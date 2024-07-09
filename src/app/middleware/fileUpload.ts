@@ -1,6 +1,6 @@
-import multer from "multer";
-import fs from "fs";
 import { Request } from "express";
+import fs from "fs";
+import multer from "multer";
 const fileUpload = (uploadDirectory: string) => {
   if (!fs.existsSync(uploadDirectory)) {
     fs.mkdirSync(uploadDirectory, { recursive: true });
@@ -29,11 +29,13 @@ const fileUpload = (uploadDirectory: string) => {
     },
 
     fileFilter: function (req: Request, file, cb) {
+      console.log(file.mimetype);
       if (
         file.mimetype === "image/png" ||
         file.mimetype === "image/jpg" ||
         file.mimetype === "image/jpeg" ||
         file.mimetype === "image/svg" ||
+        file.mimetype === "image/webp" ||
         file.mimetype === "image/svg+xml"
       ) {
         cb(null, true);

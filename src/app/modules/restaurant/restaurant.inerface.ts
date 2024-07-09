@@ -8,18 +8,19 @@ interface map {
   latitude: number;
   longitude: number;
   coordinates: [number];
+  type: { type: string };
 }
 export interface TRestaurant {
   [x: string]: any;
   name: string;
-  location: string;
+  address: string;
   owner: ObjectId;
   isDeleted: boolean;
   images?: string[];
   reviewStatus: boolean;
   description: string;
   avgReviews?: string;
-  map: map;
+  location: map;
   status: "active" | "inactive";
   helpLineNumber1: String;
   helpLineNumber2?: String;
