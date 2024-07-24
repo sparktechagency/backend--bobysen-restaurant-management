@@ -1,4 +1,5 @@
 import httpStatus from "http-status";
+import moment from "moment";
 import { PipelineStage } from "mongoose";
 import AppError from "../../error/AppError";
 import { TtopRestaurant } from "./TopRestaurant.interface";
@@ -9,7 +10,13 @@ import {
 } from "./topRestaurant.constant";
 
 const insertTopRestaurantIntoDb = async (payload: TtopRestaurant) => {
-  const { restaurant } = payload;
+  const { restaurant, startDate, endDate } = payload;
+  if (moment(endDate).isSameOrBefore(startDate)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "The end date must be later than the start date. Please select a valid end date."
+    );
+  }
   const findTopRestaurant = await TopRestaurant.findOne({ restaurant });
   if (findTopRestaurant) {
     throw new AppError(
@@ -17,6 +24,7 @@ const insertTopRestaurantIntoDb = async (payload: TtopRestaurant) => {
       "This Restaurant already in the list"
     );
   }
+
   const result = await TopRestaurant.create(payload);
   return result;
 };
