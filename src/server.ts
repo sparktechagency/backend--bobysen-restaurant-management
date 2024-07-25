@@ -52,7 +52,7 @@ function whatSappServe() {
     console.error("Error initializing WhatsApp client", err);
   });
 }
-whatSappServe();
+// whatSappServe();
 main();
 
 process.on("unhandledRejection", (err) => {

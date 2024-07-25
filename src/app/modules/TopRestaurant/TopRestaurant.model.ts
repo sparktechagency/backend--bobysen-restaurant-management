@@ -8,6 +8,12 @@ const TopReStaurantSchema = new Schema<TtopRestaurant>(
       ref: "Restaurant",
       required: [true, "restaurant is required"],
     },
+    location: {
+      latitude: Number,
+      longitude: Number,
+      coordinates: [Number],
+      type: { type: String, default: "Point" },
+    },
     startDate: {
       type: String,
       required: [true, "startDate is required"],
@@ -41,10 +47,10 @@ TopReStaurantSchema.pre("findOne", function (next) {
   next();
 });
 
-TopReStaurantSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
+// TopReStaurantSchema.pre("aggregate", function (next) {
+//   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+//   next();
+// });
 export const TopRestaurant = model<TtopRestaurant>(
   "TopRestaurant",
   TopReStaurantSchema

@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import moment from "moment";
 import { PipelineStage } from "mongoose";
 import AppError from "../../error/AppError";
+import { Restaurant } from "../restaurant/restaurant.model";
 import { TtopRestaurant } from "./TopRestaurant.interface";
 import { TopRestaurant } from "./TopRestaurant.model";
 import {
@@ -18,6 +19,7 @@ const insertTopRestaurantIntoDb = async (payload: TtopRestaurant) => {
     );
   }
   const findTopRestaurant = await TopRestaurant.findOne({ restaurant });
+
   if (findTopRestaurant) {
     throw new AppError(
       httpStatus.CONFLICT,
@@ -25,7 +27,13 @@ const insertTopRestaurantIntoDb = async (payload: TtopRestaurant) => {
     );
   }
 
-  const result = await TopRestaurant.create(payload);
+  // get location field
+  const getLocation = await Restaurant.findById(restaurant).select("location");
+
+  const result = await TopRestaurant.create({
+    ...payload,
+    location: getLocation?.location,
+  });
   return result;
 };
 
@@ -52,11 +60,32 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 10;
   const skip = (page - 1) * limit;
+  if (query?.latitude && query?.longitude) {
+    pipeline.push({
+      $geoNear: {
+        near: {
+          type: "Point",
+          coordinates: [
+            parseFloat(query?.longitude),
+            parseFloat(query?.latitude),
+          ],
+          // coordinates: [90.42308159679541, 23.77634120911962],
+        },
+        key: "location",
+        query: {},
+        maxDistance:
+          parseFloat(query?.maxDistance ?? (10000 as unknown as string)) * 1609,
+        distanceField: "dist.calculated",
+        spherical: true,
+      },
+    });
+  }
 
   pipeline.push(
     {
       $match: {
         isExpired: false,
+        isDeleted: false,
       },
     },
     {
@@ -70,6 +99,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
     { $unwind: "$restaurant" }
   );
 
+  // dynamic search
   if (query?.searchTerm) {
     pipeline.push({
       $match: {
@@ -79,8 +109,6 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
       },
     });
   }
-
-  // Add geospatial stage if latitude and longitude are provided
 
   // Dynamic filter stage
   const filterConditions = Object.fromEntries(
@@ -102,7 +130,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
   const data = await TopRestaurant.aggregate(pipeline);
 
   // Fetch the total count for pagination meta
-  const total = await TopRestaurant.countDocuments({ isExpired: false });
+  const total = await TopRestaurant.countDocuments(data);
 
   const totalPage = Math.ceil(total / limit);
 

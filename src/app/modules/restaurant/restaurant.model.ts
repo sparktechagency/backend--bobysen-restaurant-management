@@ -136,7 +136,7 @@ const RestaurantSchema = new Schema<TRestaurant>(
     timestamps: true,
   }
 );
-// RestaurantSchema.index({ map: "2dsphere" });
+// RestaurantSchema.index({ location: "2dsphere" });
 RestaurantSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();

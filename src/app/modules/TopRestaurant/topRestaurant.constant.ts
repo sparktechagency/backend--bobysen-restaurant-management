@@ -1,2 +1,11 @@
-export const topRestaurantSearchableFileds = ["restaurant.name"];
-export const topRestaurantExcludeFileds = ["searchTerm", "page", "limit"];
+export const topRestaurantSearchableFileds = [
+  "restaurant.name",
+  "restaurant.address",
+];
+export const topRestaurantExcludeFileds = [
+  "searchTerm",
+  "page",
+  "limit",
+  "latitude",
+  "longitude",
+];

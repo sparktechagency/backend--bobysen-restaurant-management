@@ -1,6 +1,8 @@
 import mongoose, { PipelineStage } from "mongoose";
-import QueryBuilder from "../../builder/QueryBuilder";
-import { RessearchAbleFields } from "./restaurant.constant";
+import {
+  RessearchAbleFields,
+  restaurantExcludeFields,
+} from "./restaurant.constant";
 import { TRestaurant } from "./restaurant.inerface";
 import { Restaurant } from "./restaurant.model";
 
@@ -50,17 +52,97 @@ const getAllRestaurant = async (query: Record<string, any>) => {
 };
 // get all restaurants for phone
 
-const getAllRestaurantsForUser = async (query: Record<string, any>) => {
-  const RestaurantModel = new QueryBuilder(Restaurant.find(), query)
-    .search(["name"])
-    .filter()
-    .fields()
-    .sort()
-    .paginate();
+// const getAllRestaurantsForUser = async (query: Record<string, any>) => {
+//   const RestaurantModel = new QueryBuilder(Restaurant.find(), query)
+//     .search(["name"])
+//     .filter()
+//     .fields()
+//     .sort()
+//     .paginate();
 
-  const data = await RestaurantModel.modelQuery;
-  const meta = await RestaurantModel.countTotal();
-  return { data, meta };
+//   const data = await RestaurantModel.modelQuery;
+//   const meta = await RestaurantModel.countTotal();
+//   return { data, meta };
+// };
+const getAllRestaurantsForUser = async (query: Record<string, any>) => {
+  const pipeline: PipelineStage[] = [];
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Add geospatial stage if latitude and longitude are provided
+  if (query?.latitude && query?.longitude) {
+    console.log("hitted");
+    pipeline.push({
+      $geoNear: {
+        near: {
+          type: "Point",
+          coordinates: [
+            parseFloat(query?.longitude),
+            parseFloat(query?.latitude),
+          ],
+          // coordinates: [90.42308159679541, 23.77634120911962],
+        },
+        key: "location",
+        // query: {},
+        maxDistance: parseFloat(10000 as unknown as string) * 1609,
+        distanceField: "dist.calculated",
+        spherical: true,
+      },
+    });
+  }
+  // search term
+  if (query?.searchTerm) {
+    pipeline.push({
+      $match: {
+        $or: RessearchAbleFields.map((field) => ({
+          [field]: { $regex: query.searchTerm, $options: "i" },
+        })),
+      },
+    });
+  }
+
+  // // get all current restaurant as well
+  pipeline.push({
+    $match: {
+      isDeleted: false,
+    },
+  });
+
+  // console.log(pipeline);
+  // // Dynamic filter stage
+  const filterConditions = Object.fromEntries(
+    Object.entries(query).filter(
+      ([key]) => !restaurantExcludeFields.includes(key)
+    )
+  );
+
+  if (Object.keys(filterConditions).length > 0) {
+    pipeline.push({
+      $match: filterConditions,
+    });
+  }
+
+  pipeline.push({ $skip: skip });
+  pipeline.push({ $limit: limit });
+
+  // Fetch the data
+  const data = await Restaurant.aggregate(pipeline);
+
+  // Fetch the total count for pagination meta
+  const total = await Restaurant.countDocuments(data);
+
+  const totalPage = Math.ceil(total / limit);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage,
+    },
+  };
 };
 const getSingleRestaurant = async (id: string) => {
   const result = await Restaurant.aggregate([
