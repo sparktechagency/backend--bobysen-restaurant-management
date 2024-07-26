@@ -29,8 +29,8 @@ class AgreegationBuilder<T> {
       console.log(this.query);
 
       // Ensure latitude and longitude are parsed correctly
-      const longitude = parseFloat(this.query.longitude);
-      const latitude = parseFloat(this.query.latitude);
+      const longitude = parseFloat(this.query.longitude as unknown as string);
+      const latitude = parseFloat(this.query.latitude as unknown as string);
 
       if (isNaN(longitude) || isNaN(latitude)) {
         throw new Error("Invalid latitude or longitude values");

@@ -1,5 +1,6 @@
 import { Server, createServer } from "http";
 import mongoose from "mongoose";
+import qrcode from "qrcode-terminal";
 import Whatsapp from "whatsapp-web.js";
 import app from "./app";
 import config from "./app/config";
@@ -7,7 +8,7 @@ import initializeSocketIO from "./socketIo";
 const { Client, LocalAuth } = Whatsapp;
 export const client = new Client({
   puppeteer: {
-    headless: false,
+    headless: true,
   },
   authStrategy: new LocalAuth({
     clientId: "clientId",
@@ -31,7 +32,8 @@ async function main() {
 
 function whatSappServe() {
   client.on("qr", (qr) => {
-    console.log("QR RECEIVED", qr);
+    // Generate and display the QR code in the terminal
+    qrcode.generate(qr, { small: true });
   });
 
   client.on("ready", () => {
@@ -52,7 +54,7 @@ function whatSappServe() {
     console.error("Error initializing WhatsApp client", err);
   });
 }
-// whatSappServe();
+whatSappServe();
 main();
 
 process.on("unhandledRejection", (err) => {
