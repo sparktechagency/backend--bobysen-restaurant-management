@@ -21,7 +21,7 @@ module.exports = {
           "sk_test_51JxCs8L9MVzlfyPWBrdSppNnP55RJcU7VgaaVh7yzA4GQOkGp8HuZKPkEw1XUE8Q52PVkPmrvV9pX0voNBghZEqe0",
       },
       env_production: {
-        NODE_ENV: "development",
+        NODE_ENV: "production",
         DATABASE_URL:
           "mongodb+srv://restaurant:WSC0b2Lhjzew2ETj@cluster0.dgoei.mongodb.net/restaurant?retryWrites=true&w=majority",
         PORT: 5005,
