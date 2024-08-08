@@ -29,13 +29,14 @@ const fileUpload = (uploadDirectory: string) => {
     },
 
     fileFilter: function (req: Request, file, cb) {
-      console.log(file.mimetype);
+      console.log(file);
       if (
         file.mimetype === "image/png" ||
         file.mimetype === "image/jpg" ||
         file.mimetype === "image/jpeg" ||
         file.mimetype === "image/svg" ||
         file.mimetype === "image/webp" ||
+        file.mimetype === "application/octet-stream" ||
         file.mimetype === "image/svg+xml"
       ) {
         cb(null, true);

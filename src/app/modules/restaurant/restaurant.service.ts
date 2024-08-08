@@ -168,6 +168,7 @@ const getSingleRestaurant = async (id: string) => {
       $project: {
         close: 1,
         avgReviews: 1,
+        address:1,
         _id: 1,
         name: 1,
         location: 1,
@@ -288,6 +289,7 @@ const getAllRestaurantForAdmin = async (query: Record<string, any>) => {
         location: 1,
         createdAt: "$formattedDate",
         status: 1,
+        address:1
       },
     },
   ];

@@ -64,6 +64,7 @@ const insertOrderIntoDb = async (payload: any) => {
 };
 
 const getImnCallback = async (received_crypted_data: any) => {
+
   const obj = {
     authentify: {
       id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
@@ -79,7 +80,7 @@ const getImnCallback = async (received_crypted_data: any) => {
 
   try {
     const response = await axios.post(
-      "https://api.mips.mu/api/decrypt_imn_data",
+      "https://api.mips.mu/api/load_payment_zone",
       obj,
       {
         headers: {
@@ -101,7 +102,47 @@ const getImnCallback = async (received_crypted_data: any) => {
   }
 };
 
+// load payment zone
+
+
+const loadPaymentZone = async (payload:any) => {
+  console.log(payload)
+  let response;
+  const headers = {
+    "content-type": "application/json",
+    Authorization: 'Basic ' + Buffer.from('datamation_8a9ft5:kqK1hvT5Mhwu7t0KavYaJctDW5M8xruW').toString('base64')
+  };
+
+  const authObj = {
+    authentify:{
+      id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
+      id_entity: "w3QAeoMtLJROmlIyXVgnx1R6y7BgNo8t",
+      id_operator: "oeRH43c5RoQockXajPTo0TA5YW0KReio",
+      operator_password: "NUvxccs0R0rzKPoLlIPeet21rarpX0rk",
+    }
+  };
+
+  try {
+    response = await axios.post(
+      "https://api.mips.mu/api/load_payment_zone",
+      { ...authObj, ...payload },
+      {
+        headers: headers
+      }
+    );
+
+    console.log("response:", response.data);
+    // Handle the response data as needed
+  } catch (error) {
+    console.error("Error:", error);
+    // Handle the error
+  }
+
+  return response;
+};
+
 export const orderServices = {
   insertOrderIntoDb,
   getImnCallback,
+  loadPaymentZone
 };

@@ -24,8 +24,22 @@ const getimnCallback = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const loadPaymentZone = catchAsync(async (req: Request, res: Response) => {
+  console.log("body from controller", req.body);
+  const result = await orderServices.loadPaymentZone(
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "payment url retrived successfully",
+    data: result,
+  });
+});
 
 export const orderControllers = {
   insertOrderIntoDB,
   getimnCallback,
+  loadPaymentZone
+  
 };

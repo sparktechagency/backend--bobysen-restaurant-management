@@ -17,7 +17,7 @@ router.post(
   "/",
   upload.single("file"),
   parseData(),
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.vendor),
   menuControllers.insertMenuIntoDb
 );
 router.get(

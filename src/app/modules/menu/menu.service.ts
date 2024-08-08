@@ -14,8 +14,7 @@ const insertMenuIntoDb = async (payload: TMenu): Promise<TMenu> => {
 };
 
 const getAllMenu = async (query: { [key: string]: any }) => {
-  console.log(query);
-  const MenuModel = new QueryBuilder(Menu.find(), query)
+  const MenuModel = new QueryBuilder(Menu.find().populate("category","title"), query)
     .search(["name"])
     .filter()
     .paginate()
