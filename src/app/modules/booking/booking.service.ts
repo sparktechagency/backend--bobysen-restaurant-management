@@ -164,6 +164,36 @@ const getAllBookings = async (query: Record<string, any>) => {
     meta,
   };
 };
+const getAllBookingsForAdmin = async (query: Record<string, any>) => {
+  const bookingModel = new QueryBuilder(
+    Booking.find()
+      .populate({
+        path: "user",
+        select: "fullName", // Select only the fullname field from the user
+      })
+      .populate({
+        path: "restaurant",
+        select: "name", // Select only the name field from the restaurant
+      })
+      .populate({
+        path: "table",
+        select: "tableNo seats", // Select only the table_name field from the table
+      }),
+    query
+  )
+    .search([])
+    .filter()
+    .paginate()
+    .sort()
+    .fields();
+  const data = await bookingModel.modelQuery;
+  const meta = await bookingModel.countTotal();
+
+  return {
+    data,
+    meta,
+  };
+};
 const getAllBookingByOwner = async (query: Record<string, any>) => {
   const searchAbleFields = ["userName", "id", "email"];
   const pipeline: any[] = [
@@ -430,6 +460,7 @@ export const bookingServies = {
   getSingleBooking,
   updateBooking,
   getBookingDetailsWithMenuOrder,
+  getAllBookingsForAdmin,
   deletebooking,
   getBookingStatics,
 };

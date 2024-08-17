@@ -29,6 +29,17 @@ const getAllBooking = catchAsync(async (req: Request, res: Response) => {
     meta: result?.meta,
   });
 });
+const getAllBookingsForAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await bookingServies.getAllBookingsForAdmin(req.query);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Booking data retrived successfully",
+      data: result,
+    });
+  }
+);
 const getAllBookingByOwner = catchAsync(async (req: Request, res: Response) => {
   if (req?.user?.role === "vendor") {
     req.query.owner = req?.user?.userId;
@@ -104,4 +115,5 @@ export const bookingControllers = {
   updatebooking,
   deleteBooking,
   getBookingStatics,
+  getAllBookingsForAdmin,
 };
