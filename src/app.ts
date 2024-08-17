@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
@@ -11,17 +12,17 @@ import router from "./app/routes";
 
 const app: Application = express();
 app.use(express.static("public"));
-
+app.use(bodyParser.urlencoded({ extended: true }));
 //parsers
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: '*', // Allow all origins
+    origin: "*", // Allow all origins
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
-)
+);
 // application routes
 app.use("/api/v1", router);
 app.get("/", (req: Request, res: Response) => {

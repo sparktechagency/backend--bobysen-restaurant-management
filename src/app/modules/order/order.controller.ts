@@ -1,8 +1,8 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { orderServices } from "./order.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { orderServices } from "./order.service";
 const insertOrderIntoDB = catchAsync(async (req: Request, res: Response) => {
   const result = await orderServices.insertOrderIntoDb(req.body);
   sendResponse(res, {
@@ -26,9 +26,7 @@ const getimnCallback = catchAsync(async (req: Request, res: Response) => {
 });
 const loadPaymentZone = catchAsync(async (req: Request, res: Response) => {
   console.log("body from controller", req.body);
-  const result = await orderServices.loadPaymentZone(
-    req.body
-  );
+  const result = await orderServices.loadPaymentZone(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -40,6 +38,5 @@ const loadPaymentZone = catchAsync(async (req: Request, res: Response) => {
 export const orderControllers = {
   insertOrderIntoDB,
   getimnCallback,
-  loadPaymentZone
-  
+  loadPaymentZone,
 };
