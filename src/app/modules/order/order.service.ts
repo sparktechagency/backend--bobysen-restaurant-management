@@ -81,7 +81,7 @@ const getImnCallback = async (received_crypted_data: any) => {
 
   try {
     response = await axios.post(
-      "https://stoplight.io/mocks/mips/merchant-api/36020489/decrypt_imn_data",
+      "https://api.mips.mu/api/decrypt_imn_data",
       obj,
       {
         headers: {
