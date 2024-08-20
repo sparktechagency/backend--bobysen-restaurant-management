@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
-import { Cart } from "../cart/cart.model";
-import AppError from "../../error/AppError";
-import httpStatus from "http-status";
-import { Wallet } from "../wallet/wallet.model";
 import axios from "axios";
+import httpStatus from "http-status";
+import mongoose from "mongoose";
+import AppError from "../../error/AppError";
+import { Cart } from "../cart/cart.model";
+import { Wallet } from "../wallet/wallet.model";
 const insertOrderIntoDb = async (payload: any) => {
   const { cart, amount, id_order, status, id_form, checksum } = payload || {};
   //   const formatedAmount = Number(amount) / 100;
@@ -64,7 +64,8 @@ const insertOrderIntoDb = async (payload: any) => {
 };
 
 const getImnCallback = async (received_crypted_data: any) => {
-
+  console.log(received_crypted_data);
+  let response;
   const obj = {
     authentify: {
       id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
@@ -79,8 +80,8 @@ const getImnCallback = async (received_crypted_data: any) => {
   };
 
   try {
-    const response = await axios.post(
-      "https://api.mips.mu/api/load_payment_zone",
+    response = await axios.post(
+      "https://stoplight.io/mocks/mips/merchant-api/36020489/decrypt_imn_data",
       obj,
       {
         headers: {
@@ -93,33 +94,39 @@ const getImnCallback = async (received_crypted_data: any) => {
         },
       }
     );
+    // if (response?.data?.status === "success") {
+    //   const { amount, checksum, id_order } = response?.data;
+    //   await insertOrderIntoDb({ amount, checksum, id_order });
+    // }
 
-    console.log("Decrypted data:", response.data);
     // Handle the decrypted data as needed
-  } catch (error) {
-    console.error("Error:", error);
+  } catch (error: any) {
+    throw new Error(error);
     // Handle the error
   }
+  return response?.data;
 };
 
 // load payment zone
 
-
-const loadPaymentZone = async (payload:any) => {
-  console.log(payload)
+const loadPaymentZone = async (payload: any) => {
   let response;
   const headers = {
     "content-type": "application/json",
-    Authorization: 'Basic ' + Buffer.from('datamation_8a9ft5:kqK1hvT5Mhwu7t0KavYaJctDW5M8xruW').toString('base64')
+    Authorization:
+      "Basic " +
+      Buffer.from(
+        "datamation_8a9ft5:kqK1hvT5Mhwu7t0KavYaJctDW5M8xruW"
+      ).toString("base64"),
   };
 
   const authObj = {
-    authentify:{
+    authentify: {
       id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
       id_entity: "w3QAeoMtLJROmlIyXVgnx1R6y7BgNo8t",
       id_operator: "oeRH43c5RoQockXajPTo0TA5YW0KReio",
       operator_password: "NUvxccs0R0rzKPoLlIPeet21rarpX0rk",
-    }
+    },
   };
 
   try {
@@ -127,22 +134,20 @@ const loadPaymentZone = async (payload:any) => {
       "https://api.mips.mu/api/load_payment_zone",
       { ...authObj, ...payload },
       {
-        headers: headers
+        headers: headers,
       }
     );
-
-    console.log("response:", response.data);
     // Handle the response data as needed
-  } catch (error) {
-    console.error("Error:", error);
+  } catch (error: any) {
+    throw new Error(error);
     // Handle the error
   }
 
-  return response;
+  return response?.data?.answer;
 };
 
 export const orderServices = {
   insertOrderIntoDb,
   getImnCallback,
-  loadPaymentZone
+  loadPaymentZone,
 };
