@@ -105,7 +105,6 @@ const getImnCallback = async (received_crypted_data: any) => {
     throw new Error(error);
     // Handle the error
   }
-  console.log(response);
   return response?.data;
 };
 
