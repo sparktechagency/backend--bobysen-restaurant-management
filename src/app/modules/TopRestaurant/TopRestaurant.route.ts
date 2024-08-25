@@ -6,7 +6,7 @@ const router = Router();
 
 router.post(
   "/",
-  // auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin),
   TopRestaurantControllers.insertTopRestaurantIntoDb
 );
 router.get("/", TopRestaurantControllers.getAllTopRestaurants);
