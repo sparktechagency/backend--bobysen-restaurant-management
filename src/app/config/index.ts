@@ -15,4 +15,6 @@ export default {
   nodemailer_host_pass: process.env.NODEMAILER_HOST_PASS,
   socket_port: process.env.SOCKET_PORT,
   stripe_secret: process.env.STRIPE_SECRET,
+  whatsapp_auth_key: process.env.WHATSAPP_AUTH_KEY,
+  whatsapp_sms_number: process.env.WHATSAPP_SMS_NUMBER,
 };

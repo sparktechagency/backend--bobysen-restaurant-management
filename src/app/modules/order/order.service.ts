@@ -76,7 +76,7 @@ const getImnCallback = async (received_crypted_data: any) => {
     salt: "SQt1DtGZceeCjO59cDAL82sAQcyj8uxocTxMkLeC6mzvfjILIq",
     cipher_key:
       "aAUJIcMPgVpK9zAB9tVjDWLIglibzgerTeiSU1ACEgu2GXIl1mYMj0wVNjs9XUEdIEysG2G7GNAxYpaGpqveDgVMaNzVZsHNrNdZ",
-    received_crypted_data: received_crypted_data,
+    received_crypted_data: received_crypted_data?.crypted_callback,
   };
 
   try {

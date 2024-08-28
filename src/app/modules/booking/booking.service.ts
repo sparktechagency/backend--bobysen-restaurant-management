@@ -14,7 +14,7 @@ import { Booking } from "./booking.model";
 import {
   calculateEndTime,
   generateBookingNumber,
-  sendMessageToNumber,
+  sendWhatsAppMessageToCustomers,
 } from "./booking.utils";
 
 // search booking
@@ -130,15 +130,27 @@ const bookAtable = async (payload: TBook) => {
   ];
 
   // send message to the customer
-  await sendMessageToNumber(
-    user?.phoneNumber,
-    `Hello ${user.fullName}, your table reservation at ${restaurant?.name}, has been successfully confirmed for ${result?.date} at ${result?.time}. We look forward to hosting you for ${findTable[0]?.seats}  guests. Please arrive within your designated time to ensure your reservation remains valid. Thank you!`
-  );
+  // await sendMessageToNumber(
+  //   user?.phoneNumber,
+  //   `Hello ${user.fullName}, your table reservation at ${restaurant?.name}, has been successfully confirmed for ${result?.date} at ${result?.time}. We look forward to hosting you for ${findTable[0]?.seats}  guests. Please arrive within your designated time to ensure your reservation remains valid. Thank you!`
+  // );
+  const smsData = {
+    phoneNumbers: ["01876399629"],
+    mediaUrl: "https://i.postimg.cc/pX2JQkhK/logo.png",
+    bodyValues: [
+      user.fullName,
+      restaurant?.name,
+      result?.date,
+      result?.time,
+      findTable[0]?.seats,
+    ],
+  };
+  await sendWhatsAppMessageToCustomers(smsData);
   // send message to the vendor
-  await sendMessageToNumber(
-    user?.phoneNumber,
-    `Hello, a customer named ${user.fullName} has booked a table at your restaurant, ${restaurant?.name}, for ${result?.date} at ${result?.time}. They plan to bring ${findTable[0]?.seats} guests. Please note their contact number: ${user.phoneNumber}. We look forward to welcoming them. Thank you!`
-  );
+  // await sendMessageToNumber(
+  //   user?.phoneNumber,
+  //   `Hello, a customer named ${user.fullName} has booked a table at your restaurant, ${restaurant?.name}, for ${result?.date} at ${result?.time}. They plan to bring ${findTable[0]?.seats} guests. Please note their contact number: ${user.phoneNumber}. We look forward to welcoming them. Thank you!`
+  // );
   await notificationServices.insertNotificationIntoDb(notificationData);
   return result;
 };
