@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { model, Schema } from "mongoose";
 import { statusValue, TCart } from "./cart.interface";
 const cartSchema = new Schema<TCart>(
   {
@@ -34,7 +34,7 @@ const cartSchema = new Schema<TCart>(
     ],
     transactions: [
       {
-        id_form: {
+        transaction_id: {
           type: String,
         },
         orderId: {

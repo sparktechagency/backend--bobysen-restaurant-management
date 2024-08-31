@@ -1,11 +1,22 @@
 import axios from "axios";
 import httpStatus from "http-status";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
+import config from "../../config";
 import AppError from "../../error/AppError";
 import { Cart } from "../cart/cart.model";
 import { Wallet } from "../wallet/wallet.model";
 const insertOrderIntoDb = async (payload: any) => {
-  const { cart, amount, id_order, status, id_form, checksum } = payload || {};
+  const {
+    cart,
+    amount: orderAmount,
+    id_order,
+    status,
+    transaction_id,
+    checksum,
+    date,
+  } = payload || {};
+  const amount = Number(orderAmount) / 100;
   //   const formatedAmount = Number(amount) / 100;
   const session = await mongoose.startSession();
 
@@ -25,10 +36,10 @@ const insertOrderIntoDb = async (payload: any) => {
         $push: {
           transactions: {
             amount,
-            date: new Date(),
+            date,
             orderId: id_order,
             status,
-            id_form,
+            transaction_id,
             checksum,
           },
         },
@@ -64,7 +75,6 @@ const insertOrderIntoDb = async (payload: any) => {
 };
 
 const getImnCallback = async (received_crypted_data: any) => {
-  console.log("payload", received_crypted_data);
   let response;
   const obj = {
     authentify: {
@@ -94,13 +104,35 @@ const getImnCallback = async (received_crypted_data: any) => {
         },
       }
     );
-    // if (response?.data?.status === "success") {
-    //   const { amount, checksum, id_order } = response?.data;
-    //   await insertOrderIntoDb({ amount, checksum, id_order });
-    // }
-
-    // Handle the decrypted data as needed
-    console.log("response", response);
+    // check valid user for using token
+    if (response?.data?.status !== "success") {
+      throw new AppError(
+        httpStatus.NOT_ACCEPTABLE,
+        "The transactions is failed. please contact to the customer portal."
+      );
+    }
+    // check try catch
+    const additional_param = JSON.parse(response?.data?.additional_param);
+    const { token, cart } = additional_param;
+    let decode;
+    try {
+      decode = jwt.verify(
+        token,
+        config.jwt_access_secret as string
+      ) as JwtPayload;
+    } catch (err) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "unauthorized");
+    }
+    const { amount, checksum, id_order, transaction_id, payment_date } =
+      response?.data;
+    await insertOrderIntoDb({
+      amount,
+      checksum,
+      id_order,
+      transaction_id,
+      date: payment_date,
+      cart,
+    });
   } catch (error: any) {
     throw new Error(error);
     // Handle the error
@@ -110,7 +142,27 @@ const getImnCallback = async (received_crypted_data: any) => {
 
 // load payment zone
 
-const loadPaymentZone = async (payload: any) => {
+const loadPaymentZone = async (payload: any, token: string) => {
+  const { cart, user, ...others } = payload;
+  const data = {
+    ...others,
+    additional_params: [
+      {
+        param_name: "token",
+        param_value: token,
+      },
+      {
+        param_name: "user",
+        param_value: payload?.user,
+      },
+      {
+        param_name: "cart",
+        param_value: payload?.cart,
+      },
+    ],
+    request_mode: "simple",
+    touchpoint: "native_app",
+  };
   let response;
   const headers = {
     "content-type": "application/json",
@@ -133,7 +185,7 @@ const loadPaymentZone = async (payload: any) => {
   try {
     response = await axios.post(
       "https://api.mips.mu/api/load_payment_zone",
-      { ...authObj, ...payload },
+      { ...authObj, ...data },
       {
         headers: headers,
       }

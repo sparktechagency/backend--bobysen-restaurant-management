@@ -23,7 +23,10 @@ const getimnCallback = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const loadPaymentZone = catchAsync(async (req: Request, res: Response) => {
-  const result = await orderServices.loadPaymentZone(req.body);
+  const body = { ...req.body };
+  body.user = req?.user?.userId;
+  const token = req.headers.authorization;
+  const result = await orderServices.loadPaymentZone(body, token as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
