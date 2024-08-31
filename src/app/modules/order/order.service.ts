@@ -17,6 +17,7 @@ const insertOrderIntoDb = async (payload: any) => {
     date,
   } = payload || {};
   const amount = Number(orderAmount) / 100;
+  console.log("payload from load payment zone", payload);
   //   const formatedAmount = Number(amount) / 100;
   const session = await mongoose.startSession();
 
@@ -111,6 +112,7 @@ const getImnCallback = async (received_crypted_data: any) => {
         "The transactions is failed. please contact to the customer portal."
       );
     }
+    console.log(response?.data);
     // check try catch
     const additional_param = JSON.parse(response?.data?.additional_param);
     const { token, cart } = additional_param;
