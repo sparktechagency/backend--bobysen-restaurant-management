@@ -107,7 +107,7 @@ const getImnCallback = async (received_crypted_data: any) => {
     );
     // check valid user for using token
     console.log(response?.data);
-    if (response?.data?.status !== "success") {
+    if (response?.data?.status !== "SUCCESS") {
       throw new AppError(
         httpStatus.NOT_ACCEPTABLE,
         "The transactions is failed. please contact to the customer portal."
