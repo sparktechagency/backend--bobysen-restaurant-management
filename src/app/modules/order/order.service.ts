@@ -106,13 +106,14 @@ const getImnCallback = async (received_crypted_data: any) => {
       }
     );
     // check valid user for using token
+    console.log(response?.data);
     if (response?.data?.status !== "success") {
       throw new AppError(
         httpStatus.NOT_ACCEPTABLE,
         "The transactions is failed. please contact to the customer portal."
       );
     }
-    console.log(response?.data);
+
     // check try catch
     const additional_param = JSON.parse(response?.data?.additional_param);
     const { token, cart } = additional_param;
