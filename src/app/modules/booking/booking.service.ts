@@ -11,11 +11,7 @@ import { Table } from "../table/table.model";
 import { User } from "../user/user.model";
 import { TBook } from "./booking.interface";
 import { Booking } from "./booking.model";
-import {
-  calculateEndTime,
-  generateBookingNumber,
-  sendWhatsAppMessageToCustomers,
-} from "./booking.utils";
+import { calculateEndTime, generateBookingNumber } from "./booking.utils";
 
 // search booking
 const bookAtable = async (payload: TBook) => {
@@ -145,7 +141,7 @@ const bookAtable = async (payload: TBook) => {
       findTable[0]?.seats,
     ],
   };
-  await sendWhatsAppMessageToCustomers(smsData);
+  // await sendWhatsAppMessageToCustomers(smsData);
   // send message to the vendor
   // await sendMessageToNumber(
   //   user?.phoneNumber,
