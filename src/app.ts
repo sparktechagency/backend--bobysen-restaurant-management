@@ -20,6 +20,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
+      "http://localhost:5173",
       "https://bookatable.mu",
       "https://mybookatable.mu",
     ], // Allow all origins
