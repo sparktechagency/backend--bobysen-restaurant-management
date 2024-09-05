@@ -11,7 +11,15 @@ import { Table } from "../table/table.model";
 import { User } from "../user/user.model";
 import { TBook } from "./booking.interface";
 import { Booking } from "./booking.model";
-import { calculateEndTime, generateBookingNumber } from "./booking.utils";
+import {
+  calculateEndTime,
+  checkRestaurantAvailability,
+  generateBookingNumber,
+  sendReservationEmail,
+  sendWhatsAppMessageToCustomers,
+  sendWhatsAppMessageToVendors,
+  validateBookingTime,
+} from "./booking.utils";
 
 // search booking
 const bookAtable = async (payload: TBook) => {
@@ -25,30 +33,10 @@ const bookAtable = async (payload: TBook) => {
   const restaurant: any = await Restaurant.findById(payload?.restaurant);
   // check if restaurant booked or open
   const bookingTime = moment(payload.date);
-  const isClosed = bookingTime.isBetween(
-    moment(restaurant?.close?.from),
-    moment(restaurant?.close?.to),
-    undefined,
-    "[]"
-  );
-  if (isClosed) {
-    throw new AppError(
-      httpStatus.NOT_ACCEPTABLE,
-      "Restaurant is closed during this time. Please select another date."
-    );
-  }
+  // check closing and opening time
+  validateBookingTime(restaurant, bookingTime);
   // check the restaurant avilable that day
-  const { openingTime, closingTime } = restaurant[day?.toLocaleLowerCase()];
-  if (
-    moment(payload?.time, "HH:mm").isBefore(moment(openingTime, "HH:mm")) ||
-    moment(payload?.time, "HH:mm").isAfter(moment(closingTime, "HH:mm"))
-  ) {
-    throw new AppError(
-      httpStatus.NOT_ACCEPTABLE,
-      `Restaurant is closed at ${payload.time} on ${day}`
-    );
-  }
-  // retrive total tables under the restaurant
+  checkRestaurantAvailability(restaurant, day, payload?.time);
   const totalTables = await Table.find({
     restaurant: payload.restaurant,
     seats: Number(payload.seats),
@@ -59,15 +47,14 @@ const bookAtable = async (payload: TBook) => {
     date: moment(payload?.date).format("YYYY-MM-DD"),
     restaurant: payload?.restaurant,
     status: "active",
-    arrivalTime: { $lt: expireHours },
+    time: { $lt: expireHours },
     endTime: { $gt: payload?.time },
-  }).populate("restaurant");
-  console.log(bookedTables, "bookedtables");
+  });
   // conditionally check avilable tables
   if (bookedTables?.length >= totalTables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "No tables avilable for booking during this date"
+      "No tables avilable for booking during this time. please choose different time and seats"
     );
   }
 
@@ -100,9 +87,8 @@ const bookAtable = async (payload: TBook) => {
 
   // find user
   const user = await User.findById(payload?.user).select(
-    "fullName phoneNumber"
+    "fullName phoneNumber email"
   );
-  console.log(user);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -126,13 +112,10 @@ const bookAtable = async (payload: TBook) => {
   ];
 
   // send message to the customer
-  // await sendMessageToNumber(
-  //   user?.phoneNumber,
-  //   `Hello ${user.fullName}, your table reservation at ${restaurant?.name}, has been successfully confirmed for ${result?.date} at ${result?.time}. We look forward to hosting you for ${findTable[0]?.seats}  guests. Please arrive within your designated time to ensure your reservation remains valid. Thank you!`
-  // );
   const smsData = {
-    phoneNumbers: ["01876399629"],
-    mediaUrl: "https://i.postimg.cc/pX2JQkhK/logo.png",
+    phoneNumbers: ["+8801324959819"],
+    mediaUrl:
+      "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
     bodyValues: [
       user.fullName,
       restaurant?.name,
@@ -140,14 +123,29 @@ const bookAtable = async (payload: TBook) => {
       result?.time,
       findTable[0]?.seats,
     ],
+    buttonUrl: "https://bookatable.mu",
   };
+
   // await sendWhatsAppMessageToCustomers(smsData);
   // send message to the vendor
-  // await sendMessageToNumber(
-  //   user?.phoneNumber,
-  //   `Hello, a customer named ${user.fullName} has booked a table at your restaurant, ${restaurant?.name}, for ${result?.date} at ${result?.time}. They plan to bring ${findTable[0]?.seats} guests. Please note their contact number: ${user.phoneNumber}. We look forward to welcoming them. Thank you!`
-  // );
   await notificationServices.insertNotificationIntoDb(notificationData);
+  await sendWhatsAppMessageToCustomers(smsData);
+  await sendWhatsAppMessageToVendors(smsData);
+  const emailContext = {
+    name: user?.fullName,
+    email: user?.email,
+    date: payload?.date,
+    seats: payload?.seats,
+    arrivalTime: payload?.time,
+    restaurant: restaurant?.name,
+    address: restaurant?.address,
+  };
+  await sendReservationEmail(
+    "reservationTemplate", // The name of your template file without the .html extension
+    user?.email,
+    "Your Reservation was successful",
+    emailContext
+  );
   return result;
 };
 
@@ -379,7 +377,6 @@ const deletebooking = async (id: string) => {
   return result;
 };
 const getBookingStatics = async (userId: string, year: string) => {
-  console.log("service", userId, year);
   const monthsOfYear = Array.from({ length: 12 }, (_, i) => i + 1); // Array of month numbers from 1 to 12
 
   const result = await Booking.aggregate([

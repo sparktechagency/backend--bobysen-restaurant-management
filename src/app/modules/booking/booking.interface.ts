@@ -1,13 +1,21 @@
 import { ObjectId } from "mongodb";
 export interface TBook {
   restaurant: ObjectId;
-  date: Date;
+  date: string;
   time: string;
   user: ObjectId;
-  seats: string | number;
+  seats: number;
   customerNumber: string;
 }
-
+export interface EmailContext {
+  name: string;
+  email: string;
+  date: string;
+  seats: number;
+  arrivalTime: string;
+  restaurant: string;
+  address: string;
+}
 export interface TBooking {
   user: ObjectId;
   id: string | number;

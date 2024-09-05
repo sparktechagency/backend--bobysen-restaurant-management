@@ -1,7 +1,13 @@
 import axios from "axios";
+import fs from "fs";
+import handlebars from "handlebars";
+import httpStatus from "http-status";
 import moment from "moment";
+import path from "path";
 import config from "../../config";
-
+import AppError from "../../error/AppError";
+import { sendEmail } from "../../utils/mailSender";
+import { EmailContext } from "./booking.interface";
 export const generateBookingNumber = () => {
   // Get the current timestamp
   const timestamp = Date.now();
@@ -42,16 +48,37 @@ export const sendWhatsAppMessageToCustomers = async ({
   phoneNumbers,
   mediaUrl,
   bodyValues,
+  buttonUrl,
 }: {
   phoneNumbers: string[];
   mediaUrl: string;
   bodyValues: string[];
+  buttonUrl: string;
 }) => {
   const headers = {
     "Content-Type": "application/json",
     authkey: config.whatsapp_auth_key!,
   };
 
+  // Dynamically create body components
+  const components: any = {
+    header_1: {
+      type: "image",
+      value: mediaUrl,
+    },
+  };
+
+  bodyValues.forEach((value, index) => {
+    components[`body_${index + 1}`] = {
+      type: "text",
+      value,
+    };
+  });
+  components["button_1"] = {
+    Subtype: "url",
+    type: "text",
+    value: buttonUrl,
+  };
   const payload = {
     integrated_number: config.whatsapp_sms_number,
     content_type: "template",
@@ -59,7 +86,7 @@ export const sendWhatsAppMessageToCustomers = async ({
       messaging_product: "whatsapp",
       type: "template",
       template: {
-        name: "owner",
+        name: "owner", // Adjust the template name as needed
         language: {
           code: "en",
           policy: "deterministic",
@@ -68,32 +95,7 @@ export const sendWhatsAppMessageToCustomers = async ({
         to_and_components: [
           {
             to: phoneNumbers,
-            components: {
-              header_1: {
-                type: "image",
-                value: mediaUrl,
-              },
-              body_1: {
-                type: "text",
-                value: bodyValues[0],
-              },
-              body_2: {
-                type: "text",
-                value: bodyValues[1],
-              },
-              body_3: {
-                type: "text",
-                value: bodyValues[2],
-              },
-              body_4: {
-                type: "text",
-                value: bodyValues[3],
-              },
-              body_5: {
-                type: "text",
-                value: bodyValues[4],
-              },
-            },
+            components,
           },
         ],
       },
@@ -102,7 +104,7 @@ export const sendWhatsAppMessageToCustomers = async ({
 
   try {
     const response = await axios.post(
-      "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk",
+      "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/",
       payload,
       { headers }
     );
@@ -113,5 +115,129 @@ export const sendWhatsAppMessageToCustomers = async ({
     throw error;
   }
 };
+export const sendWhatsAppMessageToVendors = async ({
+  phoneNumbers,
+  mediaUrl,
+  bodyValues,
+}: {
+  phoneNumbers: string[];
+  mediaUrl: string;
+  bodyValues: string[];
+}) => {
+  const headers = {
+    "Content-Type": "application/json",
+    authkey: config.whatsapp_auth_key!,
+  };
 
+  // Dynamically create the components object
+  const components: any = {
+    header_1: {
+      type: "image",
+      value: mediaUrl,
+    },
+  };
+
+  bodyValues.forEach((value, index) => {
+    components[`body_${index + 1}`] = {
+      type: "text",
+      value,
+    };
+  });
+
+  const payload = {
+    integrated_number: config.whatsapp_sms_number,
+    content_type: "template",
+    payload: {
+      messaging_product: "whatsapp",
+      type: "template",
+      template: {
+        name: "owner", // Template name as per the curl example
+        language: {
+          code: "en",
+          policy: "deterministic",
+        },
+        namespace: null, // Keep it null as per the curl example
+        to_and_components: [
+          {
+            to: phoneNumbers, // List of phone numbers
+            components: components, // Components object created above
+          },
+        ],
+      },
+    },
+  };
+
+  try {
+    const response = await axios.post(
+      "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/",
+      payload,
+      { headers }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending WhatsApp message:", error);
+    throw error;
+  }
+};
 // Example usage:
+export const checkRestaurantAvailability = (
+  restaurant: any,
+  day: string,
+  time: string
+) => {
+  const { openingTime, closingTime } = restaurant[day?.toLocaleLowerCase()];
+  if (
+    moment(time, "HH:mm").isBefore(moment(openingTime, "HH:mm")) ||
+    moment(time, "HH:mm").isAfter(moment(closingTime, "HH:mm"))
+  ) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      `Restaurant is closed at ${time} on ${day}`
+    );
+  }
+};
+export const validateBookingTime = (
+  restaurant: any,
+  bookingTime: moment.Moment
+) => {
+  const isClosed = bookingTime.isBetween(
+    moment(restaurant?.close?.from),
+    moment(restaurant?.close?.to),
+    undefined,
+    "[]"
+  );
+  if (isClosed) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "Restaurant is closed during this time. Please select another date."
+    );
+  }
+};
+
+export const sendReservationEmail = async (
+  templateName: string,
+  userEmail: string,
+  subject: string,
+  emailContext: EmailContext
+) => {
+  const templatePath = path.resolve(__dirname, `../../../../public.html`);
+
+  fs.readFile(templatePath, "utf8", async (err, htmlContent) => {
+    if (err) {
+      console.error("Error reading the HTML file:", err);
+      return;
+    }
+
+    try {
+      const template = handlebars.compile(htmlContent);
+      const htmlToSend = template(emailContext);
+
+      // Send the email using your sendEmail utility
+      await sendEmail(userEmail, subject, htmlToSend);
+      console.log(`Email sent successfully to ${userEmail}`);
+    } catch (compileError) {
+      console.error("Error compiling the email template:", compileError);
+    }
+  });
+};
