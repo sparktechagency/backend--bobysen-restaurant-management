@@ -112,8 +112,21 @@ const bookAtable = async (payload: TBook) => {
   ];
 
   // send message to the customer
-  const smsData = {
-    phoneNumbers: ["+8801324959819"],
+  const customerSmsData = {
+    phoneNumbers: [`+230${user?.phoneNumber}`],
+    mediaUrl:
+      "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+    bodyValues: [
+      user.fullName,
+      restaurant?.name,
+      result?.date,
+      result?.time,
+      findTable[0]?.seats,
+    ],
+    buttonUrl: "https://bookatable.mu",
+  };
+  const vendorSmsData = {
+    phoneNumbers: [`+230${restaurant?.helpLineNumber1}`],
     mediaUrl:
       "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
     bodyValues: [
@@ -129,8 +142,8 @@ const bookAtable = async (payload: TBook) => {
   // await sendWhatsAppMessageToCustomers(smsData);
   // send message to the vendor
   await notificationServices.insertNotificationIntoDb(notificationData);
-  await sendWhatsAppMessageToCustomers(smsData);
-  await sendWhatsAppMessageToVendors(smsData);
+  await sendWhatsAppMessageToCustomers(customerSmsData);
+  await sendWhatsAppMessageToVendors(vendorSmsData);
   const emailContext = {
     name: user?.fullName,
     email: user?.email,
