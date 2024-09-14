@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authRoutes } from "../modules/auth/auth.route";
+import { bannerRoutes } from "../modules/banner/banner.route";
 import { bookingRoutes } from "../modules/booking/booking.route";
 import { cartRoutes } from "../modules/cart/cart.route";
 import { contentRoues } from "../modules/content/content.route";
@@ -44,6 +45,10 @@ const moduleRoutes = [
   {
     path: "/menu",
     route: menuRoutes,
+  },
+  {
+    path: "/banner",
+    route: bannerRoutes,
   },
   {
     path: "/reviews",
