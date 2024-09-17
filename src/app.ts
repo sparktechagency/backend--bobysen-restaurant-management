@@ -23,6 +23,7 @@ app.use(
       "http://localhost:5173",
       "https://bookatable.mu",
       "https://mybookatable.mu",
+      "https://socket.bookatable.mu",
     ], // Allow all origins
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
