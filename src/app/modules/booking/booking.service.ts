@@ -390,6 +390,7 @@ const deletebooking = async (id: string) => {
   return result;
 };
 const getBookingStatics = async (userId: string, year: string) => {
+  console.log(userId, year);
   const monthsOfYear = Array.from({ length: 12 }, (_, i) => i + 1); // Array of month numbers from 1 to 12
 
   const result = await Booking.aggregate([
@@ -397,7 +398,7 @@ const getBookingStatics = async (userId: string, year: string) => {
       $match: {
         date: {
           $gte: `${year}-01-01`,
-          $lt: `${year + 1}-01-01`,
+          $lt: `${parseInt(year) + 1}-01-01`,
         },
         restaurant: { $exists: true }, // Filter out bookings without restaurant
       },
@@ -412,20 +413,25 @@ const getBookingStatics = async (userId: string, year: string) => {
     {
       $lookup: {
         from: "restaurants",
-        let: { restaurantId: "$restaurant" },
+        let: { restaurantId: { $toObjectId: "$restaurant" } }, // Convert restaurantId to ObjectId
         pipeline: [
           {
             $match: {
               $expr: {
                 $and: [
-                  { $eq: ["$_id", "$$restaurantId"] },
-                  { $eq: ["$owner", new mongoose.Types.ObjectId(userId)] },
+                  { $eq: ["$_id", "$$restaurantId"] }, // Match restaurant by ObjectId
+                  { $eq: ["$owner", new mongoose.Types.ObjectId(userId)] }, // Match owner by ObjectId
                 ],
               },
             },
           },
         ],
         as: "restaurantOwner",
+      },
+    },
+    {
+      $match: {
+        restaurantOwner: { $ne: [] }, // Ensure that the restaurant has an owner that matches the userId
       },
     },
     {

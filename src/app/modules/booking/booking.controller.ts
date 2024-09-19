@@ -93,7 +93,7 @@ const deleteBooking = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getBookingStatics = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.query);
+  console.log(req.user);
   const result = await bookingServies.getBookingStatics(
     req.user.userId,
     req?.query?.year as string
