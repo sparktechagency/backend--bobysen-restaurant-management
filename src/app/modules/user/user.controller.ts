@@ -1,8 +1,9 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { userServices } from "./user.service";
-import sendResponse from "../../utils/sendResponse";
+import catchAsync from "../../utils/catchAsync";
 import { storeFile } from "../../utils/fileHelper";
+import sendResponse from "../../utils/sendResponse";
+import { uploadToSpaces } from "../../utils/spaces";
+import { userServices } from "./user.service";
 const insertuserIntoDb = catchAsync(async (req: Request, res: Response) => {
   // if (req?.file) {
   //   req.body.image = storeFile("profile", req?.file?.filename);
@@ -17,6 +18,10 @@ const insertuserIntoDb = catchAsync(async (req: Request, res: Response) => {
 });
 const insertVendorIntoDb = catchAsync(async (req: Request, res: Response) => {
   req.body.role = "vendor";
+  if (req?.file) {
+    req.body.image = await uploadToSpaces(req?.file, "profile");
+  }
+  console.log(req.file);
   const result = await userServices.insertVendorIntoDb(req.body);
   sendResponse(res, {
     statusCode: 200,
@@ -31,7 +36,7 @@ const getme = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "user retrived successfully",
+    message: "user retrieved successfully",
     data: result,
   });
 });
@@ -40,7 +45,7 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
     req.body.image = storeFile("profile", req?.file?.filename);
   }
-  console.log(req.body);
+
   const result = await userServices.updateProfile(req.user.userId, req.body);
   sendResponse(res, {
     statusCode: 200,
@@ -54,7 +59,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "users retrived successfully",
+    message: "users retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -64,7 +69,7 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "User retrived successfully",
+    message: "User retrieved successfully",
     data: result,
   });
 });

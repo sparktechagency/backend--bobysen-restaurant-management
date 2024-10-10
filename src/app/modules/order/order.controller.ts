@@ -18,7 +18,7 @@ const getimnCallback = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "imn callback retrived successfully",
+    message: "imn callback retrieved successfully",
     data: result,
   });
 });
@@ -31,7 +31,7 @@ const loadPaymentZone = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "payment url retrived successfully",
+    message: "payment url retrieved successfully",
     data: result,
   });
 });

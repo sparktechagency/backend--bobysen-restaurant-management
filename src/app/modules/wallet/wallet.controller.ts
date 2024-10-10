@@ -1,9 +1,9 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { walletServices } from "./wallet.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 import { USER_ROLE } from "../user/user.constant";
+import { walletServices } from "./wallet.service";
 const sentAmountToTheVendor = catchAsync(
   async (req: Request, res: Response) => {
     const result = await walletServices.sendAmountToVendor(
@@ -29,7 +29,7 @@ const getWalletDetails = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Wallet details retrived successfully",
+    message: "Wallet details retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -41,7 +41,7 @@ const getwalletDetailsByOwner = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Wallet details retrived successfully",
+      message: "Wallet details retrieved successfully",
       data: result,
     });
   }
@@ -51,7 +51,7 @@ const getSingleWallet = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Wallet details retrived successfully",
+    message: "Wallet details retrieved successfully",
     data: result,
   });
 });
@@ -60,7 +60,7 @@ const getWalletStatics = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Wallet details retrived successfully",
+    message: "Wallet details retrieved successfully",
     data: result,
   });
 });

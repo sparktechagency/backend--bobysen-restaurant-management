@@ -1,9 +1,9 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { storeFile } from "../../utils/fileHelper";
-import { menuServices, reviewServices } from "./menu.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import { storeFile } from "../../utils/fileHelper";
+import sendResponse from "../../utils/sendResponse";
+import { menuServices, reviewServices } from "./menu.service";
 const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
     req.body.image = storeFile("menu", req?.file?.filename);
@@ -28,7 +28,7 @@ const getAllMenu = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Menu retrived successfully",
+    message: "Menu retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -39,7 +39,7 @@ const getAllMenuForOwner = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Menu retrived successfully",
+    message: "Menu retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -52,7 +52,7 @@ const getsingleMenu = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Menu retrived successfully",
+    message: "Menu retrieved successfully",
     data: result,
   });
 });
@@ -96,7 +96,7 @@ const getAllReviews = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Reviews retrived successfully",
+    message: "Reviews retrieved successfully",
     data: result,
   });
 });

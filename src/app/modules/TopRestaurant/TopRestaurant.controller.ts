@@ -23,7 +23,7 @@ const getAllTopRestaurants = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurants retrived successfully",
+    message: "Restaurants retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -38,7 +38,7 @@ const getSingleTopRestaurant = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurant retrived successfully",
+      message: "Restaurant retrieved successfully",
       data: result,
     });
     return result;

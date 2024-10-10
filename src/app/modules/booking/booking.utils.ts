@@ -241,3 +241,8 @@ export const sendReservationEmail = async (
     }
   });
 };
+export function generateTicketNumber() {
+  const timestamp = Date.now().toString(); // Get the current timestamp as a string
+  const uniqueTicket = timestamp.slice(-6); // Extract the last 6 digits of the timestamp
+  return parseInt(uniqueTicket, 10); // Convert it back to an integer
+}

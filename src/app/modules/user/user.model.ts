@@ -1,9 +1,8 @@
-import { Schema, model } from "mongoose";
-import { TUser, UserModel } from "./user.interface";
-import { UserStatus } from "./user.constant";
-import config from "../../config";
 import bcrypt from "bcrypt";
-import { string } from "zod";
+import { Schema, model } from "mongoose";
+import config from "../../config";
+import { UserStatus } from "./user.constant";
+import { TUser, UserModel } from "./user.interface";
 const userSchema = new Schema<TUser, UserModel>(
   {
     // userName: {
@@ -47,6 +46,10 @@ const userSchema = new Schema<TUser, UserModel>(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    coin: {
+      type: Number,
+      default: 0,
     },
     phoneNumber: {
       type: String,

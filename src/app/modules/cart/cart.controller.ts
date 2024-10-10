@@ -1,9 +1,8 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import sendResponse from "../../utils/sendResponse";
-import { menuCategoryServices } from "../menuCategory/menuCategory.service";
+import httpStatus from "http-status";
 import moment from "moment";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 import { cartServices } from "./cart.service";
 const insertItemIntoCart = catchAsync(async (req: Request, res: Response) => {
   let itemData = { ...req.body };
@@ -26,7 +25,7 @@ const getCartItems = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Cart items retrived successfully",
+    message: "Cart items retrieved successfully",
     data: result,
   });
 });
@@ -37,7 +36,7 @@ const getMYOrders = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Orders retrived successfully",
+    message: "Orders retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -58,7 +57,7 @@ const getSingleCartItemsUsingId = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Order details retrived successfully",
+      message: "Order details retrieved successfully",
       data: result,
     });
   }

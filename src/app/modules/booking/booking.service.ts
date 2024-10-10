@@ -3,6 +3,7 @@ import moment from "moment";
 import mongoose, { Types } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
+import { Coin } from "../coins/coins.model";
 import { notificationServices } from "../notification/notificaiton.service";
 import { messages } from "../notification/notification.constant";
 import { modeType } from "../notification/notification.interface";
@@ -16,13 +17,13 @@ import {
   checkRestaurantAvailability,
   generateBookingNumber,
   sendReservationEmail,
-  sendWhatsAppMessageToCustomers,
-  sendWhatsAppMessageToVendors,
   validateBookingTime,
 } from "./booking.utils";
 
 // search booking
-const bookAtable = async (payload: TBook) => {
+const bookAtable = async (BookingData: TBook) => {
+  const payload: any = { ...BookingData };
+  if (BookingData?.event) payload["ticket"] = generateBookingNumber();
   const day = moment(payload?.date).format("dddd");
   if (Number(payload?.seats) > 10) {
     throw new AppError(
@@ -100,17 +101,13 @@ const bookAtable = async (payload: TBook) => {
       refference: result?._id,
       model_type: modeType.Booking,
     },
-    // {
-    //   receiver: bookedTables[0]?.restaurant?.owner,
-    //   message: messages.bookingForOwner,
-    //   description: `Date:${moment(payload?.date).format(
-    //     "YYYY-MM-DD HH:mm a"
-    //   )},TableNo:${findTable[0]?.tableNo},Seats:${findTable[0]?.seats}`,
-    //   refference: result?._id,
-    //   model_type: modeType.Booking,
-    // },
   ];
 
+  await Coin.findOneAndUpdate(
+    { customer: user }, // Search condition
+    { $inc: { coins: 10 } }, // Increment the coins by 10 if the document exists
+    { new: true, upsert: true } // Insert if no document found, and return the updated document
+  );
   // send message to the customer
   const customerSmsData = {
     phoneNumbers: [`+230${user?.phoneNumber}`],
@@ -142,8 +139,8 @@ const bookAtable = async (payload: TBook) => {
   // await sendWhatsAppMessageToCustomers(smsData);
   // send message to the vendor
   await notificationServices.insertNotificationIntoDb(notificationData);
-  await sendWhatsAppMessageToCustomers(customerSmsData);
-  await sendWhatsAppMessageToVendors(vendorSmsData);
+  // await sendWhatsAppMessageToCustomers(customerSmsData);
+  // await sendWhatsAppMessageToVendors(vendorSmsData);
   const emailContext = {
     name: user?.fullName,
     email: user?.email,

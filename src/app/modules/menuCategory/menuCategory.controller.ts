@@ -28,7 +28,7 @@ const findAllCategory = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "categories retrived successfully",
+    message: "categories retrieved successfully",
     data: result,
   });
 });
@@ -56,7 +56,7 @@ const getSingleCategory = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Category retrived successfully",
+    message: "Category retrieved successfully",
     data: result,
   });
 });

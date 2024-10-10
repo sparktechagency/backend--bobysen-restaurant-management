@@ -24,7 +24,7 @@ const getAllBooking = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Booking data retrived successfully",
+    message: "Booking data retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -35,7 +35,7 @@ const getAllBookingsForAdmin = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Booking data retrived successfully",
+      message: "Booking data retrieved successfully",
       data: result,
     });
   }
@@ -48,7 +48,7 @@ const getAllBookingByOwner = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Booking data retrived successfully",
+    message: "Booking data retrieved successfully",
     data: result,
   });
 });
@@ -57,7 +57,7 @@ const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Booking data retrived successfully",
+    message: "Booking data retrieved successfully",
     data: result,
   });
 });
@@ -78,7 +78,7 @@ const getBookingDetailsWithMenu = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Booking details retrived successfully",
+      message: "Booking details retrieved successfully",
       data: result,
     });
   }
@@ -93,7 +93,6 @@ const deleteBooking = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getBookingStatics = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.user);
   const result = await bookingServies.getBookingStatics(
     req.user.userId,
     req?.query?.year as string
@@ -101,7 +100,7 @@ const getBookingStatics = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Booking statics retrived successfully",
+    message: "Booking statics retrieved successfully",
     data: result,
   });
 });

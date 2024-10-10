@@ -25,7 +25,7 @@ const getAllBanner = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Banners retrived successfully",
+    message: "Banners retrieved successfully",
     data: result,
   });
 });
@@ -34,7 +34,7 @@ const deleteBanner = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Banners retrived successfully",
+    message: "Banners retrieved successfully",
     data: result,
   });
 });

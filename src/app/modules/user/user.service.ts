@@ -68,7 +68,6 @@ const insertVendorIntoDb = async (payload: Partial<TUser>): Promise<TUser> => {
   };
   console.log(formatedData);
   const result = await User.create(formatedData);
-  console.log(result);
   await sendEmail(
     result?.email,
     "Your Gmail And Password Is:",

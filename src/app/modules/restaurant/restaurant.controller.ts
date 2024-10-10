@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { storeFile } from "../../utils/fileHelper";
 import sendResponse from "../../utils/sendResponse";
+import { uploadToSpaces } from "../../utils/spaces";
 import { restaurantServices } from "./restaurant.service";
 const insertRestaurantIntDb = catchAsync(
   async (req: Request, res: Response) => {
@@ -10,7 +11,7 @@ const insertRestaurantIntDb = catchAsync(
 
     if (req?.files instanceof Array) {
       for (const file of req?.files) {
-        images.push({ url: storeFile("restaurant", file?.filename) });
+        images.push({ url: await uploadToSpaces(file) });
       }
     }
     req.body.owner = req?.user?.userId;
@@ -31,7 +32,7 @@ const getAllRestaurants = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurants retrived successfully",
+    message: "Restaurants retrieved successfully",
     data: result,
   });
   return result;
@@ -42,7 +43,7 @@ const getAllRestaurantsForUser = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurants retrived successfully",
+      message: "Restaurants retrieved successfully",
       data: result?.data,
       meta: result?.meta,
     });
@@ -54,7 +55,7 @@ const getSingleRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurant retrived successfully",
+    message: "Restaurant retrieved successfully",
     data: result,
   });
   return result;
@@ -107,7 +108,7 @@ const getSingleRestaurantForOwner = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurant retrived successfully",
+      message: "Restaurant retrieved successfully",
       data: result,
     });
     return result;
@@ -119,7 +120,7 @@ const getAllRestaurantForAdmin = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurant retrived successfully",
+      message: "Restaurant retrieved successfully",
       data: result,
     });
     return result;
@@ -130,7 +131,7 @@ const nearByRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurant retrived successfully",
+    message: "Restaurant retrieved successfully",
     data: result,
   });
   return result;

@@ -1,7 +1,7 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 import { notificationServices } from "./notificaiton.service";
 const insertNotificatonIntoDb = catchAsync(
   async (req: Request, res: Response) => {
@@ -23,7 +23,7 @@ const getAllNotification = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Notifications retrived successfully",
+    message: "Notifications retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });

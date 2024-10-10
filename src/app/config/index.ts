@@ -17,4 +17,12 @@ export default {
   stripe_secret: process.env.STRIPE_SECRET,
   whatsapp_auth_key: process.env.WHATSAPP_AUTH_KEY,
   whatsapp_sms_number: process.env.WHATSAPP_SMS_NUMBER,
+  spaces: {
+    url: process.env.SPACES_API,
+    image_url: process.env.SPACES_IMAGE_URL,
+    accessKey: process.env.SPACES_ACCESS_KEY,
+    secretKey: process.env.SPACES_SECRET_KEY,
+    region: process.env.SPACES_REGION,
+    bucket: process.env.SPACES_BUCKET,
+  },
 };

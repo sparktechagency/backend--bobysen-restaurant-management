@@ -4,6 +4,7 @@ export interface TBook {
   date: string;
   time: string;
   user: ObjectId;
+  event?: ObjectId;
   seats: number;
   customerNumber: string;
 }
@@ -22,6 +23,8 @@ export interface TBooking {
   table: ObjectId;
   restaurant: ObjectId;
   date: string;
+  event: ObjectId;
+  ticket: string;
   endTime: string;
   time: string;
   status: "active" | "cancelled" | "completed";

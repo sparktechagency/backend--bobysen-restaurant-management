@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import { tableServices } from "./table.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { tableServices } from "./table.service";
 
 const insertTableIntoDb = catchAsync(async (req: Request, res: Response) => {
   const result = await tableServices.insertTableIntoDB(req.body);
@@ -19,7 +19,7 @@ const getAllTables = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "tables retrived successfully",
+    message: "tables retrieved successfully",
     data: result?.data,
     meta: result?.meta,
   });
@@ -31,7 +31,7 @@ const getSingleTable = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "table retrived successfully",
+    message: "table retrieved successfully",
     data: result,
   });
   return result;
@@ -51,7 +51,7 @@ const getVendorAllTables = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tables retrived successfully",
+    message: "Tables retrieved successfully",
     data: result,
   });
   return result;

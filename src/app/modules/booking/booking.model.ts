@@ -21,6 +21,15 @@ const bookingSchema = new Schema<TBooking>(
       type: Boolean,
       default: false,
     },
+    event: {
+      type: Schema.Types.ObjectId,
+      ref: "Event",
+      select: 0,
+    },
+    ticket: {
+      type: String,
+      select: 0,
+    },
     table: {
       type: Schema.Types.ObjectId,
       ref: "Table",

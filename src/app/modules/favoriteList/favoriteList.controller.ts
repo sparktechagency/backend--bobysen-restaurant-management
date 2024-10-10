@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import { favoriteListServices } from "./favouriteList.service";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { favoriteListServices } from "./favouriteList.service";
 
 const insertMenuintoFavriteList = catchAsync(
   async (req: Request, res: Response) => {
@@ -82,7 +82,7 @@ const getsingleMenuFromFavouriteList = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Menu retrived successfully",
+      message: "Menu retrieved successfully",
       data: result,
     });
   }
