@@ -23,7 +23,7 @@ import {
 // search booking
 const bookAtable = async (BookingData: TBook) => {
   const payload: any = { ...BookingData };
-  if (!payload?.event) delete payload.event;
+  if (payload?.event === null) delete payload.event;
   if (BookingData?.event) payload["ticket"] = generateBookingNumber();
   const day = moment(payload?.date).format("dddd");
   if (Number(payload?.seats) > 10) {
