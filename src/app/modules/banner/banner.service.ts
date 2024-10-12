@@ -7,7 +7,10 @@ const insetBannerIntoDb = async (payload: Ibanner) => {
 };
 
 const getAllBanner = async () => {
-  const result = await Banner.find({});
+  const result = await Banner.find({}).populate({
+    path: "restaurant",
+    select: "name",
+  });
   return result;
 };
 

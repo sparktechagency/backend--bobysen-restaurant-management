@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
-import { storeFile } from "../../utils/fileHelper";
 import sendResponse from "../../utils/sendResponse";
+import { uploadToSpaces } from "../../utils/spaces";
 import { menuCategoryServices } from "./menuCategory.service";
 const insertMenuCategoryIntoDb = catchAsync(
   async (req: Request, res: Response) => {
     if (req?.file) {
-      req.body.image = storeFile("category", req?.file?.filename);
+      req.body.image = await uploadToSpaces(req?.file, "category");
     }
     req.body.user = req?.user?.userId;
 
@@ -34,7 +34,7 @@ const findAllCategory = catchAsync(async (req: Request, res: Response) => {
 });
 const updateMenuCategory = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("category", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "category");
   }
   const result = await menuCategoryServices.updateMenuCategory(
     req.params.id,
@@ -50,7 +50,7 @@ const updateMenuCategory = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleCategory = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("category", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "category");
   }
   const result = await menuCategoryServices.getSingleCategory(req.params.id);
   sendResponse(res, {

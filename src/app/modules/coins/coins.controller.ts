@@ -62,8 +62,9 @@ const getSingleCoinsWithdrawRequest = catchAsync(
 );
 const updateCoinsWithdrawRequest = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await coinWithDrawServices.getSingleCoinsWithdrawRequest(
-      req.params.id
+    const result = await coinWithDrawServices.updateCoinsWithdrawRequest(
+      req.params.id,
+      req.body
     );
     sendResponse(res, {
       statusCode: httpStatus.OK,

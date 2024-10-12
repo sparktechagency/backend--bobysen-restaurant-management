@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
-import { storeFile } from "../../utils/fileHelper";
 import sendResponse from "../../utils/sendResponse";
+import { uploadToSpaces } from "../../utils/spaces";
 import { bannerservices } from "./banner.service";
 
 const insertBannerIntoDb = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("banner", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "banner");
   }
+  console.log(req.body);
   const result = await bannerservices.insetBannerIntoDb(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -18,9 +19,6 @@ const insertBannerIntoDb = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllBanner = catchAsync(async (req: Request, res: Response) => {
-  if (req?.file) {
-    req.body.image = storeFile("banner", req?.file?.filename);
-  }
   const result = await bannerservices.getAllBanner();
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -19,7 +19,7 @@ export default {
   whatsapp_sms_number: process.env.WHATSAPP_SMS_NUMBER,
   spaces: {
     url: process.env.SPACES_API,
-    image_url: process.env.SPACES_IMAGE_URL,
+    image_url: process.env.SPACES_IMAGE_API,
     accessKey: process.env.SPACES_ACCESS_KEY,
     secretKey: process.env.SPACES_SECRET_KEY,
     region: process.env.SPACES_REGION,

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
-import { storeFile } from "../../utils/fileHelper";
 import sendResponse from "../../utils/sendResponse";
 import { uploadToSpaces } from "../../utils/spaces";
 import { restaurantServices } from "./restaurant.service";
@@ -11,7 +10,7 @@ const insertRestaurantIntDb = catchAsync(
 
     if (req?.files instanceof Array) {
       for (const file of req?.files) {
-        images.push({ url: await uploadToSpaces(file) });
+        images.push({ url: await uploadToSpaces(file, "restaurant") });
       }
     }
     req.body.owner = req?.user?.userId;
@@ -64,7 +63,7 @@ const updateRestaurant = catchAsync(async (req: Request, res: Response) => {
   const images = [];
   if (req?.files instanceof Array) {
     for (const file of req?.files) {
-      images.push({ url: storeFile("Restaurant", file?.filename) });
+      images.push({ url: await uploadToSpaces(file, "restaurant") });
     }
   }
   req.body.images = images;

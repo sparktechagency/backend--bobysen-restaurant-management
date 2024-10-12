@@ -21,6 +21,7 @@ const insertEventsIntoDb = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllEvents = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.query);
   const result = await eventsServices.getAllEvents(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -32,6 +33,15 @@ const getAllEvents = catchAsync(async (req: Request, res: Response) => {
 });
 const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
   const result = await eventsServices.getSingleEvent(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "event retrieved successfully",
+    data: result,
+  });
+});
+const geteventForVendor = catchAsync(async (req: Request, res: Response) => {
+  const result = await eventsServices.geteventForVendor(req.user.userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -53,5 +63,6 @@ export const eventsController = {
   insertEventsIntoDb,
   getAllEvents,
   getSingleEvent,
+  geteventForVendor,
   updateEvent,
 };

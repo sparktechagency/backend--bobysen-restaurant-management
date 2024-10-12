@@ -11,7 +11,6 @@ const getAllMyCoin = async (id: string) => {
 };
 
 const insertCoinWithDrawRequest = async (payload: any) => {
-  console.log(payload);
   const session = await mongoose.startSession();
   try {
     await session.startTransaction();
@@ -56,6 +55,7 @@ const getSingleCoinsWithdrawRequest = async (id: string) => {
 };
 
 const updateCoinsWithdrawRequest = async (id: string, payload: any) => {
+  console.log(id, payload);
   const result = await WithDrawCoin.findByIdAndUpdate(id, payload, {
     new: true,
   });

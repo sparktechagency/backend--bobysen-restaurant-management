@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
-import { storeFile } from "../../utils/fileHelper";
 import sendResponse from "../../utils/sendResponse";
+import { uploadToSpaces } from "../../utils/spaces";
 import { menuServices, reviewServices } from "./menu.service";
 const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("menu", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "menu");
   }
   req.body.owner = req?.user?.userId;
   const result = await menuServices.insertMenuIntoDb(req.body);
@@ -58,7 +58,7 @@ const getsingleMenu = catchAsync(async (req: Request, res: Response) => {
 });
 const updateMenu = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("menu", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "menu");
   }
   const result = await menuServices.updateMenu(req.params.id, req.body);
   sendResponse(res, {
@@ -70,7 +70,7 @@ const updateMenu = catchAsync(async (req: Request, res: Response) => {
 });
 const deleteMenu = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("menu", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "menu");
   }
   const result = await menuServices.deleteMenu(req.params.id);
   sendResponse(res, {

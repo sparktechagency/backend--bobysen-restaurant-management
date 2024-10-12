@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  ObjectCannedACL,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import crypto from "crypto";
 import config from "../config";
 
@@ -23,14 +27,18 @@ const generateUniqueFileName = (originalName: string): string => {
 // Utility function to upload image to DigitalOcean Spaces
 export const uploadToSpaces = async (
   file: Express.Multer.File,
-  folder?: string
+  folder: string = "" // Default to empty string if no folder is provided
 ): Promise<string | null> => {
-  const uniqueFileName = `${generateUniqueFileName(file.originalname)}`;
+  const uniqueFileName = generateUniqueFileName(file.originalname);
+  // Construct the Key including the folder name if provided
+  const key = folder ? `${folder}/${uniqueFileName}` : uniqueFileName;
+
   const params = {
-    Bucket: config.spaces.bucket, // Replace with your Space name
-    Key: uniqueFileName, // The full path in the bucket (folder + unique file name)
-    Body: file.buffer, // The file's buffer content
-    ContentType: file.mimetype, // Optional: Set the content type
+    Bucket: config.spaces.bucket,
+    Key: key, // Use the constructed key
+    Body: file.buffer,
+    ContentType: file.mimetype,
+    ACL: ObjectCannedACL.public_read, // Set the ACL to public-read
   };
 
   try {
@@ -38,7 +46,7 @@ export const uploadToSpaces = async (
     await s3Client.send(new PutObjectCommand(params));
 
     // Return the URL of the uploaded file
-    const url = `${config.spaces.image_url}/${uniqueFileName}`;
+    const url = `${config.spaces.image_url}/${key}`; // Use the constructed key for the URL
     console.log(url);
     return url;
   } catch (err) {

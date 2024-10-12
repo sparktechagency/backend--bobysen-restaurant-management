@@ -24,7 +24,6 @@ const bookingSchema = new Schema<TBooking>(
     event: {
       type: Schema.Types.ObjectId,
       ref: "Event",
-      select: 0,
     },
     ticket: {
       type: String,

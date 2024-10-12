@@ -1,10 +1,10 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
-import fileUpload from "../../middleware/fileUpload";
+import { upload } from "../../middleware/fileUpload";
 import parseData from "../../middleware/parseData";
 import { USER_ROLE } from "../user/user.constant";
 import { menuControllers, reviewControllers } from "./menu.controller";
-const upload = fileUpload("./public/uploads/menu");
+
 const router = Router();
 export const reviewrouter = Router();
 reviewrouter.post(

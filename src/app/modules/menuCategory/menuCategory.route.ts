@@ -1,11 +1,11 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
-import fileUpload from "../../middleware/fileUpload";
+import { upload } from "../../middleware/fileUpload";
 import parseData from "../../middleware/parseData";
 import { USER_ROLE } from "../user/user.constant";
 import { categoryControllers } from "./menuCategory.controller";
 const router = Router();
-const upload = fileUpload("./public/uploads/category");
+
 router.post(
   "/",
   upload.single("file"),

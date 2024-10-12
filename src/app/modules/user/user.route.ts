@@ -1,10 +1,10 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
-import fileUpload from "../../middleware/fileUpload";
+import { upload } from "../../middleware/fileUpload";
 import parseData from "../../middleware/parseData";
 import { USER_ROLE } from "./user.constant";
 import { userControllers } from "./user.controller";
-const upload = fileUpload("./public/uploads/profile/");
+
 const router = Router();
 router.post(
   "/create-user",

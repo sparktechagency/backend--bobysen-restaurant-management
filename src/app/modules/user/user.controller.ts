@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
-import { storeFile } from "../../utils/fileHelper";
 import sendResponse from "../../utils/sendResponse";
 import { uploadToSpaces } from "../../utils/spaces";
 import { userServices } from "./user.service";
@@ -43,7 +42,7 @@ const getme = catchAsync(async (req: Request, res: Response) => {
 
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("profile", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "profile");
   }
 
   const result = await userServices.updateProfile(req.user.userId, req.body);
@@ -75,7 +74,7 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
 });
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = storeFile("profile", req?.file?.filename);
+    req.body.image = await uploadToSpaces(req?.file, "profile");
   }
   console.log(req.body);
   const result = await userServices.updateUser(req.params.id, req.body);

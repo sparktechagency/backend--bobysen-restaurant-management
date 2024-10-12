@@ -23,6 +23,7 @@ import {
 // search booking
 const bookAtable = async (BookingData: TBook) => {
   const payload: any = { ...BookingData };
+  console.log(payload);
   if (BookingData?.event) payload["ticket"] = generateBookingNumber();
   const day = moment(payload?.date).format("dddd");
   if (Number(payload?.seats) > 10) {
@@ -212,7 +213,19 @@ const getAllBookingsForAdmin = async (query: Record<string, any>) => {
 };
 const getAllBookingByOwner = async (query: Record<string, any>) => {
   const searchAbleFields = ["userName", "id", "email"];
-  const pipeline: any[] = [
+  const pipeline: any[] = [];
+
+  // Match by event if provided in the query
+  if (query?.event) {
+    pipeline.push({
+      $match: {
+        event: new mongoose.Types.ObjectId(query.event), // Convert event to ObjectId
+      },
+    });
+  }
+
+  // Add lookup and unwind stages
+  pipeline.push(
     {
       $lookup: {
         from: "restaurants",
@@ -251,7 +264,6 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
         "restaurant.owner": new mongoose.Types.ObjectId(query?.owner),
       },
     },
-
     {
       $project: {
         userName: "$user.fullName",
@@ -265,19 +277,21 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
         tableNo: "$table.tableNo",
         seats: "$table.seats",
         restaurantName: "$restaurant.name",
+        event: 1,
       },
-    },
-  ];
+    }
+  );
+
+  // Add matching for additional fields except searchTerm and owner
   Object.keys(query).forEach((key) => {
-    if (key !== "searchTerm" && key !== "owner") {
-      console.log(key);
+    if (key !== "searchTerm" && key !== "owner" && key !== "event") {
       const matchStage: Record<string, any> = {};
       matchStage[key] = query[key];
-      console.log(query);
       pipeline.push({ $match: matchStage });
     }
   });
-  // searchterm
+
+  // Match by searchTerm if provided in the query
   if (query?.searchTerm) {
     const searchRegex = new RegExp(query.searchTerm, "i");
     const searchMatchStage = {
@@ -287,11 +301,12 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
     };
     pipeline.push({ $match: searchMatchStage });
   }
-  // project
-  pipeline.push();
+
+  // Execute the pipeline
   const result = await Booking.aggregate(pipeline);
   return result;
 };
+
 const getSingleBooking = async (id: string) => {
   const result = await Booking.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(id.toString()) } },
