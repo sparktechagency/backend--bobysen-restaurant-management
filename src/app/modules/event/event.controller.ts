@@ -8,9 +8,13 @@ import { eventsServices } from "./event.service";
 const insertEventsIntoDb = catchAsync(async (req: Request, res: Response) => {
   const data = { ...req.body };
 
-  if (req?.file) {
-    data["image"] = await uploadToSpaces(req?.file, "event");
+  const images = [];
+  if (req?.files instanceof Array) {
+    for (const file of req?.files) {
+      images.push({ url: await uploadToSpaces(file, "event") });
+    }
   }
+  data["images"] = images;
   const result = await eventsServices.insertEventIntoDb(data);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -59,10 +63,35 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const loadPaymentZoneForEvent = catchAsync(
+  async (req: Request, res: Response) => {
+    const { user } = req.user;
+    req.body.userId = user;
+    const result = await eventsServices.loadPaymentZoneForEvent(req.body);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "load payment zone retrieved successfully",
+      data: result,
+    });
+  }
+);
+const makePaymentForEvent = catchAsync(async (req: Request, res: Response) => {
+  const result = await eventsServices.makePaymentForEvent(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Table Booked successfully",
+    data: result,
+  });
+});
+
 export const eventsController = {
   insertEventsIntoDb,
   getAllEvents,
   getSingleEvent,
   geteventForVendor,
   updateEvent,
+  loadPaymentZoneForEvent,
+  makePaymentForEvent,
 };

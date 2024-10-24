@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import config from "../../config";
 import AppError from "../../error/AppError";
 import { Cart } from "../cart/cart.model";
+import { eventsServices } from "../event/event.service";
 import { Wallet } from "../wallet/wallet.model";
 const insertOrderIntoDb = async (payload: any) => {
   const {
@@ -106,7 +107,7 @@ const getImnCallback = async (received_crypted_data: any) => {
       }
     );
     // check valid user for using token
-    console.log(response?.data);
+
     if (response?.data?.status !== "SUCCESS") {
       throw new AppError(
         httpStatus.NOT_ACCEPTABLE,
@@ -116,7 +117,7 @@ const getImnCallback = async (received_crypted_data: any) => {
 
     // check try catch
     const additional_param = JSON.parse(response?.data?.additional_param);
-    const { token, cart } = additional_param;
+    const { token, type } = additional_param;
     let decode;
     try {
       decode = jwt.verify(
@@ -128,14 +129,27 @@ const getImnCallback = async (received_crypted_data: any) => {
     }
     const { amount, checksum, id_order, transaction_id, payment_date } =
       response?.data;
-    await insertOrderIntoDb({
-      amount,
-      checksum,
-      id_order,
-      transaction_id,
-      date: payment_date,
-      cart,
-    });
+    if (type === "order") {
+      await insertOrderIntoDb({
+        amount,
+        checksum,
+        id_order,
+        transaction_id,
+        date: payment_date,
+        cart: additional_param?.cart,
+      });
+    } else {
+      const data = {
+        user: decode?.userId,
+        transactionId: transaction_id,
+        event: additional_param?.event,
+        seats: additional_param?.seats,
+        date: additional_param?.date,
+        time: additional_param?.time,
+        restaurant: additional_param?.restaurant,
+      };
+      await eventsServices.makePaymentForEvent(data);
+    }
   } catch (error: any) {
     throw new Error(error);
     // Handle the error
@@ -161,6 +175,10 @@ const loadPaymentZone = async (payload: any, token: string) => {
       {
         param_name: "cart",
         param_value: payload?.cart,
+      },
+      {
+        param_name: "type",
+        param_value: "order",
       },
     ],
     request_mode: "simple",

@@ -9,7 +9,7 @@ const router = Router();
 
 router.post(
   "/",
-  upload.single("file"),
+  upload.array("files"),
   parseData(),
   auth(USER_ROLE.vendor, USER_ROLE.admin),
   eventsController.insertEventsIntoDb
@@ -26,6 +26,16 @@ router.patch(
   "/:id",
   auth(USER_ROLE.vendor, USER_ROLE.admin),
   eventsController.updateEvent
+);
+router.post(
+  "/load-payment-zone",
+  auth(USER_ROLE.user),
+  eventsController.loadPaymentZoneForEvent
+);
+router.post(
+  "/payment",
+  auth(USER_ROLE.user),
+  eventsController.loadPaymentZoneForEvent
 );
 
 export const eventsRoutes = router;

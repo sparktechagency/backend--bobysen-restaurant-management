@@ -1,7 +1,11 @@
-import { Schema } from "mongoose";
+import axios from "axios";
+import httpStatus from "http-status";
+import mongoose, { Schema } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
+import AppError from "../../error/AppError";
+import { Booking } from "../booking/booking.model";
 import { Ievents } from "./event.interface";
-import { Event } from "./event.model";
+import { Event, EventPayment } from "./event.model";
 
 const insertEventIntoDb = async (payload: Ievents) => {
   const result = await Event.create(payload);
@@ -74,10 +78,122 @@ const geteventForVendor = async (vendorId: string) => {
   return events;
 };
 
+const loadPaymentZoneForEvent = async (payload: any) => {
+  const { user, ...others } = payload;
+  const data = {
+    ...others,
+    additional_params: [
+      {
+        param_name: "user",
+        param_value: payload?.user,
+      },
+      {
+        param_name: "token",
+        param_value: payload?.token,
+      },
+      {
+        param_name: "event",
+        param_value: payload?.event,
+      },
+      {
+        param_name: "restaurant",
+        param_value: payload?.restaurant,
+      },
+      {
+        param_name: "date",
+        param_value: payload?.date,
+      },
+      {
+        param_name: "time",
+        param_value: payload?.time,
+      },
+      {
+        param_name: "seats",
+        param_value: payload?.seats,
+      },
+      {
+        param_name: "type",
+        param_value: "event",
+      },
+    ],
+    request_mode: "simple",
+    touchpoint: "native_app",
+  };
+  let response;
+  const headers = {
+    "content-type": "application/json",
+    Authorization:
+      "Basic " +
+      Buffer.from(
+        "datamation_8a9ft5:kqK1hvT5Mhwu7t0KavYaJctDW5M8xruW"
+      ).toString("base64"),
+  };
+
+  const authObj = {
+    authentify: {
+      id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
+      id_entity: "w3QAeoMtLJROmlIyXVgnx1R6y7BgNo8t",
+      id_operator: "oeRH43c5RoQockXajPTo0TA5YW0KReio",
+      operator_password: "NUvxccs0R0rzKPoLlIPeet21rarpX0rk",
+    },
+  };
+
+  try {
+    response = await axios.post(
+      "https://api.mips.mu/api/load_payment_zone",
+      { ...authObj, ...data },
+      {
+        headers: headers,
+      }
+    );
+    // Handle the response data as needed
+  } catch (error: any) {
+    throw new Error(error);
+    // Handle the error
+  }
+
+  return response?.data?.answer;
+};
+
+const makePaymentForEvent = async (payload: any) => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    //  first of all post a booking
+    const bookAtable = await Booking.create([payload], { session });
+    if (!bookAtable[0]) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Event not booked");
+    }
+
+    // insert payment information to the eventpayment model
+    const insertEventPayment = await EventPayment.create(
+      [{ ...payload, booking: bookAtable[0]?._id }],
+      { session }
+    );
+
+    if (!insertEventPayment[0]) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "payment not added into database"
+      );
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+    return bookAtable[0];
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(error as any);
+  }
+};
+
 export const eventsServices = {
   insertEventIntoDb,
   getAllEvents,
   getSingleEvent,
   updateEvent,
   geteventForVendor,
+  loadPaymentZoneForEvent,
+  makePaymentForEvent,
 };

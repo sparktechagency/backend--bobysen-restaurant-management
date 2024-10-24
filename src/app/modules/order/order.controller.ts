@@ -13,7 +13,6 @@ const insertOrderIntoDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getimnCallback = catchAsync(async (req: Request, res: Response) => {
-  console.log("body from controller", req.body, req.query);
   const result = await orderServices.getImnCallback(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,

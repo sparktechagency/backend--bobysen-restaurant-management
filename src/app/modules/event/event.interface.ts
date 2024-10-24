@@ -5,7 +5,10 @@ export interface Ievents {
   restaurant: ObjectId;
   date: string;
   description: string;
-  image: string;
+  startDate: string;
+  endDate: string;
+  images: string;
   isDeleted: boolean;
   isActive: boolean;
+  entryFee: number;
 }

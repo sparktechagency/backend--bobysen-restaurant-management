@@ -1,6 +1,32 @@
 import { model, Schema } from "mongoose";
 import { Ievents } from "./event.interface";
 
+const EventPaymentSchema: Schema = new Schema({
+  event: {
+    type: Schema.Types.ObjectId,
+    ref: "Event",
+    required: true,
+  },
+  transactionId: {
+    type: String,
+    required: true,
+  },
+  booking: {
+    type: Schema.Types.ObjectId,
+    ref: "Booking",
+    required: true,
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const EventsSchema: Schema = new Schema<Ievents>({
   title: {
     type: String,
@@ -11,7 +37,11 @@ const EventsSchema: Schema = new Schema<Ievents>({
     ref: "Restaurant",
     required: true,
   },
-  date: {
+  startDate: {
+    type: String,
+    required: true,
+  },
+  endDate: {
     type: String,
     required: true,
   },
@@ -19,10 +49,17 @@ const EventsSchema: Schema = new Schema<Ievents>({
     type: String,
     required: true,
   },
-  image: {
-    type: String,
+  entryFee: {
+    type: Number,
     required: true,
   },
+  images: [
+    {
+      url: {
+        type: String,
+      },
+    },
+  ],
   isActive: {
     type: Boolean,
     default: true,
@@ -49,3 +86,4 @@ EventsSchema.pre("aggregate", function (next) {
 });
 
 export const Event = model<Ievents>("Event", EventsSchema);
+export const EventPayment = model("EventPayment", EventPaymentSchema);
