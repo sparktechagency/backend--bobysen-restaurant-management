@@ -25,6 +25,10 @@ const bookingSchema = new Schema<TBooking>(
       type: Schema.Types.ObjectId,
       ref: "Event",
     },
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
     ticket: {
       type: String,
       select: 0,

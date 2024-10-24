@@ -95,22 +95,7 @@ const loadPaymentZoneForEvent = async (payload: any) => {
         param_name: "event",
         param_value: payload?.event,
       },
-      {
-        param_name: "restaurant",
-        param_value: payload?.restaurant,
-      },
-      {
-        param_name: "date",
-        param_value: payload?.date,
-      },
-      {
-        param_name: "time",
-        param_value: payload?.time,
-      },
-      {
-        param_name: "seats",
-        param_value: payload?.seats,
-      },
+
       {
         param_name: "type",
         param_value: "event",
@@ -169,6 +154,11 @@ const makePaymentForEvent = async (payload: any) => {
     const insertEventPayment = await EventPayment.create(
       [{ ...payload, booking: bookAtable[0]?._id }],
       { session }
+    );
+    await Event.findByIdAndUpdate(
+      payload?.event,
+      { isPaid: true },
+      { new: true, session }
     );
 
     if (!insertEventPayment[0]) {

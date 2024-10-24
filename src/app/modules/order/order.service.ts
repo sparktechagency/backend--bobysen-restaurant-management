@@ -143,10 +143,6 @@ const getImnCallback = async (received_crypted_data: any) => {
         user: decode?.userId,
         transactionId: transaction_id,
         event: additional_param?.event,
-        seats: additional_param?.seats,
-        date: additional_param?.date,
-        time: additional_param?.time,
-        restaurant: additional_param?.restaurant,
       };
       await eventsServices.makePaymentForEvent(data);
     }

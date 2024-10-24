@@ -26,6 +26,7 @@ export interface TBooking {
   event: ObjectId;
   ticket: string;
   endTime: string;
+  isPaid: boolean;
   time: string;
   status: "active" | "cancelled" | "completed";
   isReviewed: boolean;
