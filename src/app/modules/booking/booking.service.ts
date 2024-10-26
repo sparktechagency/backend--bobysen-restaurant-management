@@ -11,7 +11,7 @@ import { Restaurant } from "../restaurant/restaurant.model";
 import { Table } from "../table/table.model";
 import { User } from "../user/user.model";
 import { TBook } from "./booking.interface";
-import { Booking } from "./booking.model";
+import { Booking, Unpaidbooking } from "./booking.model";
 import {
   calculateEndTime,
   checkRestaurantAvailability,
@@ -489,6 +489,154 @@ const getBookingStatics = async (userId: string, year: string) => {
   return finalResult;
 };
 
+const bookAtableForEvent = async (BookingData: TBook) => {
+  const payload: any = { ...BookingData };
+  if (payload?.event === "null") delete payload.event;
+  if (BookingData?.event) payload["ticket"] = generateBookingNumber();
+  const day = moment(payload?.date).format("dddd");
+  if (Number(payload?.seats) > 10) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "If you want to book more than 10 seats, please contact the restaurant owner."
+    );
+  }
+  const restaurant: any = await Restaurant.findById(payload?.restaurant);
+  // check if restaurant booked or open
+  const bookingTime = moment(payload.date);
+  // check closing and opening time
+  validateBookingTime(restaurant, bookingTime);
+  // check the restaurant avilable that day
+  checkRestaurantAvailability(restaurant, day, payload?.time);
+  const totalTables = await Table.find({
+    restaurant: payload.restaurant,
+    seats: Number(payload.seats),
+  }).countDocuments();
+  const expireHours = calculateEndTime(payload?.time);
+  // retrive book tables
+  const bookedTables: any = await Booking.find({
+    date: moment(payload?.date).format("YYYY-MM-DD"),
+    restaurant: payload?.restaurant,
+    status: "active",
+    time: { $lt: expireHours },
+    endTime: { $gt: payload?.time },
+  });
+  // conditionally check avilable tables
+  if (bookedTables?.length >= totalTables) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "No tables avilable for booking during this time. please choose different time and seats"
+    );
+  }
+
+  const findTable: any = await Table.aggregate([
+    {
+      $match: {
+        restaurant: new Types.ObjectId(payload?.restaurant),
+        seats: Number(payload?.seats),
+      },
+    },
+    {
+      $limit: 1,
+    },
+  ]);
+  if (!findTable[0]) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "We couldn't find any tables with the required number of seats.  Please contact with  the restaurant owner"
+    );
+  }
+
+  //
+  const data = {
+    ...payload,
+    date: moment(payload?.date).format("YYYY-MM-DD"),
+    table: findTable[0]?._id,
+    endTime: calculateEndTime(payload?.time),
+    restaurant: payload?.restaurant,
+    id: generateBookingNumber(),
+  };
+
+  // find user
+  const user = await User.findById(payload?.user).select(
+    "fullName phoneNumber email"
+  );
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  const result = await Unpaidbooking.create(data);
+  // const notificationData = [
+  //   {
+  //     receiver: payload?.user,
+  //     message: messages.booking,
+  //     refference: result?._id,
+  //     model_type: modeType.Booking,
+  //   },
+  // ];
+
+  // await Coin.findOneAndUpdate(
+  //   { customer: user }, // Search condition
+  //   { $inc: { coins: 10 } }, // Increment the coins by 10 if the document exists
+  //   { new: true, upsert: true } // Insert if no document found, and return the updated document
+  // );
+  // send message to the customer
+  // const customerSmsData = {
+  //   phoneNumbers: [`+230${user?.phoneNumber}`],
+  //   mediaUrl:
+  //     "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+  //   bodyValues: [
+  //     user.fullName,
+  //     restaurant?.name,
+  //     result?.date,
+  //     result?.time,
+  //     findTable[0]?.seats,
+  //   ],
+  //   buttonUrl: "https://bookatable.mu",
+  // };
+  // const vendorSmsData = {
+  //   phoneNumbers: [`+230${restaurant?.helpLineNumber1}`],
+  //   mediaUrl:
+  //     "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+  //   bodyValues: [
+  //     user.fullName,
+  //     restaurant?.name,
+  //     result?.date,
+  //     result?.time,
+  //     findTable[0]?.seats,
+  //   ],
+  //   buttonUrl: "https://bookatable.mu",
+  // };
+
+  // await sendWhatsAppMessageToCustomers(smsData);
+  // send message to the vendor
+  // await notificationServices.insertNotificationIntoDb(notificationData);
+  // await sendWhatsAppMessageToCustomers(customerSmsData);
+  // await sendWhatsAppMessageToVendors(vendorSmsData);
+  const emailContext = {
+    name: user?.fullName,
+    email: user?.email,
+    date: payload?.date,
+    seats: payload?.seats,
+    arrivalTime: payload?.time,
+    restaurant: restaurant?.name,
+    address: restaurant?.address,
+  };
+  // await sendReservationEmail(
+  //   "reservationTemplate", // The name of your template file without the .html extension
+  //   user?.email,
+  //   "Your Reservation was successful",
+  //   emailContext
+  // );
+  // return result;
+  return result;
+};
+
+const getSingleUnpaiEventBooking = async (id: string) => {
+  const result = await Unpaidbooking.findById(id).populate({
+    path: "table",
+    select: "tableNo seats",
+  });
+  return result;
+};
 export const bookingServies = {
   bookAtable,
   getAllBookings,
@@ -499,4 +647,6 @@ export const bookingServies = {
   getAllBookingsForAdmin,
   deletebooking,
   getBookingStatics,
+  bookAtableForEvent,
+  getSingleUnpaiEventBooking,
 };

@@ -14,6 +14,16 @@ const bookAtable = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const bookAtableForEvent = catchAsync(async (req: Request, res: Response) => {
+  req.body.user = req?.user?.userId;
+  const result = await bookingServies.bookAtableForEvent(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Table booked successfully",
+    data: result,
+  });
+});
 const getAllBooking = catchAsync(async (req: Request, res: Response) => {
   const { role, userId } = req.user;
   const query = { ...req.query };
@@ -104,6 +114,19 @@ const getBookingStatics = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getSingleUnpaiEventBooking = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await bookingServies.getSingleUnpaiEventBooking(
+      req.params.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Booking retrieved retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 export const bookingControllers = {
   bookAtable,
@@ -115,4 +138,6 @@ export const bookingControllers = {
   deleteBooking,
   getBookingStatics,
   getAllBookingsForAdmin,
+  bookAtableForEvent,
+  getSingleUnpaiEventBooking,
 };

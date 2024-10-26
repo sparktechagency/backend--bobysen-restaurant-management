@@ -4,6 +4,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import config from "../../config";
 import AppError from "../../error/AppError";
+import { Unpaidbooking } from "../booking/booking.model";
 import { Cart } from "../cart/cart.model";
 import { eventsServices } from "../event/event.service";
 import { Wallet } from "../wallet/wallet.model";
@@ -139,10 +140,12 @@ const getImnCallback = async (received_crypted_data: any) => {
         cart: additional_param?.cart,
       });
     } else {
+      const bookingData = await Unpaidbooking.findById(
+        additional_param?.unpaidBooking
+      );
       const data = {
-        user: decode?.userId,
+        ...bookingData?.toObject(),
         transactionId: transaction_id,
-        event: additional_param?.event,
       };
       await eventsServices.makePaymentForEvent(data);
     }

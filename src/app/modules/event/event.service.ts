@@ -82,6 +82,7 @@ const loadPaymentZoneForEvent = async (payload: any) => {
   const { user, ...others } = payload;
   const data = {
     ...others,
+
     additional_params: [
       {
         param_name: "user",
@@ -92,8 +93,8 @@ const loadPaymentZoneForEvent = async (payload: any) => {
         param_value: payload?.token,
       },
       {
-        param_name: "event",
-        param_value: payload?.event,
+        param_name: "unpaidBooking",
+        param_value: payload?.unpaidBooking,
       },
 
       {
@@ -150,17 +151,17 @@ const makePaymentForEvent = async (payload: any) => {
       throw new AppError(httpStatus.BAD_REQUEST, "Event not booked");
     }
 
-    // insert payment information to the eventpayment model
-    const insertEventPayment = await EventPayment.create(
-      [{ ...payload, booking: bookAtable[0]?._id }],
-      { session }
-    );
-    await Event.findByIdAndUpdate(
-      payload?.event,
-      { isPaid: true },
-      { new: true, session }
-    );
+    // data format for event
 
+    const data = {
+      user: payload?.user,
+      event: payload?.event,
+      booking: payload?.booking,
+      transactionId: payload?.transactionId,
+    };
+
+    // insert payment information to the eventpayment model
+    const insertEventPayment = await EventPayment.create([data], { session });
     if (!insertEventPayment[0]) {
       throw new AppError(
         httpStatus.BAD_REQUEST,

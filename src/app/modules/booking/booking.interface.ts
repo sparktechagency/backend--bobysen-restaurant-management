@@ -30,4 +30,5 @@ export interface TBooking {
   time: string;
   status: "active" | "cancelled" | "completed";
   isReviewed: boolean;
+  transactionId: string;
 }

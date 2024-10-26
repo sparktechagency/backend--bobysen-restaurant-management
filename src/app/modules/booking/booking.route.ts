@@ -8,6 +8,11 @@ router.post(
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
   bookingControllers.bookAtable
 );
+router.post(
+  "/event",
+  auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
+  bookingControllers.bookAtableForEvent
+);
 
 router.get(
   "/admin",
@@ -28,6 +33,11 @@ router.get(
   "/details/:id",
   auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
   bookingControllers.getBookingDetailsWithMenu
+);
+router.get(
+  "/event/:id",
+  auth(USER_ROLE.user, USER_ROLE.vendor, USER_ROLE.admin),
+  bookingControllers.getSingleUnpaiEventBooking
 );
 router.get(
   "/owner",
