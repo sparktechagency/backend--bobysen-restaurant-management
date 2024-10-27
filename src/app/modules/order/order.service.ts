@@ -78,6 +78,7 @@ const insertOrderIntoDb = async (payload: any) => {
 };
 
 const getImnCallback = async (received_crypted_data: any) => {
+  console.log(received_crypted_data, "received_crypted_data");
   let response;
   const obj = {
     authentify: {
