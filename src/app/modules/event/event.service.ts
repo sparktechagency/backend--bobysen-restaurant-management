@@ -105,6 +105,8 @@ const loadPaymentZoneForEvent = async (payload: any) => {
     request_mode: "simple",
     touchpoint: "native_app",
   };
+
+  console.log("load payment zone data", data);
   let response;
   const headers = {
     "content-type": "application/json",
