@@ -158,10 +158,11 @@ const makePaymentForEvent = async (payload: any) => {
     const data = {
       user: payload?.user,
       event: payload?.event,
-      booking: payload?.booking,
+      booking: bookAtable[0]?._id,
       transactionId: payload?.transactionId,
     };
-
+    console.log("bookatable", bookAtable[0]);
+    console.log("data", data);
     // insert payment information to the eventpayment model
     const insertEventPayment = await EventPayment.create([data], { session });
     if (!insertEventPayment[0]) {

@@ -68,6 +68,7 @@ const loadPaymentZoneForEvent = catchAsync(
     const data = { ...req.body };
     data["user"] = req.user.userId;
     data["token"] = req.headers.authorization?.split(" ")[1];
+    console.log(data);
     const result = await eventsServices.loadPaymentZoneForEvent(data);
     sendResponse(res, {
       statusCode: httpStatus.OK,
