@@ -109,7 +109,7 @@ const getImnCallback = async (received_crypted_data: any) => {
       }
     );
     // check valid user for using token
-
+    console.log("response=====================", response);
     if (response?.data?.status !== "SUCCESS") {
       throw new AppError(
         httpStatus.NOT_ACCEPTABLE,
@@ -154,6 +154,7 @@ const getImnCallback = async (received_crypted_data: any) => {
       await eventsServices.makePaymentForEvent(data);
     }
   } catch (error: any) {
+    console.log(error, "error=====");
     throw new Error(error);
     // Handle the error
   }
