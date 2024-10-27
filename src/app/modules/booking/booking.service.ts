@@ -165,7 +165,7 @@ const bookAtable = async (BookingData: TBook) => {
 // };
 const getAllBookings = async (query: Record<string, any>) => {
   const bookingModel = new QueryBuilder(
-    Booking.find().populate("user restaurant table"),
+    Booking.find().populate("user restaurant table event"),
     query
   )
     .search([])
@@ -631,10 +631,15 @@ const bookAtableForEvent = async (BookingData: TBook) => {
 };
 
 const getSingleUnpaiEventBooking = async (id: string) => {
-  const result = await Unpaidbooking.findById(id).populate({
-    path: "table",
-    select: "tableNo seats",
-  });
+  const result = await Unpaidbooking.findById(id)
+    .populate({
+      path: "table",
+      select: "tableNo seats",
+    })
+    .populate({
+      path: "event",
+      select: "title entryFee",
+    });
   return result;
 };
 export const bookingServies = {
