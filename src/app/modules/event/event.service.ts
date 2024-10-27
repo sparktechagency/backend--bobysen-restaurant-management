@@ -142,6 +142,7 @@ const loadPaymentZoneForEvent = async (payload: any) => {
 };
 
 const makePaymentForEvent = async (payload: any) => {
+  console.log("event payload", payload);
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
