@@ -65,8 +65,9 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
 
 const loadPaymentZoneForEvent = catchAsync(
   async (req: Request, res: Response) => {
-    const { user } = req.user;
-    req.body.userId = user;
+    const data = { ...req.body };
+    data["user"] = req.user.userId;
+    data["token"] = req.headers.authorization;
     const result = await eventsServices.loadPaymentZoneForEvent(req.body);
     sendResponse(res, {
       statusCode: httpStatus.OK,

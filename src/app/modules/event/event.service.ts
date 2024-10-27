@@ -79,22 +79,21 @@ const geteventForVendor = async (vendorId: string) => {
 };
 
 const loadPaymentZoneForEvent = async (payload: any) => {
-  const { user, ...others } = payload;
+  const { unpaidBooking, user, token, ...others } = payload;
   const data = {
     ...others,
-
     additional_params: [
       {
         param_name: "user",
-        param_value: payload?.user,
+        param_value: user,
       },
       {
         param_name: "token",
-        param_value: payload?.token,
+        param_value: token,
       },
       {
         param_name: "unpaidBooking",
-        param_value: payload?.unpaidBooking,
+        param_value: unpaidBooking,
       },
 
       {

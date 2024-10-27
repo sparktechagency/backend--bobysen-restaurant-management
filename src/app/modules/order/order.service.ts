@@ -116,7 +116,6 @@ const getImnCallback = async (received_crypted_data: any) => {
         "The transactions is failed. please contact to the customer portal."
       );
     }
-    console.log(response?.data, "response?.data");
     // check try catch
     const additional_param = JSON.parse(response?.data?.additional_param);
     console.log(additional_param, "additional_params");
@@ -142,7 +141,7 @@ const getImnCallback = async (received_crypted_data: any) => {
         date: payment_date,
         cart: additional_param?.cart,
       });
-    } else {
+    } else if (type === "event") {
       console.log("api being hitted for event");
       const bookingData = await Unpaidbooking.findById(
         additional_param?.unpaidBooking
