@@ -105,7 +105,6 @@ const loadPaymentZoneForEvent = async (payload: any) => {
     touchpoint: "native_app",
   };
 
-  console.log("load payment zone data", data);
   let response;
   const headers = {
     "content-type": "application/json",
@@ -161,8 +160,6 @@ const makePaymentForEvent = async (payload: any) => {
       booking: bookAtable[0]?._id,
       transactionId: payload?.transactionId,
     };
-    console.log("bookatable", bookAtable[0]);
-    console.log("data", data);
     // insert payment information to the eventpayment model
     const insertEventPayment = await EventPayment.create([data], { session });
     if (!insertEventPayment[0]) {
