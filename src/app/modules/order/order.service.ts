@@ -116,9 +116,10 @@ const getImnCallback = async (received_crypted_data: any) => {
         "The transactions is failed. please contact to the customer portal."
       );
     }
-
+    console.log(response?.data, "response?.data");
     // check try catch
     const additional_param = JSON.parse(response?.data?.additional_param);
+    console.log(additional_param, "additional_params");
     const { token, type } = additional_param;
     let decode;
     try {
