@@ -6,7 +6,7 @@ import { USER_ROLE } from "../user/user.constant";
 import { eventsController } from "./event.controller";
 
 const router = Router();
-
+export const paymentRoutes = Router();
 router.post(
   "/",
   upload.array("files"),
@@ -36,6 +36,12 @@ router.post(
   "/payment",
   auth(USER_ROLE.user),
   eventsController.loadPaymentZoneForEvent
+);
+
+paymentRoutes.get(
+  "/",
+  auth(USER_ROLE.admin),
+  eventsController.getCustomerEventPayments
 );
 
 export const eventsRoutes = router;

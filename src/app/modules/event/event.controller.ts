@@ -86,6 +86,17 @@ const makePaymentForEvent = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getCustomerEventPayments = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await eventsServices.getCustomerEventPayments(req.query);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Event payment retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 export const eventsController = {
   insertEventsIntoDb,
@@ -95,4 +106,5 @@ export const eventsController = {
   updateEvent,
   loadPaymentZoneForEvent,
   makePaymentForEvent,
+  getCustomerEventPayments,
 };

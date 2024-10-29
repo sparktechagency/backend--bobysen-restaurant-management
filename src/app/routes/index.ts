@@ -5,7 +5,7 @@ import { bookingRoutes } from "../modules/booking/booking.route";
 import { cartRoutes } from "../modules/cart/cart.route";
 import { coinRoutes, coinWithDrawRoutes } from "../modules/coins/coins.route";
 import { contentRoues } from "../modules/content/content.route";
-import { eventsRoutes } from "../modules/event/event.route";
+import { eventsRoutes, paymentRoutes } from "../modules/event/event.route";
 import { favoriteLisRoutes } from "../modules/favoriteList/favouriteList.route";
 import { menuRoutes, reviewrouter } from "../modules/menu/menu.route";
 import { menuCategoryRoutes } from "../modules/menuCategory/menuCategory.route";
@@ -43,6 +43,10 @@ const moduleRoutes = [
   {
     path: "/topRestaurants",
     route: topRestaurantRoutes,
+  },
+  {
+    path: "/events-payment",
+    route: paymentRoutes,
   },
   {
     path: "/menu-categories",

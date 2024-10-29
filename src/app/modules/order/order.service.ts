@@ -109,7 +109,7 @@ const getImnCallback = async (received_crypted_data: any) => {
       }
     );
     // check valid user for using token
-    console.log("response=====================", response);
+
     if (response?.data?.status !== "SUCCESS") {
       throw new AppError(
         httpStatus.NOT_ACCEPTABLE,
@@ -132,7 +132,6 @@ const getImnCallback = async (received_crypted_data: any) => {
     const { amount, checksum, id_order, transaction_id, payment_date } =
       response?.data;
     if (type === "order") {
-      console.log("api being hitted for order");
       await insertOrderIntoDb({
         amount,
         checksum,
@@ -142,15 +141,14 @@ const getImnCallback = async (received_crypted_data: any) => {
         cart: additional_param?.cart,
       });
     } else if (type === "event") {
-      console.log("api being hitted for event");
       const bookingData = await Unpaidbooking.findById(
         additional_param?.unpaidBooking
       );
       const data = {
         ...bookingData?.toObject(),
         transactionId: transaction_id,
+        amount: amount,
       };
-      console.log(data, "data for event from imn callback");
       await eventsServices.makePaymentForEvent(data);
     }
   } catch (error: any) {

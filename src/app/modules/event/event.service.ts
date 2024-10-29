@@ -142,7 +142,6 @@ const loadPaymentZoneForEvent = async (payload: any) => {
 };
 
 const makePaymentForEvent = async (payload: any) => {
-  console.log("event payload", payload);
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -159,6 +158,7 @@ const makePaymentForEvent = async (payload: any) => {
       event: payload?.event,
       booking: bookAtable[0]?._id,
       transactionId: payload?.transactionId,
+      amount: Number(payload?.amount) * 100,
     };
     // insert payment information to the eventpayment model
     const insertEventPayment = await EventPayment.create([data], { session });
@@ -179,6 +179,19 @@ const makePaymentForEvent = async (payload: any) => {
   }
 };
 
+const getCustomerEventPayments = async (query: Record<string, any>) => {
+  const result = await EventPayment.find(query)
+    .populate({
+      path: "booking",
+      select: "id date time",
+    })
+    .populate({
+      path: "user",
+      select: "phoneNumber fullName email",
+    });
+  return result;
+};
+
 export const eventsServices = {
   insertEventIntoDb,
   getAllEvents,
@@ -187,4 +200,5 @@ export const eventsServices = {
   geteventForVendor,
   loadPaymentZoneForEvent,
   makePaymentForEvent,
+  getCustomerEventPayments,
 };
