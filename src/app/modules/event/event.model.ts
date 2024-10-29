@@ -21,6 +21,10 @@ const EventPaymentSchema: Schema = new Schema({
     ref: "User",
     required: true,
   },
+  amount: {
+    type: Number,
+    required: true,
+  },
   isDeleted: {
     type: Boolean,
     default: false,
