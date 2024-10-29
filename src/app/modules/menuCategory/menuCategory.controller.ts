@@ -23,8 +23,9 @@ const insertMenuCategoryIntoDb = catchAsync(
   }
 );
 const findAllCategory = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.query);
-  const result = await menuCategoryServices.findAllCategory(req.query);
+  const query = { ...req.query };
+  if (req?.user?.role === "vendor") query["user"] = req?.user?.userId;
+  const result = await menuCategoryServices.findAllCategory(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

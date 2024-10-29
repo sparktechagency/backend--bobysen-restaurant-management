@@ -26,6 +26,11 @@ router.get(
   menuControllers.getAllMenuForOwner
 );
 router.get(
+  "/owner-v2",
+  auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
+  menuControllers.getAllMenu
+);
+router.get(
   "/",
   // auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
   menuControllers.getAllMenu

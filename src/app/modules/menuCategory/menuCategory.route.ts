@@ -15,6 +15,11 @@ router.post(
 );
 
 router.get(
+  "/owner-v2",
+  auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
+  categoryControllers.findAllCategory
+);
+router.get(
   "/",
   // auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
   categoryControllers.findAllCategory

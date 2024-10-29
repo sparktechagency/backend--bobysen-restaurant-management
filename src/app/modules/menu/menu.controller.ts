@@ -19,6 +19,7 @@ const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
 });
 const getAllMenu = catchAsync(async (req: Request, res: Response) => {
   const query: Record<string, any> = { ...req.query };
+  console.log(req.user, "hitted first one");
   if (req?.user?.role === "vendor") {
     req.query.owner = req?.user?.userId;
   } else if (req?.user?.role === "user") {
@@ -34,7 +35,7 @@ const getAllMenu = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllMenuForOwner = catchAsync(async (req: Request, res: Response) => {
-  console.log(req?.user?.userId);
+  console.log(req?.user?.userId, "hitted");
   const result = await menuServices.getAllTablesForOwner(req?.user?.userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
