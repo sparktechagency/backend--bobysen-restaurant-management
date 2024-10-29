@@ -158,7 +158,7 @@ const makePaymentForEvent = async (payload: any) => {
       event: payload?.event,
       booking: bookAtable[0]?._id,
       transactionId: payload?.transactionId,
-      amount: Number(payload?.amount) * 100,
+      amount: Number(payload?.amount),
     };
     // insert payment information to the eventpayment model
     const insertEventPayment = await EventPayment.create([data], { session });
