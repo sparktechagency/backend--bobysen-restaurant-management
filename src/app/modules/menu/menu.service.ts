@@ -180,23 +180,24 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
     ];
 
     const result = await Review.aggregate(pipeline);
-    console.log("result", result);
     if (result.length > 0) {
-      const { avgRating } = result[0];
+      let { avgRating } = result[0];
+
+      // Ensure only one decimal place
+      avgRating = Number(avgRating.toFixed(1));
+
       const submit = await Restaurant.findByIdAndUpdate(restaurantId, {
         avgReviews: avgRating,
       });
-
-      console.log("reviews", submit);
     }
 
     await session.commitTransaction();
-    await session.endSession();
     return review[0];
   } catch (err: any) {
     await session.abortTransaction();
-    await session.endSession();
     throw new Error(err);
+  } finally {
+    await session.endSession();
   }
 };
 
