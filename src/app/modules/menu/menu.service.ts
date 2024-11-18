@@ -14,7 +14,10 @@ const insertMenuIntoDb = async (payload: TMenu): Promise<TMenu> => {
 };
 
 const getAllMenu = async (query: { [key: string]: any }) => {
-  const MenuModel = new QueryBuilder(Menu.find().populate("category","title"), query)
+  const MenuModel = new QueryBuilder(
+    Menu.find().populate("category", "title"),
+    query
+  )
     .search(["name"])
     .filter()
     .paginate()
@@ -177,15 +180,14 @@ const insertReviewIntoDb = async (payload: TReview): Promise<TReview> => {
     ];
 
     const result = await Review.aggregate(pipeline);
-    console.log(result);
+    console.log("result", result);
     if (result.length > 0) {
       const { avgRating } = result[0];
-      const submit = await Restaurant.updateOne(
-        { _id: restaurantId },
-        { avgReviews: avgRating }
-      );
+      const submit = await Restaurant.findByIdAndUpdate(restaurantId, {
+        avgReviews: avgRating,
+      });
 
-      console.log(submit);
+      console.log("reviews", submit);
     }
 
     await session.commitTransaction();
