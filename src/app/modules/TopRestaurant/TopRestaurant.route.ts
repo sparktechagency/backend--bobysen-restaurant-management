@@ -10,6 +10,7 @@ router.post(
   TopRestaurantControllers.insertTopRestaurantIntoDb
 );
 router.get("/", TopRestaurantControllers.getAllTopRestaurants);
+router.get("/mobile", TopRestaurantControllers.getAllTopRestaurantForTable);
 router.get("/:id", TopRestaurantControllers.getSingleTopRestaurant);
 router.patch(
   "/:id",

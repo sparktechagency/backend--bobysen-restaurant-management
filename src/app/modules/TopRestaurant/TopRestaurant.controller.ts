@@ -29,7 +29,21 @@ const getAllTopRestaurants = catchAsync(async (req: Request, res: Response) => {
   });
   return result;
 });
-
+const getAllTopRestaurantForTable = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await topRestaurantServices.getAllTopRestaurantForTable(
+      req.query
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Restaurants retrieved successfully",
+      data: result?.data,
+      meta: result?.meta,
+    });
+    return result;
+  }
+);
 const getSingleTopRestaurant = catchAsync(
   async (req: Request, res: Response) => {
     const result = await topRestaurantServices.getSingleTopRestaurant(
@@ -73,6 +87,7 @@ const deleteTopRestaurant = catchAsync(async (req: Request, res: Response) => {
 export const TopRestaurantControllers = {
   insertTopRestaurantIntoDb,
   getAllTopRestaurants,
+  getAllTopRestaurantForTable,
   getSingleTopRestaurant,
   updateTopRestaurant,
   deleteTopRestaurant,
