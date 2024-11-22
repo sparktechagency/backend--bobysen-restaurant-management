@@ -1,6 +1,4 @@
 import { Router } from "express";
-import auth from "../../middleware/auth";
-import { USER_ROLE } from "../user/user.constant";
 import { orderControllers } from "./order.controller";
 
 const router = Router();
@@ -13,7 +11,7 @@ router.post(
 );
 router.post(
   "/load-payment-zone",
-  auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
+  // auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
   orderControllers.loadPaymentZone
 );
 

@@ -120,6 +120,7 @@ const getImnCallback = async (received_crypted_data: any) => {
     const additional_param = JSON.parse(response?.data?.additional_param);
     console.log(additional_param, "additional_params");
     const { token, type } = additional_param;
+
     let decode;
     try {
       decode = jwt.verify(
@@ -132,6 +133,7 @@ const getImnCallback = async (received_crypted_data: any) => {
     const { amount, checksum, id_order, transaction_id, payment_date } =
       response?.data;
     if (type === "order") {
+      console.log("being hitted order type", type);
       await insertOrderIntoDb({
         amount,
         checksum,
