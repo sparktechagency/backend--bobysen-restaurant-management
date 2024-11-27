@@ -1,30 +1,31 @@
 import httpStatus from "http-status";
+import moment from "moment";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
-import { Wallet } from "./wallet.model";
-import {
-  modeType,
-  TNotification,
-} from "../notification/notification.interface";
-import { messages } from "../notification/notification.constant";
-import parseData from "../../middleware/parseData";
 import { notificationServices } from "../notification/notificaiton.service";
-import moment from "moment";
+import { messages } from "../notification/notification.constant";
+import { modeType } from "../notification/notification.interface";
 import { WalletSearchableFields } from "./wallet.constant";
+import { Wallet } from "./wallet.model";
 
 const sendAmountToVendor = async (id: string, payload: any) => {
   const { amount, method, percentage } = payload || {};
+
+  // Calculate the subtotal after discount
   const subTotal = Math.ceil(
     (Number(amount) * (100 - Number(percentage))) / 100
   );
 
+  // Find the wallet by ID and populate the owner field
   const findWallet = await Wallet.findById(id).populate("owner");
   const date = moment().format("YYYY-MM-DD");
-  //   condition ammount
+
+  // Condition for insufficient balance
   if (Number(amount) > Number(findWallet?.due)) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, "Insufficient balance");
   }
 
+  // Prepare the notification object
   const notification = [
     {
       receiver: findWallet?.owner?._id!,
@@ -33,12 +34,14 @@ const sendAmountToVendor = async (id: string, payload: any) => {
       model_type: modeType.Wallet,
     },
   ];
+
+  // Update the wallet by decrementing the due amount and incrementing the total paid amount
   const result = await Wallet.findByIdAndUpdate(
     id,
     {
       $inc: {
-        due: Number(findWallet?.amount) - Number(amount),
-        totalPaid: Number(subTotal),
+        due: -Number(amount), // Decrease the due amount by the payment amount
+        totalPaid: Number(amount), // Increment totalPaid by the actual paid amount
       },
       lastPaymentDate: new Date(),
       $push: {
@@ -46,7 +49,7 @@ const sendAmountToVendor = async (id: string, payload: any) => {
           method: method,
           amount: Number(amount),
           date,
-          subTotal: subTotal,
+          subTotal: subTotal, // Store the discounted amount in payment history
           percentage: Number(percentage),
         },
       },
@@ -54,7 +57,9 @@ const sendAmountToVendor = async (id: string, payload: any) => {
     { new: true }
   );
 
+  // Insert the notification into the database
   await notificationServices.insertNotificationIntoDb(notification);
+
   return result;
 };
 

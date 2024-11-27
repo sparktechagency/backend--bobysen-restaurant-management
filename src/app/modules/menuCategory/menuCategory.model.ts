@@ -6,7 +6,6 @@ const MenuCategorySchema = new Schema<TMenuCategory>(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
-
       default: "",
     },
     image: {

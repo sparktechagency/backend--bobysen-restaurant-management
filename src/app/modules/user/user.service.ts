@@ -13,7 +13,6 @@ import { User } from "./user.model";
 const insertUserIntoDb = async (
   payload: Partial<TUser>
 ): Promise<{ user: TUser; token: string }> => {
-  console.log(payload);
   const user = await User.isUserExist(payload.email as string);
   if (user) {
     throw new AppError(
@@ -66,7 +65,7 @@ const insertVendorIntoDb = async (payload: Partial<TUser>): Promise<TUser> => {
     ...payload,
     needsPasswordChange: true,
   };
-  console.log(formatedData);
+
   const result = await User.create(formatedData);
   await sendEmail(
     result?.email,
@@ -147,9 +146,8 @@ const updateUser = async (
 };
 
 const deleteAccount = async (id: string, password: string) => {
-  console.log(id);
   const user = await User.IsUserExistbyId(id);
-  console.log(user);
+
   const isPasswordMatched = await bcrypt.compare(password, user?.password);
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, "Password does not match!");

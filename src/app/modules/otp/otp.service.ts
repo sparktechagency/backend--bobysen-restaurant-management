@@ -8,7 +8,6 @@ import { generateOtp } from "../../utils/otpGenerator";
 import { User } from "../user/user.model";
 
 const verifyOtp = async (token: string, otp: string | number) => {
-  console.log(token, "otp");
   if (!token) {
     throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized!");
   }
@@ -63,7 +62,6 @@ const verifyOtp = async (token: string, otp: string | number) => {
 };
 
 const resendOtp = async (email: string) => {
-  console.log(email);
   const user = await User.findOne({ email });
 
   if (!user) {

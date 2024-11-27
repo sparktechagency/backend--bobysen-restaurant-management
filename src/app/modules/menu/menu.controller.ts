@@ -35,7 +35,6 @@ const getAllMenu = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllMenuForOwner = catchAsync(async (req: Request, res: Response) => {
-  console.log(req?.user?.userId, "hitted");
   const result = await menuServices.getAllTablesForOwner(req?.user?.userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,

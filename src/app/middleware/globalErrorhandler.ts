@@ -3,15 +3,14 @@
 import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import config from "../config";
-import { TErrorSources } from "../interface/error";
-import handleZodError from "../error/ZodError";
-import handleValidationError from "../error/ValidationError";
-import handleDuplicateError from "../error/DuplicateError";
-import handleCastError from "../error/CastError";
 import AppError from "../error/AppError";
+import handleCastError from "../error/CastError";
+import handleDuplicateError from "../error/DuplicateError";
+import handleValidationError from "../error/ValidationError";
+import handleZodError from "../error/ZodError";
+import { TErrorSources } from "../interface/error";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  console.log(err.statusCode);
   //setting default values
   let statusCode = 500;
   let message = "Something went wrong!";

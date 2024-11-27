@@ -165,6 +165,7 @@ const getImnCallback = async (received_crypted_data: any) => {
 
 const loadPaymentZone = async (payload: any, token: string) => {
   const { cart, user, ...others } = payload;
+  console.log(cart);
   const data = {
     ...others,
     additional_params: [
@@ -178,7 +179,7 @@ const loadPaymentZone = async (payload: any, token: string) => {
       },
       {
         param_name: "cart",
-        param_value: payload?.cart,
+        param_value: cart,
       },
       {
         param_name: "type",
