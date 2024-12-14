@@ -18,7 +18,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: true, // Allow all origins
+    origin: [
+      "https://mybookatable.mu",
+      "https://bookatable.mu",
+      "https://socket.bookatable.mu",
+    ], // Allow all origins
     // credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
