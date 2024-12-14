@@ -8,9 +8,7 @@ const insertMenuCategoryIntoDb = async (
   return result;
 };
 const findAllCategory = async (query: { [key: string]: any }) => {
-  console.log(query);
   const result = await MenuCategory.find(query);
-  console.log(result);
   return result;
 };
 const getSingleCategory = async (id: string) => {

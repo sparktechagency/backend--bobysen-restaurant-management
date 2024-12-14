@@ -17,6 +17,8 @@ import {
   checkRestaurantAvailability,
   generateBookingNumber,
   sendReservationEmail,
+  sendWhatsAppMessageToCustomers,
+  sendWhatsAppMessageToVendors,
   validateBookingTime,
 } from "./booking.utils";
 
@@ -139,7 +141,7 @@ const bookAtable = async (BookingData: TBook) => {
 
   // await sendWhatsAppMessageToCustomers(smsData);
   // send message to the vendor
-  await notificationServices.insertNotificationIntoDb(notificationData);
+
   // await sendWhatsAppMessageToCustomers(customerSmsData);
   // await sendWhatsAppMessageToVendors(vendorSmsData);
   const emailContext = {
@@ -151,12 +153,24 @@ const bookAtable = async (BookingData: TBook) => {
     restaurant: restaurant?.name,
     address: restaurant?.address,
   };
-  await sendReservationEmail(
-    "reservationTemplate", // The name of your template file without the .html extension
-    user?.email,
-    "Your Reservation was successful",
-    emailContext
-  );
+  // await sendReservationEmail(
+  //   "reservationTemplate", // The name of your template file without the .html extension
+  //   user?.email,
+  //   "Your Reservation was successful",
+  //   emailContext
+  // );
+  Promise.all([
+    // Send WhatsApp and SMS to customer and vendor concurrently
+    await notificationServices.insertNotificationIntoDb(notificationData),
+    sendWhatsAppMessageToCustomers(customerSmsData),
+    sendWhatsAppMessageToVendors(vendorSmsData),
+    await sendReservationEmail(
+      "reservationTemplate", // The name of your template file without the .html extension
+      user?.email,
+      "Your Reservation was successful",
+      emailContext
+    ),
+  ]);
   return result;
 };
 
