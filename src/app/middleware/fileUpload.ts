@@ -4,7 +4,7 @@ const fileUpload = (folder?: string) => {
   const upload = multer({
     storage: memoryStorage(),
     limits: {
-      fileSize: 2000000,
+      fileSize: 20000000,
     },
 
     fileFilter: function (req: Request, file, cb) {
