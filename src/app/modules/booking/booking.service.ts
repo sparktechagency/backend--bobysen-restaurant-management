@@ -113,7 +113,7 @@ const bookAtable = async (BookingData: TBook) => {
   );
   // send message to the customer
   const customerSmsData = {
-    phoneNumbers: [`+230${user?.phoneNumber}`],
+    phoneNumbers: [`+8801876399629`],
     mediaUrl:
       "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
     bodyValues: [

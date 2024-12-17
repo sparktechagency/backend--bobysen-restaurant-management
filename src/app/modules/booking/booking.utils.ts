@@ -60,7 +60,7 @@ export const sendWhatsAppMessageToCustomers = async ({
     authkey: config.whatsapp_auth_key!,
   };
 
-  // Dynamically create body components
+  // Dynamically create body components for new template
   const components: any = {
     header_1: {
       type: "image",
@@ -68,17 +68,24 @@ export const sendWhatsAppMessageToCustomers = async ({
     },
   };
 
+  // Adding dynamic body values (body_1 to body_5)
   bodyValues.forEach((value, index) => {
     components[`body_${index + 1}`] = {
       type: "text",
       value,
     };
   });
-  components["button_1"] = {
-    Subtype: "url",
-    type: "text",
-    value: buttonUrl,
-  };
+
+  // Define button if required (if buttonUrl exists)
+  if (buttonUrl) {
+    components["button_1"] = {
+      Subtype: "url",
+      type: "text",
+      value: buttonUrl,
+    };
+  }
+
+  // Create payload for the API
   const payload = {
     integrated_number: config.whatsapp_sms_number,
     content_type: "template",
@@ -86,16 +93,16 @@ export const sendWhatsAppMessageToCustomers = async ({
       messaging_product: "whatsapp",
       type: "template",
       template: {
-        name: "owner", // Adjust the template name as needed
+        name: "customers", // Adjust template name to "customers"
         language: {
           code: "en",
           policy: "deterministic",
         },
-        namespace: null,
+        namespace: "06d33021_5517_467f_844e_e967daa782c2", // New namespace
         to_and_components: [
           {
             to: phoneNumbers,
-            components,
+            components, // Pass dynamically created components
           },
         ],
       },
@@ -103,6 +110,7 @@ export const sendWhatsAppMessageToCustomers = async ({
   };
 
   try {
+    // Send the request
     const response = await axios.post(
       "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/",
       payload,
@@ -115,6 +123,7 @@ export const sendWhatsAppMessageToCustomers = async ({
     throw error;
   }
 };
+
 export const sendWhatsAppMessageToVendors = async ({
   phoneNumbers,
   mediaUrl,
@@ -129,7 +138,7 @@ export const sendWhatsAppMessageToVendors = async ({
     authkey: config.whatsapp_auth_key!,
   };
 
-  // Dynamically create the components object
+  // Dynamically create components
   const components: any = {
     header_1: {
       type: "image",
@@ -137,6 +146,7 @@ export const sendWhatsAppMessageToVendors = async ({
     },
   };
 
+  // Add body components (body_1 to body_5) based on bodyValues
   bodyValues.forEach((value, index) => {
     components[`body_${index + 1}`] = {
       type: "text",
@@ -144,6 +154,7 @@ export const sendWhatsAppMessageToVendors = async ({
     };
   });
 
+  // Payload to send the WhatsApp message
   const payload = {
     integrated_number: config.whatsapp_sms_number,
     content_type: "template",
@@ -151,16 +162,16 @@ export const sendWhatsAppMessageToVendors = async ({
       messaging_product: "whatsapp",
       type: "template",
       template: {
-        name: "owner", // Template name as per the curl example
+        name: "owners", // Template name as per your new template
         language: {
           code: "en",
           policy: "deterministic",
         },
-        namespace: null, // Keep it null as per the curl example
+        namespace: "06d33021_5517_467f_844e_e967daa782c2", // New namespace
         to_and_components: [
           {
             to: phoneNumbers, // List of phone numbers
-            components: components, // Components object created above
+            components, // Dynamic components (header_1, body_1 to body_5)
           },
         ],
       },
@@ -168,6 +179,7 @@ export const sendWhatsAppMessageToVendors = async ({
   };
 
   try {
+    // Send the POST request
     const response = await axios.post(
       "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/",
       payload,
@@ -180,6 +192,7 @@ export const sendWhatsAppMessageToVendors = async ({
     throw error;
   }
 };
+
 // Example usage:
 export const checkRestaurantAvailability = (
   restaurant: any,
