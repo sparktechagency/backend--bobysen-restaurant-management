@@ -72,16 +72,16 @@ export const sendWhatsAppMessageToCustomers = async ({
   bodyValues.forEach((value, index) => {
     components[`body_${index + 1}`] = {
       type: "text",
-      text: value, // Correctly using the 'text' key
+      value: value, // Correctly using 'value' for text, as per the example
     };
   });
 
   // Button component (if provided)
   if (buttonUrl) {
     components["button_1"] = {
-      Subtype: "url",
       type: "text",
-      text: buttonUrl,
+      value: buttonUrl, // Correct button formatting (value instead of text)
+      subtype: "url", // Corrected 'subtype' to lowercase
     };
   }
 
