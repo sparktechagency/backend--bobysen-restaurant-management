@@ -55,6 +55,7 @@ export const sendWhatsAppMessageToCustomers = async ({
   bodyValues: string[];
   buttonUrl: string;
 }) => {
+  console.log(phoneNumbers, mediaUrl, bodyValues, buttonUrl);
   const headers = {
     "Content-Type": "application/json",
     authkey: config.whatsapp_auth_key!,
