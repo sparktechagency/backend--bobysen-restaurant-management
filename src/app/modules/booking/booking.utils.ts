@@ -79,8 +79,8 @@ export const sendWhatsAppMessageToCustomers = async ({
   // Button component (if provided)
   if (buttonUrl) {
     components["button_1"] = {
-      type: "text",
-      value: buttonUrl, // Correct button formatting (value instead of text)
+      type: "url", // Correctly setting the type to 'url'
+      value: buttonUrl, // Provide the URL directly here
       // Remove 'subtype' as it is not needed for url buttons
     };
   }
