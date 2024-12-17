@@ -81,10 +81,9 @@ export const sendWhatsAppMessageToCustomers = async ({
     components["button_1"] = {
       type: "text",
       value: buttonUrl, // Correct button formatting (value instead of text)
-      subtype: "url", // Corrected 'subtype' to lowercase
+      // Remove 'subtype' as it is not needed for url buttons
     };
   }
-
   // Payload to send the WhatsApp message
   const payload = {
     integrated_number: config.whatsapp_sms_number,
