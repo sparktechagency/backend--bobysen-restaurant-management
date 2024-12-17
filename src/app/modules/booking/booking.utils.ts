@@ -60,32 +60,34 @@ export const sendWhatsAppMessageToCustomers = async ({
     authkey: config.whatsapp_auth_key!,
   };
 
-  // Dynamically create body components for new template
+  // Dynamically create the components object
   const components: any = {
     header_1: {
       type: "image",
-      value: mediaUrl,
+      image: {
+        link: mediaUrl, // Correct format for image URL
+      },
     },
   };
 
-  // Adding dynamic body values (body_1 to body_5)
+  // Add body components (body_1 to body_5) based on bodyValues
   bodyValues.forEach((value, index) => {
     components[`body_${index + 1}`] = {
       type: "text",
-      value,
+      text: value, // Correctly using the 'text' key
     };
   });
 
-  // Define button if required (if buttonUrl exists)
+  // Button component (if provided)
   if (buttonUrl) {
     components["button_1"] = {
       Subtype: "url",
       type: "text",
-      value: buttonUrl,
+      text: buttonUrl,
     };
   }
 
-  // Create payload for the API
+  // Payload to send the WhatsApp message
   const payload = {
     integrated_number: config.whatsapp_sms_number,
     content_type: "template",
@@ -93,7 +95,7 @@ export const sendWhatsAppMessageToCustomers = async ({
       messaging_product: "whatsapp",
       type: "template",
       template: {
-        name: "customers", // Adjust template name to "customers"
+        name: "customers", // Template name as per your new template
         language: {
           code: "en",
           policy: "deterministic",
@@ -101,8 +103,8 @@ export const sendWhatsAppMessageToCustomers = async ({
         namespace: "06d33021_5517_467f_844e_e967daa782c2", // New namespace
         to_and_components: [
           {
-            to: phoneNumbers,
-            components, // Pass dynamically created components
+            to: phoneNumbers, // List of phone numbers
+            components, // Dynamic components (header_1, body_1 to body_5, button_1)
           },
         ],
       },
@@ -110,7 +112,7 @@ export const sendWhatsAppMessageToCustomers = async ({
   };
 
   try {
-    // Send the request
+    // Send the POST request
     const response = await axios.post(
       "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/",
       payload,
