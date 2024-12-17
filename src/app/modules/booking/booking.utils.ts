@@ -76,14 +76,14 @@ export const sendWhatsAppMessageToCustomers = async ({
     };
   });
 
-  // Button component (if provided)
-  if (buttonUrl) {
-    components["button_1"] = {
-      type: "url", // Correctly setting the type to 'url'
-      value: buttonUrl, // Provide the URL directly here
-      // Remove 'subtype' as it is not needed for url buttons
-    };
-  }
+  // // Button component (if provided)
+  // if (buttonUrl) {
+  //   components["button_1"] = {
+  //     type: "url", // Correctly setting the type to 'url'
+  //     value: buttonUrl, // Provide the URL directly here
+  //     // Remove 'subtype' as it is not needed for url buttons
+  //   };
+  // }
   // Payload to send the WhatsApp message
   const payload = {
     integrated_number: config.whatsapp_sms_number,
