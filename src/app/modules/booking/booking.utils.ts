@@ -55,7 +55,6 @@ export const sendWhatsAppMessageToCustomers = async ({
   bodyValues: string[];
   buttonUrl: string;
 }) => {
-  console.log(phoneNumbers, mediaUrl, bodyValues, buttonUrl);
   const headers = {
     "Content-Type": "application/json",
     authkey: config.whatsapp_auth_key!,
@@ -65,9 +64,7 @@ export const sendWhatsAppMessageToCustomers = async ({
   const components: any = {
     header_1: {
       type: "image",
-      image: {
-        link: mediaUrl, // Correct format for image URL
-      },
+      value: mediaUrl, // Correcting this to use 'value' for the URL as per the API example
     },
   };
 
