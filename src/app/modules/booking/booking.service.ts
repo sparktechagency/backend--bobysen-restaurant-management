@@ -33,12 +33,20 @@ const bookAtable = async (BookingData: TBook) => {
     );
   }
   const restaurant: any = await Restaurant.findById(payload?.restaurant);
+
   // check if restaurant booked or open
   const bookingTime = moment(payload.date);
+  if (bookingTime.format("HH:mm") === "00:00") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "The restaurant is closed at 00:00. Please select a valid time."
+    );
+  }
   // check closing and opening time
   validateBookingTime(restaurant, bookingTime);
   // check the restaurant avilable that day
   checkRestaurantAvailability(restaurant, day, payload?.time);
+
   const totalTables = await Table.find({
     restaurant: payload.restaurant,
     seats: Number(payload.seats),
