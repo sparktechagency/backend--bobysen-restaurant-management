@@ -24,7 +24,7 @@ export interface TRestaurant {
   status: "active" | "inactive";
   helpLineNumber1: String;
   helpLineNumber2?: String;
-
+  isClosed: boolean;
   close?: {
     from: Date;
     to: Date;

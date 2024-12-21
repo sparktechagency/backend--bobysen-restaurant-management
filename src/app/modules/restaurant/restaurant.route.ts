@@ -19,6 +19,11 @@ router.get(
   restauranntControllers.getAllRestaurants
 );
 router.get(
+  "/dashboard/owner/restaurant",
+  auth(USER_ROLE.admin),
+  restauranntControllers.getAllRestaurantId
+);
+router.get(
   "/admin",
   auth(USER_ROLE.admin),
   restauranntControllers.getAllRestaurantForAdmin

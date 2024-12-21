@@ -338,6 +338,10 @@ const nearByRestaurant = async (query: Record<string, any>) => {
   return result;
 };
 
+const getAllRestaurantId = async (query: any) => {
+  const result = await Restaurant.find(query).select("name");
+  return result;
+};
 export const restaurantServices = {
   insertRestaurantIntoDb,
   updateRestaurant,
@@ -349,4 +353,5 @@ export const restaurantServices = {
   getAllRestaurantForAdmin,
   deleteFiles,
   nearByRestaurant,
+  getAllRestaurantId,
 };

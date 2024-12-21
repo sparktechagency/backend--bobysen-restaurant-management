@@ -135,6 +135,18 @@ const nearByRestaurant = catchAsync(async (req: Request, res: Response) => {
   });
   return result;
 });
+const getAllRestaurantId = catchAsync(async (req: Request, res: Response) => {
+  const query = { ...req.query };
+  query["owner"] = req.user.userId;
+  const result = await restaurantServices.getAllRestaurantId(query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Restaurant retrieved successfully",
+    data: result,
+  });
+  return result;
+});
 
 export const restauranntControllers = {
   insertRestaurantIntDb,
@@ -147,4 +159,5 @@ export const restauranntControllers = {
   deleteFiles,
   getAllRestaurantForAdmin,
   nearByRestaurant,
+  getAllRestaurantId,
 };
