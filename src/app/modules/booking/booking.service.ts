@@ -421,19 +421,30 @@ const deletebooking = async (id: string) => {
   const result = await Booking.findByIdAndDelete(id);
   return result;
 };
-const getBookingStatics = async (userId: string, year: string) => {
-  console.log(userId, year);
+const getBookingStatics = async (
+  userId: string,
+  year: string,
+  restaurantId?: string // Optional restaurantId
+) => {
+  console.log(userId, year, restaurantId);
   const monthsOfYear = Array.from({ length: 12 }, (_, i) => i + 1); // Array of month numbers from 1 to 12
+
+  const matchStage: any = {
+    date: {
+      $gte: `${year}-01-01`,
+      $lt: `${parseInt(year) + 1}-01-01`,
+    },
+    restaurant: { $exists: true }, // Filter out bookings without restaurant
+  };
+
+  if (restaurantId) {
+    // Add restaurantId filter if provided
+    matchStage.restaurant = restaurantId;
+  }
 
   const result = await Booking.aggregate([
     {
-      $match: {
-        date: {
-          $gte: `${year}-01-01`,
-          $lt: `${parseInt(year) + 1}-01-01`,
-        },
-        restaurant: { $exists: true }, // Filter out bookings without restaurant
-      },
+      $match: matchStage,
     },
     {
       $addFields: {
@@ -453,6 +464,9 @@ const getBookingStatics = async (userId: string, year: string) => {
                 $and: [
                   { $eq: ["$_id", "$$restaurantId"] }, // Match restaurant by ObjectId
                   { $eq: ["$owner", new mongoose.Types.ObjectId(userId)] }, // Match owner by ObjectId
+                  {
+                    $eq: ["$owner", new mongoose.Types.ObjectId(restaurantId)],
+                  }, // Match owner by ObjectId
                 ],
               },
             },

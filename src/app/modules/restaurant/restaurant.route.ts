@@ -20,7 +20,7 @@ router.get(
 );
 router.get(
   "/dashboard/owner/restaurant",
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.vendor),
   restauranntControllers.getAllRestaurantId
 );
 router.get(

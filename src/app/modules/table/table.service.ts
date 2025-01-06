@@ -1,10 +1,10 @@
 import httpStatus from "http-status";
+import mongoose from "mongoose";
+import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
+import { Restaurant } from "../restaurant/restaurant.model";
 import { Ttable } from "./table.interface";
 import { Table } from "./table.model";
-import QueryBuilder from "../../builder/QueryBuilder";
-import { Restaurant } from "../restaurant/restaurant.model";
-import mongoose from "mongoose";
 
 const insertTableIntoDB = async (payload: Ttable) => {
   const isUniqueTableNo = await Table.isUniqueTable(
@@ -41,19 +41,21 @@ const getSingleTable = async (id: string) => {
 
   return result;
 };
+const getAllTablesForVendor = async (query: any) => {
+  const matchCondition: any = {
+    owner: new mongoose.Types.ObjectId(query?.user),
+  };
 
-const getAllTablesForVendor = async (userId: string) => {
+  // Dynamically add the restaurant condition
+  if (query?.restaurant) {
+    matchCondition["restaurant"] = new mongoose.Types.ObjectId(
+      query.restaurant
+    );
+  }
+  console.log(matchCondition);
   const result = await Restaurant.aggregate([
-    {
-      $match: {
-        owner: new mongoose.Types.ObjectId(userId),
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-      },
-    },
+    { $match: matchCondition },
+    { $project: { debug: "$$ROOT" } },
     {
       $lookup: {
         from: "tables",
@@ -62,9 +64,15 @@ const getAllTablesForVendor = async (userId: string) => {
         as: "tables",
       },
     },
+    {
+      $project: {
+        _id: 1,
+        tables: 1, // Return tables directly in the result
+      },
+    },
   ]);
 
-  return result[0];
+  return result.length ? result[0] : null; // Return null if no result
 };
 
 const updateTable = async (id: string, payload: Partial<Ttable>) => {

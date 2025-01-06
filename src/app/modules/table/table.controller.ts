@@ -47,7 +47,10 @@ const updateTable = catchAsync(async (req: Request, res: Response) => {
   return result;
 });
 const getVendorAllTables = catchAsync(async (req: Request, res: Response) => {
-  const result = await tableServices.getAllTablesForVendor(req?.user?.userId);
+  const query = { ...req.query };
+  query["user"] = req.user.userId;
+
+  const result = await tableServices.getAllTablesForVendor(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
