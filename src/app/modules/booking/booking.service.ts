@@ -282,6 +282,7 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
     {
       $match: {
         "restaurant.owner": new mongoose.Types.ObjectId(query?.owner),
+        "restaurant._id": new mongoose.Types.ObjectId(query?.restaurant),
       },
     },
     {
@@ -304,7 +305,12 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
 
   // Add matching for additional fields except searchTerm and owner
   Object.keys(query).forEach((key) => {
-    if (key !== "searchTerm" && key !== "owner" && key !== "event") {
+    if (
+      key !== "searchTerm" &&
+      key !== "owner" &&
+      key !== "event" &&
+      key !== "restaurant"
+    ) {
       const matchStage: Record<string, any> = {};
       matchStage[key] = query[key];
       pipeline.push({ $match: matchStage });

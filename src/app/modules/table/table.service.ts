@@ -42,17 +42,15 @@ const getSingleTable = async (id: string) => {
   return result;
 };
 const getAllTablesForVendor = async (query: any) => {
+  console.log(query);
   const matchCondition: any = {
     owner: new mongoose.Types.ObjectId(query?.user),
   };
 
   // Dynamically add the restaurant condition
   if (query?.restaurant) {
-    matchCondition["restaurant"] = new mongoose.Types.ObjectId(
-      query.restaurant
-    );
+    matchCondition["_id"] = new mongoose.Types.ObjectId(query?.restaurant);
   }
-  console.log(matchCondition);
   const result = await Restaurant.aggregate([
     { $match: matchCondition },
     { $project: { debug: "$$ROOT" } },
