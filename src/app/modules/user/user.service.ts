@@ -16,9 +16,9 @@ const insertUserIntoDb = async (
   payload: Partial<TUser>
 ): Promise<{ user: TUser; token: string }> => {
   const user = await User.isUserExist(payload.email as string);
-  if (user?.isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, "This account is Deleted.");
-  }
+  // if (user?.isDeleted) {
+  //   throw new AppError(httpStatus.FORBIDDEN, "This account is Deleted.");
+  // }
   if (user) {
     throw new AppError(
       httpStatus.FORBIDDEN,
