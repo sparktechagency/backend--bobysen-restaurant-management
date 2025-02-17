@@ -20,7 +20,7 @@ const userSchema = new Schema<TUser, UserModel>(
     email: {
       type: String,
       required: [true, "email is required"],
-      unique: true,
+      // unique: true,
     },
     password: {
       type: String,
@@ -96,10 +96,10 @@ userSchema.pre("find", function (next) {
   next();
 });
 
-// userSchema.pre("findOne", function (next) {
-//   this.find({ isDeleted: { $ne: true } });
-//   next();
-// });
+userSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
 
 userSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
@@ -107,8 +107,7 @@ userSchema.pre("aggregate", function (next) {
 });
 
 userSchema.statics.isUserExist = async function (email: string) {
-  return await User.findOne({ email })
-  .select("+password");
+  return await User.findOne({ email }).select("+password");
 };
 
 userSchema.statics.IsUserExistbyId = async function (id: string) {
