@@ -10,15 +10,24 @@ import { sendEmail } from "../../utils/mailSender";
 import { generateOtp } from "../../utils/otpGenerator";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
+import { validatePhoneNumber } from "./user.utils";
+
 const insertUserIntoDb = async (
   payload: Partial<TUser>
 ): Promise<{ user: TUser; token: string }> => {
   const user = await User.isUserExist(payload.email as string);
+  if (user?.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, "This account is Deleted.");
+  }
   if (user) {
     throw new AppError(
       httpStatus.FORBIDDEN,
       "user already exist with this email"
     );
+  }
+
+  if (!validatePhoneNumber(payload?.phoneNumber!)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Phone number is invalid");
   }
   const otp = generateOtp();
   const expiresAt = moment().add(3, "minute");
