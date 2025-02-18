@@ -15,15 +15,19 @@ const login = async (payload: Tlogin) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
   }
+  if (user?.status === "pending") {
+    await User.findByIdAndDelete(user?._id);
+    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+  }
   if (user?.status === "blocked") {
     throw new AppError(httpStatus.FORBIDDEN, "This user is blocked ! !");
   }
   if (user?.isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !");
   }
-  if (user?.status === "pending") {
-    throw new AppError(httpStatus.BAD_REQUEST, "user is not verified");
-  }
+
+  // throw new AppError(httpStatus.BAD_REQUEST, "user is not verified");
+
   if (!(await User.isPasswordMatched(payload.password, user.password))) {
     throw new AppError(httpStatus.BAD_REQUEST, "password do not match");
   }

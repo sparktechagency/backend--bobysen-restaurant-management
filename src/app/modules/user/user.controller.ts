@@ -20,7 +20,6 @@ const insertVendorIntoDb = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
     req.body.image = await uploadToSpaces(req?.file, "profile");
   }
-  console.log(req.file);
   const result = await userServices.insertVendorIntoDb(req.body);
   sendResponse(res, {
     statusCode: 200,
