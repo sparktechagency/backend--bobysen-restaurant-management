@@ -51,6 +51,10 @@ const userSchema = new Schema<TUser, UserModel>(
       type: Number,
       default: 0,
     },
+    countryCode: {
+      type: String,
+      required: [true, "countryCode is required"],
+    },
     phoneNumber: {
       type: String,
       required: [true, "phoneNumber is required"],
