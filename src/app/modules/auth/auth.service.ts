@@ -118,11 +118,26 @@ const forgotPassword = async (email: string) => {
   });
   await sendEmail(
     email,
-    "your reset password otp is:",
-    `<div><h5>your otp is: ${otp}</h5>
-    <p>valid for:${expiresAt.toLocaleString()}</p>
+    "Welcome to Bookatable – Your Smart Dining Experience Awaits!",
+    `<div style="font-family: Arial, sans-serif; text-align: center;">
+      <a href="YOUR_LOGO_LINK_HERE">
+        <img src="https://i.ibb.co.com/HfDrLRrK/1024x1024bb.png" alt="Bookatable Logo" style="width: 150px; height: auto;">
+      </a>
+      <h2>Welcome to Bookatable!</h2>
+      <p>Thank you for registering with Bookatable! You’ve just unlocked a simple yet intelligent way to book your favorite restaurants effortlessly.</p>
+      
+      <h3>Your OTP is <strong>${otp}</strong></h3>
+      <p>(Valid until ${expiresAt.toLocaleString()})</p>
+  
+      <p>With Bookatable, you can do more than just reserve a table – you can pre-order your meal, prepay, and enjoy a seamless dining experience without any hassle when you arrive.</p>
+  
+      <p>We look forward to serving you a delightful experience.</p>
+      
+      <p><strong>Bon appétit!</strong></p>
+      <p>The Bookatable Team</p>
     </div>`
   );
+
   // send the mail here
   return { email, token };
 };
