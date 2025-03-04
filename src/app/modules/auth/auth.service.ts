@@ -190,10 +190,10 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
 
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
-  console.log("hitted");
+
   const decoded = verifyToken(token, config.jwt_refresh_secret as string);
   const { userId } = decoded;
-  console.log(decoded);
+
   const user = await User.IsUserExistbyId(userId);
 
   if (!user) {
