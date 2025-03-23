@@ -18,6 +18,7 @@ router.post(
   parseData(),
   userControllers.insertVendorIntoDb
 );
+router.post("/widget/create-user", userControllers.insertUserIntoDbFromWidget);
 router.patch(
   "/update/:id",
   auth(USER_ROLE.admin),

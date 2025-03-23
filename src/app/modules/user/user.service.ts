@@ -8,6 +8,8 @@ import AppError from "../../error/AppError";
 import { deleteFile } from "../../utils/fileHelper";
 import { sendEmail } from "../../utils/mailSender";
 import { generateOtp } from "../../utils/otpGenerator";
+import { createToken } from "../auth/auth.utils";
+import { otpServices } from "../otp/otp.service";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
 import { validatePhoneNumber } from "./user.utils";
@@ -74,6 +76,44 @@ const insertUserIntoDb = async (
     user: result,
     token: token,
   };
+};
+
+//  insert user from the widget
+
+const insertUserIntoDbFromWidget = async (payload: any) => {
+  //
+  const user = await User.findOne({ email: payload?.email, type: "widget" });
+  if (user) {
+    await User.findByIdAndDelete(user?._id);
+  }
+  const data = {
+    ...payload,
+    role: "user",
+    type: "widget",
+    password: "!password",
+  };
+  const result = await User.create(data);
+
+  const smsData = {
+    mobile: payload?.phoneNumber,
+    template_id: config?.template_id,
+    authkey: config?.whatsapp_auth_key,
+    realTimeResponse: 1,
+  };
+  const otp = await otpServices.sendOtpForWidget(smsData);
+  console.log(otp);
+
+  const jwtPayload = {
+    userId: result._id,
+    role: result.role,
+  };
+  const token = createToken(
+    // @ts-ignore
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string
+  );
+  return token;
 };
 
 const insertVendorIntoDb = async (payload: Partial<TUser>): Promise<TUser> => {
@@ -198,4 +238,5 @@ export const userServices = {
   updateUser,
   getSingleUser,
   deleteAccount,
+  insertUserIntoDbFromWidget,
 };

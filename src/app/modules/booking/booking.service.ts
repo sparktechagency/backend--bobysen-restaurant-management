@@ -26,6 +26,7 @@ const bookAtable = async (BookingData: TBook) => {
   if (payload?.event === "null") delete payload.event;
   if (BookingData?.event) payload["ticket"] = generateBookingNumber();
   const day = moment(payload?.date).format("dddd");
+  console.log(day);
   if (Number(payload?.seats) > 10) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
@@ -180,9 +181,8 @@ const bookAtable = async (BookingData: TBook) => {
   return result;
 };
 
-// const bookTable = async (payload: TBook) => {
+//  book a table from widget
 
-// };
 const getAllBookings = async (query: Record<string, any>) => {
   const bookingModel = new QueryBuilder(
     Booking.find().populate("user restaurant table event"),

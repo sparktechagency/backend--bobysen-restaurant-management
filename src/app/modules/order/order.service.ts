@@ -78,18 +78,16 @@ const insertOrderIntoDb = async (payload: any) => {
 };
 
 const getImnCallback = async (received_crypted_data: any) => {
-  console.log(received_crypted_data, "received_crypted_data");
   let response;
   const obj = {
     authentify: {
-      id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
-      id_entity: "w3QAeoMtLJROmlIyXVgnx1R6y7BgNo8t",
-      id_operator: "oeRH43c5RoQockXajPTo0TA5YW0KReio",
-      operator_password: "NUvxccs0R0rzKPoLlIPeet21rarpX0rk",
+      id_merchant: config.payment.id_merchant,
+      id_entity: config.payment.id_entity,
+      id_operator: config.payment.id_operator,
+      operator_password: config.payment.operator_password,
     },
-    salt: "SQt1DtGZceeCjO59cDAL82sAQcyj8uxocTxMkLeC6mzvfjILIq",
-    cipher_key:
-      "aAUJIcMPgVpK9zAB9tVjDWLIglibzgerTeiSU1ACEgu2GXIl1mYMj0wVNjs9XUEdIEysG2G7GNAxYpaGpqveDgVMaNzVZsHNrNdZ",
+    salt: config.payment.salt,
+    cipher_key: config.payment.chiper_key,
     received_crypted_data: received_crypted_data?.crypted_callback,
   };
 
@@ -118,7 +116,7 @@ const getImnCallback = async (received_crypted_data: any) => {
     }
     // check try catch
     const additional_param = JSON.parse(response?.data?.additional_param);
-    console.log(additional_param, "additional_params");
+
     const { token, type } = additional_param;
 
     let decode;
@@ -133,7 +131,6 @@ const getImnCallback = async (received_crypted_data: any) => {
     const { amount, checksum, id_order, transaction_id, payment_date } =
       response?.data;
     if (type === "order") {
-      console.log("being hitted order type", type);
       await insertOrderIntoDb({
         amount,
         checksum,
@@ -154,7 +151,6 @@ const getImnCallback = async (received_crypted_data: any) => {
       await eventsServices.makePaymentForEvent(data);
     }
   } catch (error: any) {
-    console.log(error, "error=====");
     throw new Error(error);
     // Handle the error
   }
@@ -201,16 +197,16 @@ const loadPaymentZone = async (payload: any, token: string) => {
 
   const authObj = {
     authentify: {
-      id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
-      id_entity: "w3QAeoMtLJROmlIyXVgnx1R6y7BgNo8t",
-      id_operator: "oeRH43c5RoQockXajPTo0TA5YW0KReio",
-      operator_password: "NUvxccs0R0rzKPoLlIPeet21rarpX0rk",
+      id_merchant: config.payment.id_merchant,
+      id_entity: config.payment.id_entity,
+      id_operator: config.payment.id_operator,
+      operator_password: config.payment.operator_password,
     },
   };
 
   try {
     response = await axios.post(
-      "https://api.mips.mu/api/load_payment_zone",
+      config.payment.load_payment_zone!,
       { ...authObj, ...data },
       {
         headers: headers,

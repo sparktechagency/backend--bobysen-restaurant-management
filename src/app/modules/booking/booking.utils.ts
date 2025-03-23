@@ -198,6 +198,12 @@ export const checkRestaurantAvailability = (
   day: string,
   time: string
 ) => {
+  if (!restaurant) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Restaurant not found. Please provide a valid restaurant."
+    );
+  }
   const { openingTime, closingTime } = restaurant[day?.toLocaleLowerCase()];
   if (
     moment(time, "HH:mm").isBefore(moment(openingTime, "HH:mm")) ||

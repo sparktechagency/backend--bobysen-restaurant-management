@@ -43,6 +43,12 @@ const userSchema = new Schema<TUser, UserModel>(
       enum: UserStatus,
       default: "active",
     },
+    type: {
+      type: String,
+      enum: ["website_mobile", "widget"],
+      default: "website_mobile",
+    },
+
     isDeleted: {
       type: Boolean,
       default: false,
