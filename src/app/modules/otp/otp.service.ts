@@ -128,6 +128,7 @@ const sendOtpForWidget = async (payload: any) => {
   } catch (error) {
     console.error(
       "Error Sending OTP:",
+      // @ts-ignore
       error.response ? error.response.data : error.message
     );
   }
