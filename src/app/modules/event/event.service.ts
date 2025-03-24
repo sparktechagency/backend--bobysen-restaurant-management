@@ -2,6 +2,7 @@ import axios from "axios";
 import httpStatus from "http-status";
 import mongoose, { Schema } from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
+import config from "../../config";
 import AppError from "../../error/AppError";
 import { Booking } from "../booking/booking.model";
 import { Ievents } from "./event.interface";
@@ -117,16 +118,16 @@ const loadPaymentZoneForEvent = async (payload: any) => {
 
   const authObj = {
     authentify: {
-      id_merchant: "5s0aOiRIH43yqkffzpEbpddlqGzMCoyY",
-      id_entity: "w3QAeoMtLJROmlIyXVgnx1R6y7BgNo8t",
-      id_operator: "oeRH43c5RoQockXajPTo0TA5YW0KReio",
-      operator_password: "NUvxccs0R0rzKPoLlIPeet21rarpX0rk",
+      id_merchant: config.payment.id_merchant,
+      id_entity: config.payment.id_entity,
+      id_operator: config.payment.id_operator,
+      operator_password: config.payment.operator_password,
     },
   };
 
   try {
     response = await axios.post(
-      "https://api.mips.mu/api/load_payment_zone",
+      config.payment.load_payment_zone!,
       { ...authObj, ...data },
       {
         headers: headers,

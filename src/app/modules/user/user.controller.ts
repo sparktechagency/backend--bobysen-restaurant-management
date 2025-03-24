@@ -85,7 +85,6 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const deleteAccount = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.body, "DD");
   const result = await userServices.deleteAccount(
     req?.user?.userId,
     req?.body?.password
@@ -97,6 +96,17 @@ const deleteAccount = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const insertUserIntoDbFromWidget = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await userServices.insertUserIntoDbFromWidget(req.body);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "User created successfully",
+      data: result,
+    });
+  }
+);
 
 export const userControllers = {
   insertuserIntoDb,
@@ -107,4 +117,5 @@ export const userControllers = {
   getsingleUser,
   updateUser,
   deleteAccount,
+  insertUserIntoDbFromWidget,
 };

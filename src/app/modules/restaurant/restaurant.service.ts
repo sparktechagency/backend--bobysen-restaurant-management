@@ -1,4 +1,6 @@
+import httpStatus from "http-status";
 import mongoose, { PipelineStage } from "mongoose";
+import AppError from "../../error/AppError";
 import {
   RessearchAbleFields,
   restaurantExcludeFields,
@@ -200,7 +202,9 @@ const getSingleRestaurant = async (id: string) => {
       },
     },
   ]);
-
+  if (!result[0]) {
+    throw new AppError(httpStatus.NOT_FOUND, "The restaurant is not found.");
+  }
   return result[0]; // Return the first document from the aggregation result
 };
 

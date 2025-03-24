@@ -23,8 +23,24 @@ const resendOtp = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const verifyOtpForWidget = catchAsync(async (req: Request, res: Response) => {
+  const data = {
+    ...req.body,
+    mobile: req?.body?.phoneNumber,
+    otp: req?.body?.otp,
+    user: req.user.userId,
+  };
+  const result = await otpServices.verifyOtpForWidget(data);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Reservation successfully confirmed",
+    data: result,
+  });
+});
 
 export const otpControllers = {
   verifyOtp,
   resendOtp,
+  verifyOtpForWidget,
 };

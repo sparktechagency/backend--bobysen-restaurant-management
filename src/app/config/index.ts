@@ -17,6 +17,9 @@ export default {
   stripe_secret: process.env.STRIPE_SECRET,
   whatsapp_auth_key: process.env.WHATSAPP_AUTH_KEY,
   whatsapp_sms_number: process.env.WHATSAPP_SMS_NUMBER,
+  template_id: process.env.TEMPLATE_ID,
+  otp_url: process.env.OTP_URL,
+  verify_otp_url: process.env.VERIFY_OTP_URL,
   spaces: {
     url: process.env.SPACES_API,
     image_url: process.env.SPACES_IMAGE_API,
@@ -24,5 +27,16 @@ export default {
     secretKey: process.env.SPACES_SECRET_KEY,
     region: process.env.SPACES_REGION,
     bucket: process.env.SPACES_BUCKET,
+  },
+  payment: {
+    load_payment_zone: process.env.LOAD_PAYMENT_ZONE,
+    decrypt_payment_api: process.env.DECRYPT_PAYMENT_API,
+    authorization: process.env.PAYMENT_AUTHORIZATION,
+    id_merchant: process.env.ID_MERCHANT,
+    id_entity: process.env.ID_ENTITY,
+    id_operator: process.env.ID_OPERATOR,
+    operator_password: process.env.OPERATOR_PASSWORD,
+    salt: process.env.PAYMENT_SALT,
+    chiper_key: process.env.CHIPER_KEY,
   },
 };

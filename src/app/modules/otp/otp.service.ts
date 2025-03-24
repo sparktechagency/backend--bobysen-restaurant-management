@@ -1,3 +1,4 @@
+import axios from "axios";
 import httpStatus from "http-status";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import moment from "moment";
@@ -5,6 +6,7 @@ import config from "../../config";
 import AppError from "../../error/AppError";
 import { sendEmail } from "../../utils/mailSender";
 import { generateOtp } from "../../utils/otpGenerator";
+import { bookingServies } from "../booking/booking.service";
 import { User } from "../user/user.model";
 
 const verifyOtp = async (token: string, otp: string | number) => {
@@ -105,7 +107,57 @@ const resendOtp = async (email: string) => {
   return { token };
 };
 
+const sendOtpForWidget = async (payload: any) => {
+  const options = {
+    method: "POST",
+    url: config.otp_url,
+    headers: { "Content-Type": "application/json" },
+    params: {
+      mobile: payload?.mobile,
+      otp_expiry: 5,
+      template_id: payload?.templateId,
+      authkey: payload?.authkey,
+      realTimeResponse: payload?.realTimeResponse,
+    },
+  };
+
+  try {
+    const { data } = await axios.request(options);
+    console.log("OTP Sent Successfully:", data);
+    return data;
+  } catch (error) {
+    console.error(
+      "Error Sending OTP:",
+      // @ts-ignore
+      error.response ? error.response.data : error.message
+    );
+  }
+};
+
+const verifyOtpForWidget = async (payload: any) => {
+  const options = {
+    method: "GET",
+    url: config.verify_otp_url,
+    params: { otp: payload?.otp, mobile: payload?.mobile },
+    headers: { authkey: config.whatsapp_auth_key },
+  };
+
+  const { data } = await axios.request(options);
+  if (data?.message === "OTP expired") {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, data?.message);
+  } else if (data?.message === "OTP not match") {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, data?.message);
+  } else {
+    await bookingServies.bookAtable(payload);
+  }
+  return data;
+};
+
+// Example usage:
+
 export const otpServices = {
   verifyOtp,
   resendOtp,
+  sendOtpForWidget,
+  verifyOtpForWidget,
 };
