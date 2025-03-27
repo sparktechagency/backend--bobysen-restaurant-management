@@ -18,7 +18,7 @@ jobs:
 
       - name: Deploy Application
         run: |
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -v -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             cd /backend--bobysen-restaurant-management
             git pull origin main
             npm install
