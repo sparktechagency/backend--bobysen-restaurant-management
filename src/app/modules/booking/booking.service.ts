@@ -17,6 +17,8 @@ import {
   checkRestaurantAvailability,
   generateBookingNumber,
   sendReservationEmail,
+  sendWhatsAppMessageToCustomers,
+  sendWhatsAppMessageToVendors,
   validateBookingTime,
 } from "./booking.utils";
 
@@ -169,8 +171,8 @@ const bookAtable = async (BookingData: TBook) => {
   Promise.all([
     // Send WhatsApp and SMS to customer and vendor concurrently
     await notificationServices.insertNotificationIntoDb(notificationData),
-    // sendWhatsAppMessageToCustomers(customerSmsData),
-    // sendWhatsAppMessageToVendors(vendorSmsData),
+    sendWhatsAppMessageToCustomers(customerSmsData),
+    sendWhatsAppMessageToVendors(vendorSmsData),
     await sendReservationEmail(
       "reservationTemplate", // The name of your template file without the .html extension
       user?.email,
