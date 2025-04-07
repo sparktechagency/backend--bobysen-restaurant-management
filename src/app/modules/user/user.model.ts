@@ -60,6 +60,7 @@ const userSchema = new Schema<TUser, UserModel>(
     countryCode: {
       type: String,
       required: [true, "countryCode is required"],
+      default: "MU",
     },
     phoneNumber: {
       type: String,
