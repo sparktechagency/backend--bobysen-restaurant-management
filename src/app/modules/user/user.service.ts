@@ -31,6 +31,7 @@ const insertUserIntoDb = async (
   if (!validatePhoneNumber(payload?.phoneNumber!)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Phone number is invalid");
   }
+
   const otp = generateOtp();
   const expiresAt = moment().add(3, "minute");
   const formatedData = {
@@ -49,29 +50,37 @@ const insertUserIntoDb = async (
     id: result?._id,
   };
   const token = jwt.sign(jwtPayload, config.jwt_access_secret as Secret, {
-    expiresIn: "1m",
+    expiresIn: "3m",
   });
-  await sendEmail(
-    payload?.email!,
-    "Welcome to Bookatable – Your Smart Dining Experience Awaits!",
-    `<div style="font-family: Arial, sans-serif; text-align: center;">
-      <a href="YOUR_LOGO_LINK_HERE">
-        <img src="https://i.ibb.co.com/HfDrLRrK/1024x1024bb.png" alt="Bookatable Logo" style="width: 150px; height: auto;">
-      </a>
-      <h2>Welcome to Bookatable!</h2>
-      <p>Thank you for registering with Bookatable! You’ve just unlocked a simple yet intelligent way to book your favorite restaurants effortlessly.</p>
-      
-      <h3>Your OTP is <strong>${otp}</strong></h3>
-      <p>(Valid until ${expiresAt.toLocaleString()})</p>
-  
-      <p>With Bookatable, you can do more than just reserve a table – you can pre-order your meal, prepay, and enjoy a seamless dining experience without any hassle when you arrive.</p>
-  
-      <p>We look forward to serving you a delightful experience.</p>
-      
-      <p><strong>Bon appétit!</strong></p>
-      <p>The Bookatable Team</p>
-    </div>`
-  );
+  const smsData = {
+    mobile: payload?.phoneNumber,
+    template_id: config?.otp_tempalte_id,
+    authkey: config?.whatsapp_auth_key,
+    realTimeResponse: 1,
+  };
+  console.log("dhaka");
+  // await sendEmail(
+  //   payload?.email!,
+  //   "Welcome to Bookatable – Your Smart Dining Experience Awaits!",
+  //   `<div style="font-family: Arial, sans-serif; text-align: center;">
+  //     <a href="YOUR_LOGO_LINK_HERE">
+  //       <img src="https://i.ibb.co.com/HfDrLRrK/1024x1024bb.png" alt="Bookatable Logo" style="width: 150px; height: auto;">
+  //     </a>
+  //     <h2>Welcome to Bookatable!</h2>
+  //     <p>Thank you for registering with Bookatable! You’ve just unlocked a simple yet intelligent way to book your favorite restaurants effortlessly.</p>
+
+  //     <h3>Your OTP is <strong>${otp}</strong></h3>
+  //     <p>(Valid until ${expiresAt.toLocaleString()})</p>
+
+  //     <p>With Bookatable, you can do more than just reserve a table – you can pre-order your meal, prepay, and enjoy a seamless dining experience without any hassle when you arrive.</p>
+
+  //     <p>We look forward to serving you a delightful experience.</p>
+
+  //     <p><strong>Bon appétit!</strong></p>
+  //     <p>The Bookatable Team</p>
+  //   </div>`
+  // );
+  await otpServices.sendotpforverification(smsData);
   return {
     user: result,
     token: token,
@@ -101,7 +110,6 @@ const insertUserIntoDbFromWidget = async (payload: any) => {
     realTimeResponse: 1,
   };
   const otp = await otpServices.sendOtpForWidget(smsData);
-  console.log(otp);
 
   const jwtPayload = {
     userId: result._id,

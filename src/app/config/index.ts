@@ -20,6 +20,7 @@ export default {
   template_id: process.env.TEMPLATE_ID,
   otp_url: process.env.OTP_URL,
   verify_otp_url: process.env.VERIFY_OTP_URL,
+  otp_tempalte_id: process.env.OTP_TEMPLATE_ID,
   spaces: {
     url: process.env.SPACES_API,
     image_url: process.env.SPACES_IMAGE_API,

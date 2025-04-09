@@ -55,7 +55,6 @@ const login = async (payload: Tlogin) => {
 // change password
 
 const changePassword = async (id: string, payload: TchangePassword) => {
-  console.log(payload);
   const user = await User.IsUserExistbyId(id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not found");
