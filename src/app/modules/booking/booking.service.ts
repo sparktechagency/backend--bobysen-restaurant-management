@@ -122,7 +122,7 @@ const bookAtable = async (BookingData: TBook) => {
   );
   // send message to the customer
   const customerSmsData = {
-    phoneNumbers: [`+8801876399629`],
+    phoneNumbers: [user?.phoneNumber],
     mediaUrl:
       "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
     bodyValues: [
@@ -135,7 +135,7 @@ const bookAtable = async (BookingData: TBook) => {
     buttonUrl: "https://bookatable.mu",
   };
   const vendorSmsData = {
-    phoneNumbers: [`+230${restaurant?.helpLineNumber1}`],
+    phoneNumbers: [restaurant?.helpLineNumber1],
     mediaUrl:
       "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
     bodyValues: [
