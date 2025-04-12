@@ -144,6 +144,7 @@ const bookAtable = async (BookingData: TBook) => {
       result?.date,
       result?.time,
       findTable[0]?.seats,
+      user?.phoneNumber,
     ],
     buttonUrl: "https://bookatable.mu",
   };
