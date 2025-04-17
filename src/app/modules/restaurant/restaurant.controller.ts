@@ -147,6 +147,20 @@ const getAllRestaurantId = catchAsync(async (req: Request, res: Response) => {
   });
   return result;
 });
+const changeRestaurantStatus = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await restaurantServices.changeRestaurantStatus(
+      req.params.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Restaurant status changed successfully",
+      data: result,
+    });
+    return result;
+  }
+);
 
 export const restauranntControllers = {
   insertRestaurantIntDb,
@@ -160,4 +174,5 @@ export const restauranntControllers = {
   getAllRestaurantForAdmin,
   nearByRestaurant,
   getAllRestaurantId,
+  changeRestaurantStatus,
 };

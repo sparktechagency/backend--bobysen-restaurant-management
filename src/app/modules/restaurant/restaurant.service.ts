@@ -107,6 +107,7 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
   pipeline.push({
     $match: {
       isDeleted: false,
+      status: "active",
     },
   });
 
@@ -346,6 +347,14 @@ const getAllRestaurantId = async (query: any) => {
   const result = await Restaurant.find(query).select("name");
   return result;
 };
+
+const changeRestaurantStatus = async (id: string) => {
+  const result = await Restaurant.updateOne(
+    { _id: id },
+    { $set: { status: "inactive" } }
+  );
+  return result;
+};
 export const restaurantServices = {
   insertRestaurantIntoDb,
   updateRestaurant,
@@ -358,4 +367,5 @@ export const restaurantServices = {
   deleteFiles,
   nearByRestaurant,
   getAllRestaurantId,
+  changeRestaurantStatus,
 };

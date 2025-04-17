@@ -70,5 +70,10 @@ router.patch(
   auth(USER_ROLE.vendor, USER_ROLE.admin),
   restauranntControllers.deleteFiles
 );
+router.patch(
+  "/status/:id",
+  auth(USER_ROLE.admin),
+  restauranntControllers.changeRestaurantStatus
+);
 
 export const restaurantRoutes = router;
