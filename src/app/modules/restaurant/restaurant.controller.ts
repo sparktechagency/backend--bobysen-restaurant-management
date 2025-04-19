@@ -138,7 +138,10 @@ const nearByRestaurant = catchAsync(async (req: Request, res: Response) => {
 const getAllRestaurantId = catchAsync(async (req: Request, res: Response) => {
   const query = { ...req.query };
   query["owner"] = req.user.userId;
-  const result = await restaurantServices.getAllRestaurantId(query);
+  const result = await restaurantServices.getAllRestaurantId({
+    ...query,
+    status: "active",
+  });
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
