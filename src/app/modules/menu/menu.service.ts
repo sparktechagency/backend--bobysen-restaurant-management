@@ -227,6 +227,7 @@ const getAllReviews = async (restaurantId: string) => {
           $push: {
             rating: "$rating",
             comment: "$comment",
+            _id: "$_id",
             user: {
               name: "$userDetails.fullName",
               image: "$userDetails.image",
@@ -300,6 +301,11 @@ const getAllReviews = async (restaurantId: string) => {
   const result = await Review.aggregate(pipeline as PipelineStage[]);
   return result[0];
 };
+
+const updateReviews = async (id: string) => {
+  const result = await Review.deleteOne({ _id: id });
+  return result;
+};
 export const menuServices = {
   insertMenuIntoDb,
   getAllMenu,
@@ -312,4 +318,5 @@ export const menuServices = {
 export const reviewServices = {
   insertReviewIntoDb,
   getAllReviews,
+  updateReviews,
 };

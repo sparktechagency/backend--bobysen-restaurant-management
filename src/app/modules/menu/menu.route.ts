@@ -13,6 +13,11 @@ reviewrouter.post(
   reviewControllers.insertReviewIntoDb
 );
 reviewrouter.get("/:id", reviewControllers.getAllReviews);
+reviewrouter.patch(
+  "/:id",
+  auth(USER_ROLE.admin),
+  reviewControllers.UpdateReview
+);
 router.post(
   "/",
   upload.single("file"),

@@ -19,7 +19,6 @@ const insertMenuIntoDb = catchAsync(async (req: Request, res: Response) => {
 });
 const getAllMenu = catchAsync(async (req: Request, res: Response) => {
   const query: Record<string, any> = { ...req.query };
-  console.log(req.user, "hitted first one");
   if (req?.user?.role === "vendor") {
     req.query.owner = req?.user?.userId;
   } else if (req?.user?.role === "user") {
@@ -100,6 +99,15 @@ const getAllReviews = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const UpdateReview = catchAsync(async (req: Request, res: Response) => {
+  const result = await reviewServices.updateReviews(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Reviews updated successfully",
+    data: result,
+  });
+});
 
 export const menuControllers = {
   insertMenuIntoDb,
@@ -113,4 +121,5 @@ export const menuControllers = {
 export const reviewControllers = {
   insertReviewIntoDb,
   getAllReviews,
+  UpdateReview,
 };
