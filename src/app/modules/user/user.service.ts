@@ -202,8 +202,13 @@ const updateUser = async (
 ): Promise<TUser | null> => {
   const user = await User.findById(id);
   //  email update lagbe na
-  if (payload?.email) {
-    throw new AppError(httpStatus?.BAD_REQUEST, "email is not for update");
+  if (payload?.email !== payload?.currentEmail) {
+    const findEmail = await User.findOne({ email: payload?.email }).select(
+      "email"
+    );
+    if (findEmail) {
+      throw new AppError(httpStatus.NOT_ACCEPTABLE, "Duplicate email!");
+    }
   }
   if (payload?.role) {
     throw new AppError(httpStatus?.BAD_REQUEST, "role is not for update");

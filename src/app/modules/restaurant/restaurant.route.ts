@@ -45,7 +45,7 @@ router.get(
 );
 router.get(
   "/owner/:id",
-  auth(USER_ROLE.vendor),
+  auth(USER_ROLE.vendor, USER_ROLE.admin),
   restauranntControllers.getSingleRestaurantForOwner
 );
 router.get(
