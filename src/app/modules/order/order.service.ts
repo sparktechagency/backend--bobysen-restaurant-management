@@ -19,7 +19,7 @@ const insertOrderIntoDb = async (payload: any) => {
     date,
   } = payload || {};
   const amount = Number(orderAmount) / 100;
-  console.log("payload from load payment zone", payload);
+  // console.log("payload from load payment zone", payload);
   //   const formatedAmount = Number(amount) / 100;
   const session = await mongoose.startSession();
 
@@ -161,7 +161,6 @@ const getImnCallback = async (received_crypted_data: any) => {
 
 const loadPaymentZone = async (payload: any, token: string) => {
   const { cart, user, ...others } = payload;
-  console.log(cart);
   const data = {
     ...others,
     additional_params: [

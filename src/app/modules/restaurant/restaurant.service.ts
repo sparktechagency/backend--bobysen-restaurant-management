@@ -348,10 +348,10 @@ const getAllRestaurantId = async (query: any) => {
   return result;
 };
 
-const changeRestaurantStatus = async (id: string) => {
+const changeRestaurantStatus = async (id: string, status: any) => {
   const result = await Restaurant.updateOne(
     { _id: id },
-    { $set: { status: "inactive" } }
+    { $set: { status: status } }
   );
   return result;
 };

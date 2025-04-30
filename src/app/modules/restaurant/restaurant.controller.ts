@@ -153,7 +153,8 @@ const getAllRestaurantId = catchAsync(async (req: Request, res: Response) => {
 const changeRestaurantStatus = catchAsync(
   async (req: Request, res: Response) => {
     const result = await restaurantServices.changeRestaurantStatus(
-      req.params.id
+      req.params.id,
+      req.body?.status
     );
     sendResponse(res, {
       statusCode: httpStatus.OK,
