@@ -311,7 +311,7 @@ const getAllRestaurantForAdmin = async (query: Record<string, any>) => {
 };
 const nearByRestaurant = async (query: Record<string, any>) => {
   // const pipeline: PipelineStage[] = [];
-  const { maxDistance = 10000, longitude, latitude } = query;
+  const { maxDistance = 10, longitude, latitude } = query;
   // If geospatial data is provided, add $geoNear stage
 
   const pipeline: PipelineStage[] = [
