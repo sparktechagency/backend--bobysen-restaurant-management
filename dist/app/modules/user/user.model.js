@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-const mongoose_1 = require("mongoose");
-const user_constant_1 = require("./user.constant");
-const config_1 = __importDefault(require("../../config"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const mongoose_1 = require("mongoose");
+const config_1 = __importDefault(require("../../config"));
+const user_constant_1 = require("./user.constant");
 const userSchema = new mongoose_1.Schema({
     // userName: {
     //   type: String,
@@ -33,7 +33,7 @@ const userSchema = new mongoose_1.Schema({
     email: {
         type: String,
         required: [true, "email is required"],
-        unique: true,
+        // unique: true,
     },
     password: {
         type: String,
@@ -56,9 +56,23 @@ const userSchema = new mongoose_1.Schema({
         enum: user_constant_1.UserStatus,
         default: "active",
     },
+    type: {
+        type: String,
+        enum: ["website_mobile", "widget"],
+        default: "website_mobile",
+    },
     isDeleted: {
         type: Boolean,
         default: false,
+    },
+    coin: {
+        type: Number,
+        default: 0,
+    },
+    countryCode: {
+        type: String,
+        required: [true, "countryCode is required"],
+        default: "MU",
     },
     phoneNumber: {
         type: String,
@@ -109,7 +123,7 @@ userSchema.pre("aggregate", function (next) {
 });
 userSchema.statics.isUserExist = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findOne({ email: email }).select("+password");
+        return yield exports.User.findOne({ email }).select("+password");
     });
 };
 userSchema.statics.IsUserExistbyId = function (id) {

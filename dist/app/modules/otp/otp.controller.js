@@ -20,7 +20,6 @@ const otp_service_1 = require("./otp.service");
 const verifyOtp = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const token = (_a = req === null || req === void 0 ? void 0 : req.headers) === null || _a === void 0 ? void 0 : _a.token;
-    console.log(req.headers);
     const result = yield otp_service_1.otpServices.verifyOtp(token, req.body.otp);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
@@ -38,7 +37,19 @@ const resendOtp = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
         data: result,
     });
 }));
+const verifyOtpForWidget = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const data = Object.assign(Object.assign({}, req.body), { mobile: (_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.phoneNumber, otp: (_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.otp, user: req.user.userId });
+    const result = yield otp_service_1.otpServices.verifyOtpForWidget(data);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Reservation successfully confirmed",
+        data: result,
+    });
+}));
 exports.otpControllers = {
     verifyOtp,
     resendOtp,
+    verifyOtpForWidget,
 };

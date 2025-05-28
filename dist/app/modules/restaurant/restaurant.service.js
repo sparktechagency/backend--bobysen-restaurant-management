@@ -24,7 +24,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.restaurantServices = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const AppError_1 = __importDefault(require("../../error/AppError"));
 const restaurant_constant_1 = require("./restaurant.constant");
 const restaurant_model_1 = require("./restaurant.model");
 const insertRestaurantIntoDb = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -85,7 +87,6 @@ const getAllRestaurantsForUser = (query) => __awaiter(void 0, void 0, void 0, fu
     const skip = (page - 1) * limit;
     // Add geospatial stage if latitude and longitude are provided
     if ((query === null || query === void 0 ? void 0 : query.latitude) && (query === null || query === void 0 ? void 0 : query.longitude)) {
-        console.log("hitted");
         pipeline.push({
             $geoNear: {
                 near: {
@@ -118,6 +119,7 @@ const getAllRestaurantsForUser = (query) => __awaiter(void 0, void 0, void 0, fu
     pipeline.push({
         $match: {
             isDeleted: false,
+            status: "active",
         },
     });
     // console.log(pipeline);
@@ -169,6 +171,7 @@ const getSingleRestaurant = (id) => __awaiter(void 0, void 0, void 0, function* 
             $project: {
                 close: 1,
                 avgReviews: 1,
+                address: 1,
                 _id: 1,
                 name: 1,
                 location: 1,
@@ -201,6 +204,9 @@ const getSingleRestaurant = (id) => __awaiter(void 0, void 0, void 0, function* 
             },
         },
     ]);
+    if (!result[0]) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "The restaurant is not found.");
+    }
     return result[0]; // Return the first document from the aggregation result
 });
 // update restaurant here
@@ -266,6 +272,7 @@ const getAllRestaurantForAdmin = (query) => __awaiter(void 0, void 0, void 0, fu
                 location: 1,
                 createdAt: "$formattedDate",
                 status: 1,
+                address: 1,
             },
         },
     ];
@@ -283,7 +290,7 @@ const getAllRestaurantForAdmin = (query) => __awaiter(void 0, void 0, void 0, fu
 });
 const nearByRestaurant = (query) => __awaiter(void 0, void 0, void 0, function* () {
     // const pipeline: PipelineStage[] = [];
-    const { maxDistance = 10000, longitude, latitude } = query;
+    const { maxDistance = 10, longitude, latitude } = query;
     // If geospatial data is provided, add $geoNear stage
     const pipeline = [
         {
@@ -309,7 +316,14 @@ const nearByRestaurant = (query) => __awaiter(void 0, void 0, void 0, function* 
     //   });
     // }
     const result = yield restaurant_model_1.Restaurant.aggregate(pipeline);
-    console.log(result);
+    return result;
+});
+const getAllRestaurantId = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield restaurant_model_1.Restaurant.find(query).select("name");
+    return result;
+});
+const changeRestaurantStatus = (id, status) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield restaurant_model_1.Restaurant.updateOne({ _id: id }, { $set: { status: status } });
     return result;
 });
 exports.restaurantServices = {
@@ -323,4 +337,6 @@ exports.restaurantServices = {
     getAllRestaurantForAdmin,
     deleteFiles,
     nearByRestaurant,
+    getAllRestaurantId,
+    changeRestaurantStatus,
 };

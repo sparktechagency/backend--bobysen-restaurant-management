@@ -14,11 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tableServices = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const AppError_1 = __importDefault(require("../../error/AppError"));
-const table_model_1 = require("./table.model");
-const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
-const restaurant_model_1 = require("../restaurant/restaurant.model");
 const mongoose_1 = __importDefault(require("mongoose"));
+const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
+const AppError_1 = __importDefault(require("../../error/AppError"));
+const restaurant_model_1 = require("../restaurant/restaurant.model");
+const table_model_1 = require("./table.model");
 const insertTableIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isUniqueTableNo = yield table_model_1.Table.isUniqueTable(payload === null || payload === void 0 ? void 0 : payload.restaurant, payload === null || payload === void 0 ? void 0 : payload.tableNo);
     if (isUniqueTableNo) {
@@ -45,18 +45,18 @@ const getSingleTable = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield table_model_1.Table.findById(id).populate("restaurant");
     return result;
 });
-const getAllTablesForVendor = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllTablesForVendor = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(query);
+    const matchCondition = {
+        owner: new mongoose_1.default.Types.ObjectId(query === null || query === void 0 ? void 0 : query.user),
+    };
+    // Dynamically add the restaurant condition
+    if (query === null || query === void 0 ? void 0 : query.restaurant) {
+        matchCondition["_id"] = new mongoose_1.default.Types.ObjectId(query === null || query === void 0 ? void 0 : query.restaurant);
+    }
     const result = yield restaurant_model_1.Restaurant.aggregate([
-        {
-            $match: {
-                owner: new mongoose_1.default.Types.ObjectId(userId),
-            },
-        },
-        {
-            $project: {
-                _id: 1,
-            },
-        },
+        { $match: matchCondition },
+        { $project: { debug: "$$ROOT" } },
         {
             $lookup: {
                 from: "tables",
@@ -65,8 +65,14 @@ const getAllTablesForVendor = (userId) => __awaiter(void 0, void 0, void 0, func
                 as: "tables",
             },
         },
+        {
+            $project: {
+                _id: 1,
+                tables: 1, // Return tables directly in the result
+            },
+        },
     ]);
-    return result[0];
+    return result.length ? result[0] : null; // Return null if no result
 });
 const updateTable = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield table_model_1.Table.findByIdAndUpdate(id, payload, { new: true });

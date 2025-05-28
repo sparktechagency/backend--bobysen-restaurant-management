@@ -2,9 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_route_1 = require("../modules/auth/auth.route");
+const banner_route_1 = require("../modules/banner/banner.route");
 const booking_route_1 = require("../modules/booking/booking.route");
 const cart_route_1 = require("../modules/cart/cart.route");
+const coins_route_1 = require("../modules/coins/coins.route");
 const content_route_1 = require("../modules/content/content.route");
+const event_route_1 = require("../modules/event/event.route");
 const favouriteList_route_1 = require("../modules/favoriteList/favouriteList.route");
 const menu_route_1 = require("../modules/menu/menu.route");
 const menuCategory_route_1 = require("../modules/menuCategory/menuCategory.route");
@@ -27,6 +30,10 @@ const moduleRoutes = [
         route: auth_route_1.authRoutes,
     },
     {
+        path: "/coins",
+        route: coins_route_1.coinRoutes,
+    },
+    {
         path: "/otp",
         route: otp_routes_1.otpRoutes,
     },
@@ -39,12 +46,20 @@ const moduleRoutes = [
         route: TopRestaurant_route_1.topRestaurantRoutes,
     },
     {
+        path: "/events-payment",
+        route: event_route_1.paymentRoutes,
+    },
+    {
         path: "/menu-categories",
         route: menuCategory_route_1.menuCategoryRoutes,
     },
     {
         path: "/menu",
         route: menu_route_1.menuRoutes,
+    },
+    {
+        path: "/banner",
+        route: banner_route_1.bannerRoutes,
     },
     {
         path: "/reviews",
@@ -81,6 +96,14 @@ const moduleRoutes = [
     {
         path: "/wallet",
         route: wallet_route_1.walletRoutes,
+    },
+    {
+        path: "/events",
+        route: event_route_1.eventsRoutes,
+    },
+    {
+        path: "/coin",
+        route: coins_route_1.coinWithDrawRoutes,
     },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

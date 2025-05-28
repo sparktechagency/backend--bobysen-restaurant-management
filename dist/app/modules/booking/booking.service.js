@@ -41,6 +41,7 @@ const moment_1 = __importDefault(require("moment"));
 const mongoose_1 = __importStar(require("mongoose"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../error/AppError"));
+const coins_model_1 = require("../coins/coins.model");
 const notificaiton_service_1 = require("../notification/notificaiton.service");
 const notification_constant_1 = require("../notification/notification.constant");
 const notification_interface_1 = require("../notification/notification.interface");
@@ -50,8 +51,13 @@ const user_model_1 = require("../user/user.model");
 const booking_model_1 = require("./booking.model");
 const booking_utils_1 = require("./booking.utils");
 // search booking
-const bookAtable = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
+const bookAtable = (BookingData) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
+    const payload = Object.assign({}, BookingData);
+    if ((payload === null || payload === void 0 ? void 0 : payload.event) === "null")
+        delete payload.event;
+    if (BookingData === null || BookingData === void 0 ? void 0 : BookingData.event)
+        payload["ticket"] = (0, booking_utils_1.generateBookingNumber)();
     const day = (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.date).format("dddd");
     if (Number(payload === null || payload === void 0 ? void 0 : payload.seats) > 10) {
         throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, "If you want to book more than 10 seats, please contact the restaurant owner.");
@@ -59,17 +65,13 @@ const bookAtable = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const restaurant = yield restaurant_model_1.Restaurant.findById(payload === null || payload === void 0 ? void 0 : payload.restaurant);
     // check if restaurant booked or open
     const bookingTime = (0, moment_1.default)(payload.date);
-    const isClosed = bookingTime.isBetween((0, moment_1.default)((_a = restaurant === null || restaurant === void 0 ? void 0 : restaurant.close) === null || _a === void 0 ? void 0 : _a.from), (0, moment_1.default)((_b = restaurant === null || restaurant === void 0 ? void 0 : restaurant.close) === null || _b === void 0 ? void 0 : _b.to), undefined, "[]");
-    if (isClosed) {
-        throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, "Restaurant is closed during this time. Please select another date.");
+    if ((payload === null || payload === void 0 ? void 0 : payload.time) === "00:00") {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "The restaurant is closed at 00:00. Please select a valid time.");
     }
+    // check closing and opening time
+    (0, booking_utils_1.validateBookingTime)(restaurant, bookingTime);
     // check the restaurant avilable that day
-    const { openingTime, closingTime } = restaurant[day === null || day === void 0 ? void 0 : day.toLocaleLowerCase()];
-    if ((0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.time, "HH:mm").isBefore((0, moment_1.default)(openingTime, "HH:mm")) ||
-        (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.time, "HH:mm").isAfter((0, moment_1.default)(closingTime, "HH:mm"))) {
-        throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, `Restaurant is closed at ${payload.time} on ${day}`);
-    }
-    // retrive total tables under the restaurant
+    (0, booking_utils_1.checkRestaurantAvailability)(restaurant, day, payload === null || payload === void 0 ? void 0 : payload.time);
     const totalTables = yield table_model_1.Table.find({
         restaurant: payload.restaurant,
         seats: Number(payload.seats),
@@ -80,13 +82,12 @@ const bookAtable = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         date: (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.date).format("YYYY-MM-DD"),
         restaurant: payload === null || payload === void 0 ? void 0 : payload.restaurant,
         status: "active",
-        arrivalTime: { $lt: expireHours },
+        time: { $lt: expireHours },
         endTime: { $gt: payload === null || payload === void 0 ? void 0 : payload.time },
-    }).populate("restaurant");
-    console.log(bookedTables, "bookedtables");
+    });
     // conditionally check avilable tables
     if ((bookedTables === null || bookedTables === void 0 ? void 0 : bookedTables.length) >= totalTables) {
-        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "No tables avilable for booking during this date");
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "No tables avilable for booking during this time. please choose different time and seats");
     }
     const findTable = yield table_model_1.Table.aggregate([
         {
@@ -103,10 +104,9 @@ const bookAtable = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "We couldn't find any tables with the required number of seats.  Please contact with  the restaurant owner");
     }
     //
-    const data = Object.assign(Object.assign({}, payload), { date: (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.date).format("YYYY-MM-DD"), table: (_c = findTable[0]) === null || _c === void 0 ? void 0 : _c._id, endTime: (0, booking_utils_1.calculateEndTime)(payload === null || payload === void 0 ? void 0 : payload.time), restaurant: payload === null || payload === void 0 ? void 0 : payload.restaurant, id: (0, booking_utils_1.generateBookingNumber)() });
+    const data = Object.assign(Object.assign({}, payload), { date: (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.date).format("YYYY-MM-DD"), table: (_a = findTable[0]) === null || _a === void 0 ? void 0 : _a._id, endTime: (0, booking_utils_1.calculateEndTime)(payload === null || payload === void 0 ? void 0 : payload.time), restaurant: payload === null || payload === void 0 ? void 0 : payload.restaurant, id: (0, booking_utils_1.generateBookingNumber)() });
     // find user
-    const user = yield user_model_1.User.findById(payload === null || payload === void 0 ? void 0 : payload.user).select("fullName phoneNumber");
-    console.log(user);
+    const user = yield user_model_1.User.findById(payload === null || payload === void 0 ? void 0 : payload.user).select("fullName phoneNumber email");
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
     }
@@ -118,27 +118,95 @@ const bookAtable = (payload) => __awaiter(void 0, void 0, void 0, function* () {
             refference: result === null || result === void 0 ? void 0 : result._id,
             model_type: notification_interface_1.modeType.Booking,
         },
-        // {
-        //   receiver: bookedTables[0]?.restaurant?.owner,
-        //   message: messages.bookingForOwner,
-        //   description: `Date:${moment(payload?.date).format(
-        //     "YYYY-MM-DD HH:mm a"
-        //   )},TableNo:${findTable[0]?.tableNo},Seats:${findTable[0]?.seats}`,
-        //   refference: result?._id,
-        //   model_type: modeType.Booking,
-        // },
     ];
+    yield coins_model_1.Coin.findOneAndUpdate({ customer: user }, // Search condition
+    { $inc: { coins: 10 } }, // Increment the coins by 10 if the document exists
+    { new: true, upsert: true } // Insert if no document found, and return the updated document
+    );
     // send message to the customer
-    yield (0, booking_utils_1.sendMessageToNumber)(user === null || user === void 0 ? void 0 : user.phoneNumber, `Hello ${user.fullName}, your table reservation at ${restaurant === null || restaurant === void 0 ? void 0 : restaurant.name}, has been successfully confirmed for ${result === null || result === void 0 ? void 0 : result.date} at ${result === null || result === void 0 ? void 0 : result.time}. We look forward to hosting you for ${(_d = findTable[0]) === null || _d === void 0 ? void 0 : _d.seats}  guests. Please arrive within your designated time to ensure your reservation remains valid. Thank you!`);
+    const customerSmsData = {
+        phoneNumbers: [user === null || user === void 0 ? void 0 : user.phoneNumber],
+        mediaUrl: "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+        bodyValues: [
+            user.fullName,
+            restaurant === null || restaurant === void 0 ? void 0 : restaurant.name,
+            result === null || result === void 0 ? void 0 : result.date,
+            result === null || result === void 0 ? void 0 : result.time,
+            (_b = findTable[0]) === null || _b === void 0 ? void 0 : _b.seats,
+        ],
+        buttonUrl: "https://bookatable.mu",
+    };
+    const vendorSmsData = {
+        phoneNumbers: [restaurant === null || restaurant === void 0 ? void 0 : restaurant.helpLineNumber1],
+        mediaUrl: "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+        bodyValues: [
+            user.fullName,
+            restaurant === null || restaurant === void 0 ? void 0 : restaurant.name,
+            result === null || result === void 0 ? void 0 : result.date,
+            result === null || result === void 0 ? void 0 : result.time,
+            (_c = findTable[0]) === null || _c === void 0 ? void 0 : _c.seats,
+            user === null || user === void 0 ? void 0 : user.phoneNumber,
+        ],
+        buttonUrl: "https://bookatable.mu",
+    };
+    // await sendWhatsAppMessageToCustomers(smsData);
     // send message to the vendor
-    yield (0, booking_utils_1.sendMessageToNumber)(user === null || user === void 0 ? void 0 : user.phoneNumber, `Hello, a customer named ${user.fullName} has booked a table at your restaurant, ${restaurant === null || restaurant === void 0 ? void 0 : restaurant.name}, for ${result === null || result === void 0 ? void 0 : result.date} at ${result === null || result === void 0 ? void 0 : result.time}. They plan to bring ${(_e = findTable[0]) === null || _e === void 0 ? void 0 : _e.seats} guests. Please note their contact number: ${user.phoneNumber}. We look forward to welcoming them. Thank you!`);
-    yield notificaiton_service_1.notificationServices.insertNotificationIntoDb(notificationData);
+    // await sendWhatsAppMessageToCustomers(customerSmsData);
+    // await sendWhatsAppMessageToVendors(vendorSmsData);
+    const emailContext = {
+        name: user === null || user === void 0 ? void 0 : user.fullName,
+        email: user === null || user === void 0 ? void 0 : user.email,
+        date: payload === null || payload === void 0 ? void 0 : payload.date,
+        seats: payload === null || payload === void 0 ? void 0 : payload.seats,
+        arrivalTime: payload === null || payload === void 0 ? void 0 : payload.time,
+        restaurant: restaurant === null || restaurant === void 0 ? void 0 : restaurant.name,
+        address: restaurant === null || restaurant === void 0 ? void 0 : restaurant.address,
+    };
+    // await sendReservationEmail(
+    //   "reservationTemplate", // The name of your template file without the .html extension
+    //   user?.email,
+    //   "Your Reservation was successful",
+    //   emailContext
+    // );
+    Promise.all([
+        // Send WhatsApp and SMS to customer and vendor concurrently
+        yield notificaiton_service_1.notificationServices.insertNotificationIntoDb(notificationData),
+        (0, booking_utils_1.sendWhatsAppMessageToCustomers)(customerSmsData),
+        (0, booking_utils_1.sendWhatsAppMessageToVendors)(vendorSmsData),
+        yield (0, booking_utils_1.sendReservationEmail)("reservationTemplate", // The name of your template file without the .html extension
+        user === null || user === void 0 ? void 0 : user.email, "Your Reservation was successful", emailContext),
+    ]);
     return result;
 });
-// const bookTable = async (payload: TBook) => {
-// };
+//  book a table from widget
 const getAllBookings = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const bookingModel = new QueryBuilder_1.default(booking_model_1.Booking.find().populate("user restaurant table"), query)
+    const bookingModel = new QueryBuilder_1.default(booking_model_1.Booking.find().populate("user restaurant table event"), query)
+        .search([])
+        .filter()
+        .paginate()
+        .sort()
+        .fields();
+    const data = yield bookingModel.modelQuery;
+    const meta = yield bookingModel.countTotal();
+    return {
+        data,
+        meta,
+    };
+});
+const getAllBookingsForAdmin = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const bookingModel = new QueryBuilder_1.default(booking_model_1.Booking.find()
+        .populate({
+        path: "user",
+        select: "fullName", // Select only the fullname field from the user
+    })
+        .populate({
+        path: "restaurant",
+        select: "name", // Select only the name field from the restaurant
+    })
+        .populate({
+        path: "table",
+        select: "tableNo seats", // Select only the table_name field from the table
+    }), query)
         .search([])
         .filter()
         .paginate()
@@ -153,71 +221,76 @@ const getAllBookings = (query) => __awaiter(void 0, void 0, void 0, function* ()
 });
 const getAllBookingByOwner = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const searchAbleFields = ["userName", "id", "email"];
-    const pipeline = [
-        {
-            $lookup: {
-                from: "restaurants",
-                localField: "restaurant",
-                foreignField: "_id",
-                as: "restaurant",
-            },
-        },
-        {
-            $unwind: "$restaurant",
-        },
-        {
-            $lookup: {
-                from: "tables",
-                localField: "table",
-                foreignField: "_id",
-                as: "table",
-            },
-        },
-        {
-            $unwind: "$table",
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "user",
-                foreignField: "_id",
-                as: "user",
-            },
-        },
-        {
-            $unwind: "$user",
-        },
-        {
+    const pipeline = [];
+    // Match by event if provided in the query
+    if (query === null || query === void 0 ? void 0 : query.event) {
+        pipeline.push({
             $match: {
-                "restaurant.owner": new mongoose_1.default.Types.ObjectId(query === null || query === void 0 ? void 0 : query.owner),
+                event: new mongoose_1.default.Types.ObjectId(query.event), // Convert event to ObjectId
             },
+        });
+    }
+    // Add lookup and unwind stages
+    pipeline.push({
+        $lookup: {
+            from: "restaurants",
+            localField: "restaurant",
+            foreignField: "_id",
+            as: "restaurant",
         },
-        {
-            $project: {
-                userName: "$user.fullName",
-                email: "$user.email",
-                id: "$id",
-                status: "$status",
-                date: "$date",
-                time: "$time",
-                tableId: "$table._id",
-                tableName: "$table.tableName",
-                tableNo: "$table.tableNo",
-                seats: "$table.seats",
-                restaurantName: "$restaurant.name",
-            },
+    }, {
+        $unwind: "$restaurant",
+    }, {
+        $lookup: {
+            from: "tables",
+            localField: "table",
+            foreignField: "_id",
+            as: "table",
         },
-    ];
+    }, {
+        $unwind: "$table",
+    }, {
+        $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+        },
+    }, {
+        $unwind: "$user",
+    }, {
+        $match: {
+            "restaurant.owner": new mongoose_1.default.Types.ObjectId(query === null || query === void 0 ? void 0 : query.owner),
+            "restaurant._id": new mongoose_1.default.Types.ObjectId(query === null || query === void 0 ? void 0 : query.restaurant),
+        },
+    }, {
+        $project: {
+            userName: "$user.fullName",
+            email: "$user.email",
+            id: "$id",
+            status: "$status",
+            date: "$date",
+            time: "$time",
+            tableId: "$table._id",
+            tableName: "$table.tableName",
+            tableNo: "$table.tableNo",
+            seats: "$table.seats",
+            restaurantName: "$restaurant.name",
+            event: 1,
+        },
+    });
+    // Add matching for additional fields except searchTerm and owner
     Object.keys(query).forEach((key) => {
-        if (key !== "searchTerm" && key !== "owner") {
-            console.log(key);
+        if (key !== "searchTerm" &&
+            key !== "owner" &&
+            key !== "event" &&
+            key !== "restaurant") {
             const matchStage = {};
             matchStage[key] = query[key];
-            console.log(query);
             pipeline.push({ $match: matchStage });
         }
     });
-    // searchterm
+    // Match by searchTerm if provided in the query
     if (query === null || query === void 0 ? void 0 : query.searchTerm) {
         const searchRegex = new RegExp(query.searchTerm, "i");
         const searchMatchStage = {
@@ -227,8 +300,7 @@ const getAllBookingByOwner = (query) => __awaiter(void 0, void 0, void 0, functi
         };
         pipeline.push({ $match: searchMatchStage });
     }
-    // project
-    pipeline.push();
+    // Execute the pipeline
     const result = yield booking_model_1.Booking.aggregate(pipeline);
     return result;
 });
@@ -320,18 +392,24 @@ const deletebooking = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield booking_model_1.Booking.findByIdAndDelete(id);
     return result;
 });
-const getBookingStatics = (userId, year) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("service", userId, year);
+const getBookingStatics = (userId, year, restaurantId // Optional restaurantId
+) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(userId, year, restaurantId);
     const monthsOfYear = Array.from({ length: 12 }, (_, i) => i + 1); // Array of month numbers from 1 to 12
+    const matchStage = {
+        date: {
+            $gte: `${year}-01-01`,
+            $lt: `${parseInt(year) + 1}-01-01`,
+        },
+        restaurant: { $exists: true }, // Filter out bookings without restaurant
+    };
+    if (restaurantId) {
+        // Add restaurantId filter if provided
+        matchStage.restaurant = restaurantId;
+    }
     const result = yield booking_model_1.Booking.aggregate([
         {
-            $match: {
-                date: {
-                    $gte: `${year}-01-01`,
-                    $lt: `${year + 1}-01-01`,
-                },
-                restaurant: { $exists: true }, // Filter out bookings without restaurant
-            },
+            $match: matchStage,
         },
         {
             $addFields: {
@@ -343,20 +421,28 @@ const getBookingStatics = (userId, year) => __awaiter(void 0, void 0, void 0, fu
         {
             $lookup: {
                 from: "restaurants",
-                let: { restaurantId: "$restaurant" },
+                let: { restaurantId: { $toObjectId: "$restaurant" } }, // Convert restaurantId to ObjectId
                 pipeline: [
                     {
                         $match: {
                             $expr: {
                                 $and: [
-                                    { $eq: ["$_id", "$$restaurantId"] },
-                                    { $eq: ["$owner", new mongoose_1.default.Types.ObjectId(userId)] },
+                                    { $eq: ["$_id", "$$restaurantId"] }, // Match restaurant by ObjectId
+                                    { $eq: ["$owner", new mongoose_1.default.Types.ObjectId(userId)] }, // Match owner by ObjectId
+                                    {
+                                        $eq: ["$owner", new mongoose_1.default.Types.ObjectId(restaurantId)],
+                                    }, // Match owner by ObjectId
                                 ],
                             },
                         },
                     },
                 ],
                 as: "restaurantOwner",
+            },
+        },
+        {
+            $match: {
+                restaurantOwner: { $ne: [] }, // Ensure that the restaurant has an owner that matches the userId
             },
         },
         {
@@ -396,6 +482,138 @@ const getBookingStatics = (userId, year) => __awaiter(void 0, void 0, void 0, fu
     });
     return finalResult;
 });
+const bookAtableForEvent = (BookingData) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const payload = Object.assign({}, BookingData);
+    if ((payload === null || payload === void 0 ? void 0 : payload.event) === "null")
+        delete payload.event;
+    if (BookingData === null || BookingData === void 0 ? void 0 : BookingData.event)
+        payload["ticket"] = (0, booking_utils_1.generateBookingNumber)();
+    const day = (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.date).format("dddd");
+    if (Number(payload === null || payload === void 0 ? void 0 : payload.seats) > 10) {
+        throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, "If you want to book more than 10 seats, please contact the restaurant owner.");
+    }
+    const restaurant = yield restaurant_model_1.Restaurant.findById(payload === null || payload === void 0 ? void 0 : payload.restaurant);
+    // check if restaurant booked or open
+    const bookingTime = (0, moment_1.default)(payload.date);
+    // check closing and opening time
+    (0, booking_utils_1.validateBookingTime)(restaurant, bookingTime);
+    // check the restaurant avilable that day
+    (0, booking_utils_1.checkRestaurantAvailability)(restaurant, day, payload === null || payload === void 0 ? void 0 : payload.time);
+    const totalTables = yield table_model_1.Table.find({
+        restaurant: payload.restaurant,
+        seats: Number(payload.seats),
+    }).countDocuments();
+    const expireHours = (0, booking_utils_1.calculateEndTime)(payload === null || payload === void 0 ? void 0 : payload.time);
+    // retrive book tables
+    const bookedTables = yield booking_model_1.Booking.find({
+        date: (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.date).format("YYYY-MM-DD"),
+        restaurant: payload === null || payload === void 0 ? void 0 : payload.restaurant,
+        status: "active",
+        time: { $lt: expireHours },
+        endTime: { $gt: payload === null || payload === void 0 ? void 0 : payload.time },
+    });
+    // conditionally check avilable tables
+    if ((bookedTables === null || bookedTables === void 0 ? void 0 : bookedTables.length) >= totalTables) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "No tables avilable for booking during this time. please choose different time and seats");
+    }
+    const findTable = yield table_model_1.Table.aggregate([
+        {
+            $match: {
+                restaurant: new mongoose_1.Types.ObjectId(payload === null || payload === void 0 ? void 0 : payload.restaurant),
+                seats: Number(payload === null || payload === void 0 ? void 0 : payload.seats),
+            },
+        },
+        {
+            $limit: 1,
+        },
+    ]);
+    if (!findTable[0]) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "We couldn't find any tables with the required number of seats.  Please contact with  the restaurant owner");
+    }
+    //
+    const data = Object.assign(Object.assign({}, payload), { date: (0, moment_1.default)(payload === null || payload === void 0 ? void 0 : payload.date).format("YYYY-MM-DD"), table: (_a = findTable[0]) === null || _a === void 0 ? void 0 : _a._id, endTime: (0, booking_utils_1.calculateEndTime)(payload === null || payload === void 0 ? void 0 : payload.time), restaurant: payload === null || payload === void 0 ? void 0 : payload.restaurant, id: (0, booking_utils_1.generateBookingNumber)() });
+    // find user
+    const user = yield user_model_1.User.findById(payload === null || payload === void 0 ? void 0 : payload.user).select("fullName phoneNumber email");
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
+    }
+    const result = yield booking_model_1.Unpaidbooking.create(data);
+    // const notificationData = [
+    //   {
+    //     receiver: payload?.user,
+    //     message: messages.booking,
+    //     refference: result?._id,
+    //     model_type: modeType.Booking,
+    //   },
+    // ];
+    // await Coin.findOneAndUpdate(
+    //   { customer: user }, // Search condition
+    //   { $inc: { coins: 10 } }, // Increment the coins by 10 if the document exists
+    //   { new: true, upsert: true } // Insert if no document found, and return the updated document
+    // );
+    // send message to the customer
+    // const customerSmsData = {
+    //   phoneNumbers: [`+230${user?.phoneNumber}`],
+    //   mediaUrl:
+    //     "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+    //   bodyValues: [
+    //     user.fullName,
+    //     restaurant?.name,
+    //     result?.date,
+    //     result?.time,
+    //     findTable[0]?.seats,
+    //   ],
+    //   buttonUrl: "https://bookatable.mu",
+    // };
+    // const vendorSmsData = {
+    //   phoneNumbers: [`+230${restaurant?.helpLineNumber1}`],
+    //   mediaUrl:
+    //     "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+    //   bodyValues: [
+    //     user.fullName,
+    //     restaurant?.name,
+    //     result?.date,
+    //     result?.time,
+    //     findTable[0]?.seats,
+    //   ],
+    //   buttonUrl: "https://bookatable.mu",
+    // };
+    // await sendWhatsAppMessageToCustomers(smsData);
+    // send message to the vendor
+    // await notificationServices.insertNotificationIntoDb(notificationData);
+    // await sendWhatsAppMessageToCustomers(customerSmsData);
+    // await sendWhatsAppMessageToVendors(vendorSmsData);
+    const emailContext = {
+        name: user === null || user === void 0 ? void 0 : user.fullName,
+        email: user === null || user === void 0 ? void 0 : user.email,
+        date: payload === null || payload === void 0 ? void 0 : payload.date,
+        seats: payload === null || payload === void 0 ? void 0 : payload.seats,
+        arrivalTime: payload === null || payload === void 0 ? void 0 : payload.time,
+        restaurant: restaurant === null || restaurant === void 0 ? void 0 : restaurant.name,
+        address: restaurant === null || restaurant === void 0 ? void 0 : restaurant.address,
+    };
+    // await sendReservationEmail(
+    //   "reservationTemplate", // The name of your template file without the .html extension
+    //   user?.email,
+    //   "Your Reservation was successful",
+    //   emailContext
+    // );
+    // return result;
+    return result;
+});
+const getSingleUnpaiEventBooking = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield booking_model_1.Unpaidbooking.findById(id)
+        .populate({
+        path: "table",
+        select: "tableNo seats",
+    })
+        .populate({
+        path: "event",
+        select: "title entryFee",
+    });
+    return result;
+});
 exports.bookingServies = {
     bookAtable,
     getAllBookings,
@@ -403,6 +621,9 @@ exports.bookingServies = {
     getSingleBooking,
     updateBooking,
     getBookingDetailsWithMenuOrder,
+    getAllBookingsForAdmin,
     deletebooking,
     getBookingStatics,
+    bookAtableForEvent,
+    getSingleUnpaiEventBooking,
 };

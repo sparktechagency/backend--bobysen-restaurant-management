@@ -16,9 +16,9 @@ const updateCategoryValidation = z.object({
   }),
 });
 
-const getCategoryValidation = {
+const categoryValidation = {
   createCategoryValidation,
   updateCategoryValidation,
 };
 
-export default getCategoryValidation;
+export default categoryValidation;

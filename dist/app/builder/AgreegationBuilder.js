@@ -18,7 +18,6 @@ class AgreegationBuilder {
     }
     geospatial() {
         if (this.query.latitude && this.query.longitude) {
-            console.log(this.query);
             // Ensure latitude and longitude are parsed correctly
             const longitude = parseFloat(this.query.longitude);
             const latitude = parseFloat(this.query.latitude);

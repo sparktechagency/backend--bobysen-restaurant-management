@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+const body_parser_1 = __importDefault(require("body-parser"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
@@ -15,12 +16,20 @@ const notfound_1 = __importDefault(require("./app/middleware/notfound"));
 const routes_1 = __importDefault(require("./app/routes"));
 const app = (0, express_1.default)();
 app.use(express_1.default.static("public"));
+app.use(body_parser_1.default.urlencoded({ extended: true }));
 //parsers
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: true,
-    credentials: true,
+    origin: [
+        "https://mybookatable.mu",
+        "https://bookatable.mu",
+        "https://socket.bookatable.mu",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://reservation.bookatable.mu",
+    ], // Allow all originss
+    // credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 }));
 // application routes

@@ -119,10 +119,99 @@ const getAllTopRestaurants = (query) => __awaiter(void 0, void 0, void 0, functi
         },
     };
 });
+const getAllTopRestaurantForTable = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const pipeline = [];
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    // GeoNear stage (optional, if needed)
+    if ((query === null || query === void 0 ? void 0 : query.latitude) && (query === null || query === void 0 ? void 0 : query.longitude)) {
+        pipeline.push({
+            $geoNear: {
+                near: {
+                    type: "Point",
+                    coordinates: [
+                        parseFloat(query === null || query === void 0 ? void 0 : query.longitude),
+                        parseFloat(query === null || query === void 0 ? void 0 : query.latitude),
+                    ],
+                },
+                key: "location",
+                maxDistance: parseFloat((_a = query === null || query === void 0 ? void 0 : query.maxDistance) !== null && _a !== void 0 ? _a : 10000) * 1609,
+                distanceField: "dist.calculated",
+                spherical: true,
+            },
+        });
+    }
+    // Match valid top restaurants
+    pipeline.push({
+        $match: {
+            isExpired: false,
+            isDeleted: false,
+        },
+    });
+    // Lookup to fetch restaurant data
+    pipeline.push({
+        $lookup: {
+            from: "restaurants", // Name of the restaurant collection
+            localField: "restaurant", // Field in TopRestaurant referencing Restaurant
+            foreignField: "_id", // Field in Restaurant that matches the reference
+            as: "restaurantData",
+        },
+    });
+    // Unwind the restaurant data to flatten it
+    pipeline.push({
+        $unwind: "$restaurantData",
+    });
+    // Replace root to return only restaurant data
+    pipeline.push({
+        $replaceRoot: {
+            newRoot: "$restaurantData",
+        },
+    });
+    // Dynamic search on restaurant fields
+    if (query === null || query === void 0 ? void 0 : query.searchTerm) {
+        pipeline.push({
+            $match: {
+                $or: topRestaurant_constant_1.topRestaurantSearchableFileds.map((field) => ({
+                    [field]: { $regex: query.searchTerm, $options: "i" },
+                })),
+            },
+        });
+    }
+    // Dynamic filters for restaurant fields
+    const filterConditions = Object.fromEntries(Object.entries(query).filter(([key]) => !topRestaurant_constant_1.topRestaurantSearchableFileds.includes(key)));
+    if (Object.keys(filterConditions).length > 0) {
+        pipeline.push({
+            $match: filterConditions,
+        });
+    }
+    // Add pagination
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limit });
+    // Fetch the data
+    const data = yield TopRestaurant_model_1.TopRestaurant.aggregate(pipeline);
+    // Fetch the total count for pagination meta
+    const total = yield TopRestaurant_model_1.TopRestaurant.countDocuments({
+        isExpired: false,
+        isDeleted: false,
+    });
+    const totalPage = Math.ceil(total / limit);
+    return {
+        data,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+    };
+});
 exports.topRestaurantServices = {
     insertTopRestaurantIntoDb,
     getAllTopRestaurants,
     getSingleTopRestaurant,
     updateTopRestaurant,
     deleteTopRestaurantFromList,
+    getAllTopRestaurantForTable,
 };

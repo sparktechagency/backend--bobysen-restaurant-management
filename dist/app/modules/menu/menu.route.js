@@ -6,24 +6,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.menuRoutes = exports.reviewrouter = void 0;
 const express_1 = require("express");
 const auth_1 = __importDefault(require("../../middleware/auth"));
-const fileUpload_1 = __importDefault(require("../../middleware/fileUpload"));
+const fileUpload_1 = require("../../middleware/fileUpload");
 const parseData_1 = __importDefault(require("../../middleware/parseData"));
 const user_constant_1 = require("../user/user.constant");
 const menu_controller_1 = require("./menu.controller");
-const upload = (0, fileUpload_1.default)("./public/uploads/menu");
 const router = (0, express_1.Router)();
 exports.reviewrouter = (0, express_1.Router)();
 exports.reviewrouter.post("/", (0, auth_1.default)(user_constant_1.USER_ROLE.user), menu_controller_1.reviewControllers.insertReviewIntoDb);
 exports.reviewrouter.get("/:id", menu_controller_1.reviewControllers.getAllReviews);
-router.post("/", upload.single("file"), (0, parseData_1.default)(), (0, auth_1.default)(user_constant_1.USER_ROLE.user), menu_controller_1.menuControllers.insertMenuIntoDb);
+exports.reviewrouter.patch("/:id", (0, auth_1.default)(user_constant_1.USER_ROLE.admin), menu_controller_1.reviewControllers.UpdateReview);
+router.post("/", fileUpload_1.upload.single("file"), (0, parseData_1.default)(), (0, auth_1.default)(user_constant_1.USER_ROLE.vendor), menu_controller_1.menuControllers.insertMenuIntoDb);
 router.get("/owner", (0, auth_1.default)(user_constant_1.USER_ROLE.vendor), menu_controller_1.menuControllers.getAllMenuForOwner);
+router.get("/owner-v2", (0, auth_1.default)(user_constant_1.USER_ROLE.vendor, user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin), menu_controller_1.menuControllers.getAllMenu);
 router.get("/", 
 // auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
 menu_controller_1.menuControllers.getAllMenu);
 router.get("/:id", 
 // auth(USER_ROLE.vendor, USER_ROLE.user, USER_ROLE.admin),
 menu_controller_1.menuControllers.getsingleMenu);
-router.patch("/:id", upload.single("file"), (0, parseData_1.default)(), (0, auth_1.default)(user_constant_1.USER_ROLE.vendor), menu_controller_1.menuControllers.updateMenu);
+router.patch("/:id", fileUpload_1.upload.single("file"), (0, parseData_1.default)(), (0, auth_1.default)(user_constant_1.USER_ROLE.vendor), menu_controller_1.menuControllers.updateMenu);
 router.delete("/:id", (0, auth_1.default)(user_constant_1.USER_ROLE.vendor), menu_controller_1.menuControllers.deleteMenu);
 router.post("/review", (0, auth_1.default)(user_constant_1.USER_ROLE.user), menu_controller_1.reviewControllers.insertReviewIntoDb);
 router.get("/review/:id", 

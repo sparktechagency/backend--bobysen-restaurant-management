@@ -16,9 +16,7 @@ const insertMenuCategoryIntoDb = (payload) => __awaiter(void 0, void 0, void 0, 
     return result;
 });
 const findAllCategory = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(query);
     const result = yield menuCategory_model_1.MenuCategory.find(query);
-    console.log(result);
     return result;
 });
 const getSingleCategory = (id) => __awaiter(void 0, void 0, void 0, function* () {

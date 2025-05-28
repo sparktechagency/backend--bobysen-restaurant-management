@@ -26,8 +26,7 @@ const insertMenuIntoDb = (payload) => __awaiter(void 0, void 0, void 0, function
     return result;
 });
 const getAllMenu = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(query);
-    const MenuModel = new QueryBuilder_1.default(menu_model_1.Menu.find(), query)
+    const MenuModel = new QueryBuilder_1.default(menu_model_1.Menu.find().populate("category", "title"), query)
         .search(["name"])
         .filter()
         .paginate()
@@ -169,20 +168,23 @@ const insertReviewIntoDb = (payload) => __awaiter(void 0, void 0, void 0, functi
             },
         ];
         const result = yield menu_model_1.Review.aggregate(pipeline);
-        console.log(result);
         if (result.length > 0) {
-            const { avgRating } = result[0];
-            const submit = yield restaurant_model_1.Restaurant.updateOne({ _id: restaurantId }, { avgReviews: avgRating });
-            console.log(submit);
+            let { avgRating } = result[0];
+            // Ensure only one decimal place
+            avgRating = Number(avgRating.toFixed(1));
+            const submit = yield restaurant_model_1.Restaurant.findByIdAndUpdate(restaurantId, {
+                avgReviews: avgRating,
+            });
         }
         yield session.commitTransaction();
-        yield session.endSession();
         return review[0];
     }
     catch (err) {
         yield session.abortTransaction();
-        yield session.endSession();
         throw new Error(err);
+    }
+    finally {
+        yield session.endSession();
     }
 });
 const getAllReviews = (restaurantId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -211,6 +213,7 @@ const getAllReviews = (restaurantId) => __awaiter(void 0, void 0, void 0, functi
                     $push: {
                         rating: "$rating",
                         comment: "$comment",
+                        _id: "$_id",
                         user: {
                             name: "$userDetails.fullName",
                             image: "$userDetails.image",
@@ -283,6 +286,10 @@ const getAllReviews = (restaurantId) => __awaiter(void 0, void 0, void 0, functi
     const result = yield menu_model_1.Review.aggregate(pipeline);
     return result[0];
 });
+const updateReviews = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield menu_model_1.Review.deleteOne({ _id: id });
+    return result;
+});
 exports.menuServices = {
     insertMenuIntoDb,
     getAllMenu,
@@ -294,4 +301,5 @@ exports.menuServices = {
 exports.reviewServices = {
     insertReviewIntoDb,
     getAllReviews,
+    updateReviews,
 };

@@ -10,5 +10,8 @@ const user_constant_1 = require("../user/user.constant");
 const order_controller_1 = require("./order.controller");
 const router = (0, express_1.Router)();
 router.post("/decrypt-data", order_controller_1.orderControllers.getimnCallback);
-router.post("/", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin, user_constant_1.USER_ROLE.vendor), order_controller_1.orderControllers.insertOrderIntoDB);
+router.post("/", 
+// auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
+order_controller_1.orderControllers.insertOrderIntoDB);
+router.post("/load-payment-zone", (0, auth_1.default)(user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE.admin, user_constant_1.USER_ROLE.vendor), order_controller_1.orderControllers.loadPaymentZone);
 exports.orderRoutes = router;

@@ -3,6 +3,7 @@ import { authRoutes } from "../modules/auth/auth.route";
 import { bannerRoutes } from "../modules/banner/banner.route";
 import { bookingRoutes } from "../modules/booking/booking.route";
 import { cartRoutes } from "../modules/cart/cart.route";
+import { categoryRoutes } from "../modules/category/category.route";
 import { coinRoutes, coinWithDrawRoutes } from "../modules/coins/coins.route";
 import { contentRoues } from "../modules/content/content.route";
 import { eventsRoutes, paymentRoutes } from "../modules/event/event.route";
@@ -99,6 +100,10 @@ const moduleRoutes = [
   {
     path: "/events",
     route: eventsRoutes,
+  },
+  {
+    path: "/categories",
+    route: categoryRoutes,
   },
   {
     path: "/coin",

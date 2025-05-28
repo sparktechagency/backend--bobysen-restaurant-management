@@ -36,7 +36,7 @@ const cartSchema = new mongoose_1.Schema({
     ],
     transactions: [
         {
-            id_form: {
+            transaction_id: {
                 type: String,
             },
             orderId: {
