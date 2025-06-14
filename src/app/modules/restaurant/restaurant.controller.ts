@@ -26,8 +26,9 @@ const insertRestaurantIntDb = catchAsync(
   }
 );
 const getAllRestaurants = catchAsync(async (req: Request, res: Response) => {
-  req.query.owner = req?.user?.userId;
-  const result = await restaurantServices.getAllRestaurant(req.query);
+  const query = { ...req.query };
+  query["owner"] = req?.user?.userId;
+  const result = await restaurantServices.getAllRestaurant(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
