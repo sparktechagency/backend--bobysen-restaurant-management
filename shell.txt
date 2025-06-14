@@ -1,0 +1,11 @@
+mkdir category2
+cd category2
+echo "// category2.model.ts" > category2.model.ts
+echo "// category2.service.ts" > category2.service.ts
+echo "// category2.controller.ts" > category2.controller.ts
+echo "// category2.route.ts" > category2.route.ts
+echo "// category2.validation.ts" > category2.validation.ts
+echo "// category2.interface.ts" > category2.interface.ts
+echo "// category2.constant.ts" > category2.constant.ts
+echo "// category2.utils.ts" > category2.utils.ts
+cd ..

@@ -33,6 +33,12 @@ const RestaurantSchema = new Schema<TRestaurant>(
       ref: "User",
       required: [true, "owner id is required"],
     },
+
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: [true, "category id is required"],
+    },
     status: {
       type: String,
       enum: ["active", "inactive"],

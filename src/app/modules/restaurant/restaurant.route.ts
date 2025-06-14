@@ -72,7 +72,7 @@ router.patch(
 );
 router.patch(
   "/status/:id",
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.vendor, USER_ROLE.admin),
   restauranntControllers.changeRestaurantStatus
 );
 

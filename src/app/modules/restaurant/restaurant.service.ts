@@ -30,7 +30,6 @@ const getAllRestaurant = async (query: Record<string, any>) => {
         as: "tables",
       },
     },
-
     {
       $lookup: {
         from: "menus",
@@ -39,7 +38,20 @@ const getAllRestaurant = async (query: Record<string, any>) => {
         as: "menus",
       },
     },
-
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: {
+        path: "$category",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
     {
       $project: {
         name: 1,
@@ -47,6 +59,7 @@ const getAllRestaurant = async (query: Record<string, any>) => {
         tables: { $size: "$tables" }, // Count total tables
         menus: { $size: "$menus" },
         address: 1, // Count total menus
+        category: 1,
       },
     },
   ]);
@@ -180,6 +193,7 @@ const getSingleRestaurant = async (id: string) => {
         helpLineNumber2: 1,
         images: 1,
         reviewStatus: 1,
+        category: 1,
         map: 1,
         days: {
           $map: {
@@ -239,8 +253,9 @@ const updateRestaurant = async (id: string, payload: Partial<TRestaurant>) => {
       },
       ...update,
     },
-    { new: true }
+    { new: true, upsert: true }
   );
+
   return result;
 };
 
