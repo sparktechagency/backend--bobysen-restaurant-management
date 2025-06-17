@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import moment from "moment";
-import { PipelineStage } from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import AppError from "../../error/AppError";
 import { Restaurant } from "../restaurant/restaurant.model";
 import { TtopRestaurant } from "./TopRestaurant.interface";
@@ -109,7 +109,13 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
       },
     });
   }
-
+  if (query?.category) {
+    pipeline.push({
+      $match: {
+        category: new mongoose.Types.ObjectId(query.category),
+      },
+    });
+  }
   // Dynamic filter stage
   const filterConditions = Object.fromEntries(
     Object.entries(query).filter(

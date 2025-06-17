@@ -105,6 +105,13 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
       },
     });
   }
+  if (query?.category) {
+    pipeline.push({
+      $match: {
+        category: new mongoose.Types.ObjectId(query.category),
+      },
+    });
+  }
   // search term
   if (query?.searchTerm) {
     pipeline.push({
