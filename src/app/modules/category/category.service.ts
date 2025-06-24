@@ -28,9 +28,16 @@ export const updateCategory = async (
   return updated;
 };
 
+// Delete category by id
+export const deleteCategory = async (id: string) => {
+  const deleted = await Category.findByIdAndDelete(id);
+  return deleted;
+};
+
 export const categoryService = {
   createCategory,
   getAllCategories,
   getSingleCategory,
   updateCategory,
+  deleteCategory,
 };

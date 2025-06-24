@@ -22,5 +22,6 @@ router.patch(
   validateRequest(categoryValidation.updateCategoryValidation),
   categoryController.updateCategory
 );
+router.delete("/:id", auth(USER_ROLE.admin), categoryController.deleteCategory);
 
 export const categoryRoutes = router;

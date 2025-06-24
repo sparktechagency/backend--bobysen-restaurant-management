@@ -110,7 +110,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
     });
   }
   // Category filter (with ObjectId validation)
-  if (query?.category) {
+  if (query?.category && query.category !== "null" && query.category !== "") {
     try {
       const catId = new mongoose.Types.ObjectId(query.category);
       pipeline.push({
@@ -134,8 +134,6 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
 
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: limit });
-
-  // Debug: log the pipeline
 
   // Fetch the data
   const data = await TopRestaurant.aggregate(pipeline);

@@ -104,14 +104,13 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
     });
   }
   // Only handle category here, and exclude from dynamic filter
-  if (query?.category) {
+  if (query?.category && query.category !== "null" && query.category !== "") {
     try {
       const catId = new mongoose.Types.ObjectId(query.category);
       pipeline.push({
         $match: { category: catId },
       });
     } catch (e) {
-      // Invalid ObjectId, so no results should be returned
       pipeline.push({ $match: { _id: null } });
     }
   }
@@ -148,6 +147,8 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
 
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: limit });
+
+  // Debug: log the pipeline
 
   // Fetch the data
   const data = await Restaurant.aggregate(pipeline);
