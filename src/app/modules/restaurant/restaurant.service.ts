@@ -95,22 +95,25 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
             parseFloat(query?.longitude),
             parseFloat(query?.latitude),
           ],
-          // coordinates: [90.42308159679541, 23.77634120911962],
         },
         key: "location",
-        // query: {},
         maxDistance: parseFloat(10000 as unknown as string) * 1609,
         distanceField: "dist.calculated",
         spherical: true,
       },
     });
   }
+  // Only handle category here, and exclude from dynamic filter
   if (query?.category) {
-    pipeline.push({
-      $match: {
-        category: new mongoose.Types.ObjectId(query.category),
-      },
-    });
+    try {
+      const catId = new mongoose.Types.ObjectId(query.category);
+      pipeline.push({
+        $match: { category: catId },
+      });
+    } catch (e) {
+      // Invalid ObjectId, so no results should be returned
+      pipeline.push({ $match: { _id: null } });
+    }
   }
   // search term
   if (query?.searchTerm) {
@@ -123,7 +126,6 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
     });
   }
 
-  // // get all current restaurant as well
   pipeline.push({
     $match: {
       isDeleted: false,
@@ -131,11 +133,10 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
     },
   });
 
-  // console.log(pipeline);
-  // // Dynamic filter stage
+  // Dynamic filter stage, but exclude 'category' to avoid double filtering
   const filterConditions = Object.fromEntries(
     Object.entries(query).filter(
-      ([key]) => !restaurantExcludeFields.includes(key)
+      ([key]) => !restaurantExcludeFields.includes(key) && key !== "category"
     )
   );
 
@@ -152,7 +153,10 @@ const getAllRestaurantsForUser = async (query: Record<string, any>) => {
   const data = await Restaurant.aggregate(pipeline);
 
   // Fetch the total count for pagination meta
-  const total = await Restaurant.countDocuments(data);
+  const total = await Restaurant.countDocuments({
+    isDeleted: false,
+    status: "active",
+  });
 
   const totalPage = Math.ceil(total / limit);
 

@@ -60,6 +60,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 10;
   const skip = (page - 1) * limit;
+
   if (query?.latitude && query?.longitude) {
     pipeline.push({
       $geoNear: {
@@ -69,7 +70,6 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
             parseFloat(query?.longitude),
             parseFloat(query?.latitude),
           ],
-          // coordinates: [90.42308159679541, 23.77634120911962],
         },
         key: "location",
         query: {},
@@ -99,7 +99,7 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
     { $unwind: "$restaurant" }
   );
 
-  // dynamic search
+  // Dynamic search
   if (query?.searchTerm) {
     pipeline.push({
       $match: {
@@ -109,20 +109,23 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
       },
     });
   }
+  // Category filter (with ObjectId validation)
   if (query?.category) {
-    pipeline.push({
-      $match: {
-        category: new mongoose.Types.ObjectId(query.category),
-      },
-    });
+    try {
+      const catId = new mongoose.Types.ObjectId(query.category);
+      pipeline.push({
+        $match: { "restaurant.category": catId },
+      });
+    } catch (e) {
+      pipeline.push({ $match: { _id: null } });
+    }
   }
-  // Dynamic filter stage
+  // Dynamic filter stage, but exclude 'category' to avoid double filtering
   const filterConditions = Object.fromEntries(
     Object.entries(query).filter(
-      ([key]) => !topRestaurantExcludeFileds.includes(key)
+      ([key]) => !topRestaurantExcludeFileds.includes(key) && key !== "category"
     )
   );
-
   if (Object.keys(filterConditions).length > 0) {
     pipeline.push({
       $match: filterConditions,
@@ -132,12 +135,16 @@ const getAllTopRestaurants = async (query: Record<string, any>) => {
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: limit });
 
+  // Debug: log the pipeline
+
   // Fetch the data
   const data = await TopRestaurant.aggregate(pipeline);
 
   // Fetch the total count for pagination meta
-  const total = await TopRestaurant.countDocuments(data);
-
+  const total = await TopRestaurant.countDocuments({
+    isExpired: false,
+    isDeleted: false,
+  });
   const totalPage = Math.ceil(total / limit);
 
   return {
