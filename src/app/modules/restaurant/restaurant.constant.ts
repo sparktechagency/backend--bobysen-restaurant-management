@@ -1,4 +1,4 @@
-export const RessearchAbleFields = ["name", "owner"];
+export const RessearchAbleFields = ["name", "owner", "address"];
 
 export const restaurantExcludeFields = [
   "searchTerm",
