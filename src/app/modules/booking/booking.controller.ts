@@ -5,8 +5,9 @@ import sendResponse from "../../utils/sendResponse";
 import { USER_ROLE } from "../user/user.constant";
 import { bookingServies } from "./booking.service";
 const bookAtable = catchAsync(async (req: Request, res: Response) => {
-  req.body.user = req?.user?.userId;
-  const result = await bookingServies.bookAtable(req.body);
+const data ={...req.body}
+  data["user"] = req?.user?.userId;
+  const result = await bookingServies.bookAtable(data);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -15,8 +16,9 @@ const bookAtable = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const bookAtableForEvent = catchAsync(async (req: Request, res: Response) => {
-  req.body.user = req?.user?.userId;
-  const result = await bookingServies.bookAtableForEvent(req.body);
+const data ={...req.body}
+  data["user"] = req?.user?.userId;
+  const result = await bookingServies.bookAtableForEvent(data);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

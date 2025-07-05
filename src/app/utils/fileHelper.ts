@@ -13,7 +13,7 @@ export const deleteFile = async (path: string) => {
     console.log(err);
     throw new Error(`Error deleting file: ${err.message}`);
   }
-};
+}; 
 
 export const storeFile = (folderName: string, filename: string) => {
   return `/uploads/${folderName}/${filename}`;

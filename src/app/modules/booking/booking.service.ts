@@ -204,6 +204,7 @@ const getAllBookings = async (query: Record<string, any>) => {
   };
 };
 const getAllBookingsForAdmin = async (query: Record<string, any>) => {
+
   const bookingModel = new QueryBuilder(
     Booking.find()
       .populate({

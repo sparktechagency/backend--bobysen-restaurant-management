@@ -75,19 +75,22 @@ const EventsSchema: Schema = new Schema<Ievents>({
 });
 
 EventsSchema.pre("find", function (next) {
-  this.find({ isDeleted: { $ne: true } });
+  this.find({ isDeleted: { $ne: true }, isActive: true });
   next();
 });
 
 EventsSchema.pre("findOne", function (next) {
-  this.find({ isDeleted: { $ne: true } });
+  this.find({ isDeleted: { $ne: true }, isActive: true });
   next();
 });
 
 EventsSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  this.pipeline().unshift({
+    $match: { isDeleted: { $ne: true }, isActive: true }
+  });
   next();
 });
+
 
 export const Event = model<Ievents>("Event", EventsSchema);
 export const EventPayment = model("EventPayment", EventPaymentSchema);
