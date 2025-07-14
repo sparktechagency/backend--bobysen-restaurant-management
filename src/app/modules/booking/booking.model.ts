@@ -56,6 +56,11 @@ const unpaidBookingSchema = new Schema<TBooking>(
       enum: ["active", "cancelled", "completed"],
       default: "active",
     },
+        isDeleted:{
+      type:Boolean,
+      default:false,
+
+    }
   },
   {
     timestamps: true,
@@ -113,6 +118,11 @@ const bookingSchema = new Schema<TBooking>(
       enum: ["active", "cancelled", "completed"],
       default: "active",
     },
+    isDeleted:{
+      type:Boolean,
+      default:false,
+
+    }
   },
   {
     timestamps: true,
