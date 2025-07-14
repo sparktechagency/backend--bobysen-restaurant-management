@@ -17,7 +17,6 @@ const unpaidBookingSchema = new Schema<TBooking>(
       ref: "Restaurant",
       required: [true, "table id is required"],
     },
-
     isReviewed: {
       type: Boolean,
       default: false,

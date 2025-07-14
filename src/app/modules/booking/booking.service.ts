@@ -204,7 +204,7 @@ const getAllBookings = async (query: Record<string, any>) => {
   };
 };
 const getAllBookingsForAdmin = async (query: Record<string, any>) => {
-
+  const payload  = {...query,isDeleted:false}
   const bookingModel = new QueryBuilder(
     Booking.find()
       .populate({
@@ -219,7 +219,7 @@ const getAllBookingsForAdmin = async (query: Record<string, any>) => {
         path: "table",
         select: "tableNo seats", // Select only the table_name field from the table
       }),
-    query
+    payload
   )
     .search([])
     .filter()
