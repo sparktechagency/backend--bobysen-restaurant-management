@@ -1,17 +1,17 @@
-import httpStatus from "http-status";
-import moment from "moment";
-import mongoose, { Types } from "mongoose";
-import QueryBuilder from "../../builder/QueryBuilder";
-import AppError from "../../error/AppError";
-import { Coin } from "../coins/coins.model";
-import { notificationServices } from "../notification/notificaiton.service";
-import { messages } from "../notification/notification.constant";
-import { modeType } from "../notification/notification.interface";
-import { Restaurant } from "../restaurant/restaurant.model";
-import { Table } from "../table/table.model";
-import { User } from "../user/user.model";
-import { TBook } from "./booking.interface";
-import { Booking, Unpaidbooking } from "./booking.model";
+import httpStatus from 'http-status';
+import moment from 'moment';
+import mongoose, { Types } from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/AppError';
+import { Coin } from '../coins/coins.model';
+import { notificationServices } from '../notification/notificaiton.service';
+import { messages } from '../notification/notification.constant';
+import { modeType } from '../notification/notification.interface';
+import { Restaurant } from '../restaurant/restaurant.model';
+import { Table } from '../table/table.model';
+import { User } from '../user/user.model';
+import { TBook } from './booking.interface';
+import { Booking, Unpaidbooking } from './booking.model';
 import {
   calculateEndTime,
   checkRestaurantAvailability,
@@ -20,28 +20,34 @@ import {
   sendWhatsAppMessageToCustomers,
   sendWhatsAppMessageToVendors,
   validateBookingTime,
-} from "./booking.utils";
+} from './booking.utils';
 
 // search booking
 const bookAtable = async (BookingData: TBook) => {
   const payload: any = { ...BookingData };
-  if (payload?.event === "null") delete payload.event;
-  if (BookingData?.event) payload["ticket"] = generateBookingNumber();
-  const day = moment(payload?.date).format("dddd");
+  const user = await User.findById(payload?.user).select(
+    'fullName phoneNumber email'
+  );
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (payload?.event === 'null') delete payload.event;
+  if (BookingData?.event) payload['ticket'] = generateBookingNumber();
+  const day = moment(payload?.date).format('dddd');
   if (Number(payload?.seats) > 10) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
-      "If you want to book more than 10 seats, please contact the restaurant owner."
+      'If you want to book more than 10 seats, please contact the restaurant owner.'
     );
   }
   const restaurant: any = await Restaurant.findById(payload?.restaurant);
 
   // check if restaurant booked or open
   const bookingTime = moment(payload.date);
-  if (payload?.time === "00:00") {
+  if (payload?.time === '00:00') {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "The restaurant is closed at 00:00. Please select a valid time."
+      'The restaurant is closed at 00:00. Please select a valid time.'
     );
   }
   // check closing and opening time
@@ -56,9 +62,9 @@ const bookAtable = async (BookingData: TBook) => {
   const expireHours = calculateEndTime(payload?.time);
   // retrive book tables
   const bookedTables: any = await Booking.find({
-    date: moment(payload?.date).format("YYYY-MM-DD"),
+    date: moment(payload?.date).format('YYYY-MM-DD'),
     restaurant: payload?.restaurant,
-    status: "active",
+    status: 'active',
     time: { $lt: expireHours },
     endTime: { $gt: payload?.time },
   });
@@ -66,7 +72,7 @@ const bookAtable = async (BookingData: TBook) => {
   if (bookedTables?.length >= totalTables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "No tables avilable for booking during this time. please choose different time and seats"
+      'No tables avilable for booking during this time. please choose different time and seats'
     );
   }
 
@@ -90,7 +96,7 @@ const bookAtable = async (BookingData: TBook) => {
   //
   const data = {
     ...payload,
-    date: moment(payload?.date).format("YYYY-MM-DD"),
+    date: moment(payload?.date).format('YYYY-MM-DD'),
     table: findTable[0]?._id,
     endTime: calculateEndTime(payload?.time),
     restaurant: payload?.restaurant,
@@ -98,12 +104,7 @@ const bookAtable = async (BookingData: TBook) => {
   };
 
   // find user
-  const user = await User.findById(payload?.user).select(
-    "fullName phoneNumber email"
-  );
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
-  }
+
   const result = await Booking.create(data);
   const notificationData = [
     {
@@ -123,7 +124,7 @@ const bookAtable = async (BookingData: TBook) => {
   const customerSmsData = {
     phoneNumbers: [user?.phoneNumber],
     mediaUrl:
-      "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+      'https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75',
     bodyValues: [
       user.fullName,
       restaurant?.name,
@@ -131,12 +132,12 @@ const bookAtable = async (BookingData: TBook) => {
       result?.time,
       findTable[0]?.seats,
     ],
-    buttonUrl: "https://bookatable.mu",
+    buttonUrl: 'https://bookatable.mu',
   };
   const vendorSmsData = {
     phoneNumbers: [restaurant?.helpLineNumber1],
     mediaUrl:
-      "https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75",
+      'https://bookatable.mu/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.71060dcf.png&w=640&q=75',
     bodyValues: [
       user.fullName,
       restaurant?.name,
@@ -145,7 +146,7 @@ const bookAtable = async (BookingData: TBook) => {
       findTable[0]?.seats,
       user?.phoneNumber,
     ],
-    buttonUrl: "https://bookatable.mu",
+    buttonUrl: 'https://bookatable.mu',
   };
 
   // await sendWhatsAppMessageToCustomers(smsData);
@@ -174,9 +175,9 @@ const bookAtable = async (BookingData: TBook) => {
     sendWhatsAppMessageToCustomers(customerSmsData),
     sendWhatsAppMessageToVendors(vendorSmsData),
     await sendReservationEmail(
-      "reservationTemplate", // The name of your template file without the .html extension
+      'reservationTemplate', // The name of your template file without the .html extension
       user?.email,
-      "Your Reservation was successful",
+      'Your Reservation was successful',
       emailContext
     ),
   ]);
@@ -187,7 +188,7 @@ const bookAtable = async (BookingData: TBook) => {
 
 const getAllBookings = async (query: Record<string, any>) => {
   const bookingModel = new QueryBuilder(
-    Booking.find().populate("user restaurant table event"),
+    Booking.find().populate('user restaurant table event'),
     query
   )
     .search([])
@@ -204,20 +205,20 @@ const getAllBookings = async (query: Record<string, any>) => {
   };
 };
 const getAllBookingsForAdmin = async (query: Record<string, any>) => {
-  const payload  = {...query,isDeleted:false}
+  const payload = { ...query, isDeleted: false };
   const bookingModel = new QueryBuilder(
     Booking.find()
       .populate({
-        path: "user",
-        select: "fullName", // Select only the fullname field from the user
+        path: 'user',
+        select: 'fullName', // Select only the fullname field from the user
       })
       .populate({
-        path: "restaurant",
-        select: "name", // Select only the name field from the restaurant
+        path: 'restaurant',
+        select: 'name', // Select only the name field from the restaurant
       })
       .populate({
-        path: "table",
-        select: "tableNo seats", // Select only the table_name field from the table
+        path: 'table',
+        select: 'tableNo seats', // Select only the table_name field from the table
       }),
     payload
   )
@@ -235,7 +236,7 @@ const getAllBookingsForAdmin = async (query: Record<string, any>) => {
   };
 };
 const getAllBookingByOwner = async (query: Record<string, any>) => {
-  const searchAbleFields = ["userName", "id", "email"];
+  const searchAbleFields = ['userName', 'id', 'email'];
   const pipeline: any[] = [];
 
   // Match by event if provided in the query
@@ -251,68 +252,68 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
   pipeline.push(
     {
       $lookup: {
-        from: "restaurants",
-        localField: "restaurant",
-        foreignField: "_id",
-        as: "restaurant",
+        from: 'restaurants',
+        localField: 'restaurant',
+        foreignField: '_id',
+        as: 'restaurant',
       },
     },
     {
-      $unwind: "$restaurant",
+      $unwind: '$restaurant',
     },
     {
       $lookup: {
-        from: "tables",
-        localField: "table",
-        foreignField: "_id",
-        as: "table",
+        from: 'tables',
+        localField: 'table',
+        foreignField: '_id',
+        as: 'table',
       },
     },
     {
-      $unwind: "$table",
+      $unwind: '$table',
     },
     {
       $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "_id",
-        as: "user",
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
       },
     },
     {
-      $unwind: "$user",
+      $unwind: '$user',
     },
     {
       $match: {
-        "restaurant.owner": new mongoose.Types.ObjectId(query?.owner),
-        "restaurant._id": new mongoose.Types.ObjectId(query?.restaurant),
+        'restaurant.owner': new mongoose.Types.ObjectId(query?.owner),
+        'restaurant._id': new mongoose.Types.ObjectId(query?.restaurant),
       },
     },
     {
       $project: {
-        userName: "$user.fullName",
-        email: "$user.email",
-        id: "$id",
-        status: "$status",
-        date: "$date",
-        time: "$time",
-        tableId: "$table._id",
-        tableName: "$table.tableName",
-        tableNo: "$table.tableNo",
-        seats: "$table.seats",
-        restaurantName: "$restaurant.name",
+        userName: '$user.fullName',
+        email: '$user.email',
+        id: '$id',
+        status: '$status',
+        date: '$date',
+        time: '$time',
+        tableId: '$table._id',
+        tableName: '$table.tableName',
+        tableNo: '$table.tableNo',
+        seats: '$table.seats',
+        restaurantName: '$restaurant.name',
         event: 1,
       },
     }
   );
 
   // Add matching for additional fields except searchTerm and owner
-  Object.keys(query).forEach((key) => {
+  Object.keys(query).forEach(key => {
     if (
-      key !== "searchTerm" &&
-      key !== "owner" &&
-      key !== "event" &&
-      key !== "restaurant"
+      key !== 'searchTerm' &&
+      key !== 'owner' &&
+      key !== 'event' &&
+      key !== 'restaurant'
     ) {
       const matchStage: Record<string, any> = {};
       matchStage[key] = query[key];
@@ -322,9 +323,9 @@ const getAllBookingByOwner = async (query: Record<string, any>) => {
 
   // Match by searchTerm if provided in the query
   if (query?.searchTerm) {
-    const searchRegex = new RegExp(query.searchTerm, "i");
+    const searchRegex = new RegExp(query.searchTerm, 'i');
     const searchMatchStage = {
-      $or: searchAbleFields.map((field) => ({
+      $or: searchAbleFields.map(field => ({
         [field]: { $regex: searchRegex },
       })),
     };
@@ -341,29 +342,29 @@ const getSingleBooking = async (id: string) => {
     { $match: { _id: new mongoose.Types.ObjectId(id.toString()) } },
     {
       $lookup: {
-        from: "tables",
-        localField: "table",
-        foreignField: "_id",
-        as: "tableDetails",
+        from: 'tables',
+        localField: 'table',
+        foreignField: '_id',
+        as: 'tableDetails',
       },
     },
 
     {
       $lookup: {
-        from: "reviews",
-        let: { bookingId: "$_id" },
+        from: 'reviews',
+        let: { bookingId: '$_id' },
         pipeline: [
-          { $match: { $expr: { $eq: ["$booking", "$$bookingId"] } } },
+          { $match: { $expr: { $eq: ['$booking', '$$bookingId'] } } },
           { $limit: 1 },
         ],
-        as: "reviewDetails",
+        as: 'reviewDetails',
       },
     },
     {
       $addFields: {
         isReview: {
           $cond: {
-            if: { $gt: [{ $size: "$reviewDetails" }, 0] },
+            if: { $gt: [{ $size: '$reviewDetails' }, 0] },
             then: true,
             else: false,
           },
@@ -377,7 +378,7 @@ const getSingleBooking = async (id: string) => {
         time: 1,
         status: 1,
 
-        table: { $arrayElemAt: ["$tableDetails", 0] },
+        table: { $arrayElemAt: ['$tableDetails', 0] },
         isReview: 1,
       },
     },
@@ -394,14 +395,14 @@ const getBookingDetailsWithMenuOrder = async (id: string) => {
     },
     {
       $lookup: {
-        from: "tables",
-        foreignField: "_id",
-        localField: "table",
-        as: "table",
+        from: 'tables',
+        foreignField: '_id',
+        localField: 'table',
+        as: 'table',
       },
     },
     {
-      $unwind: "$table",
+      $unwind: '$table',
     },
   ]);
   return result;
@@ -410,7 +411,7 @@ const updateBooking = async (id: string, payload: Record<string, any>) => {
   let message;
   const result = await Booking.findByIdAndUpdate(id, payload, { new: true });
 
-  if (payload?.status === "cancelled") {
+  if (payload?.status === 'cancelled') {
     message = messages.cancelled;
     const notificationData = [
       {
@@ -458,30 +459,30 @@ const getBookingStatics = async (
     {
       $addFields: {
         dateObj: {
-          $dateFromString: { dateString: "$date", format: "%Y-%m-%d" },
+          $dateFromString: { dateString: '$date', format: '%Y-%m-%d' },
         },
       },
     },
     {
       $lookup: {
-        from: "restaurants",
-        let: { restaurantId: { $toObjectId: "$restaurant" } }, // Convert restaurantId to ObjectId
+        from: 'restaurants',
+        let: { restaurantId: { $toObjectId: '$restaurant' } }, // Convert restaurantId to ObjectId
         pipeline: [
           {
             $match: {
               $expr: {
                 $and: [
-                  { $eq: ["$_id", "$$restaurantId"] }, // Match restaurant by ObjectId
-                  { $eq: ["$owner", new mongoose.Types.ObjectId(userId)] }, // Match owner by ObjectId
+                  { $eq: ['$_id', '$$restaurantId'] }, // Match restaurant by ObjectId
+                  { $eq: ['$owner', new mongoose.Types.ObjectId(userId)] }, // Match owner by ObjectId
                   {
-                    $eq: ["$owner", new mongoose.Types.ObjectId(restaurantId)],
+                    $eq: ['$owner', new mongoose.Types.ObjectId(restaurantId)],
                   }, // Match owner by ObjectId
                 ],
               },
             },
           },
         ],
-        as: "restaurantOwner",
+        as: 'restaurantOwner',
       },
     },
     {
@@ -491,7 +492,7 @@ const getBookingStatics = async (
     },
     {
       $group: {
-        _id: { $month: "$dateObj" },
+        _id: { $month: '$dateObj' },
         totalBooking: { $sum: 1 },
       },
     },
@@ -499,9 +500,9 @@ const getBookingStatics = async (
       $project: {
         month: {
           $dateToString: {
-            format: "%b", // Use %b for abbreviated month name
+            format: '%b', // Use %b for abbreviated month name
             date: {
-              $dateFromParts: { year: Number(year), month: "$_id", day: 1 },
+              $dateFromParts: { year: Number(year), month: '$_id', day: 1 },
             },
           },
         },
@@ -515,15 +516,15 @@ const getBookingStatics = async (
   ]);
 
   // Merge with monthsOfYear array to include all months in the result
-  const finalResult = monthsOfYear.map((month) => {
+  const finalResult = monthsOfYear.map(month => {
     const match = result.find(
-      (item) =>
+      item =>
         item.month ===
-        new Date(`${year}-${month}-01`).toLocaleString("en", { month: "short" })
+        new Date(`${year}-${month}-01`).toLocaleString('en', { month: 'short' })
     );
     return {
-      month: new Date(`${year}-${month}-01`).toLocaleString("en", {
-        month: "short",
+      month: new Date(`${year}-${month}-01`).toLocaleString('en', {
+        month: 'short',
       }),
       totalBooking: match ? match.totalBooking : 0,
     };
@@ -534,13 +535,13 @@ const getBookingStatics = async (
 
 const bookAtableForEvent = async (BookingData: TBook) => {
   const payload: any = { ...BookingData };
-  if (payload?.event === "null") delete payload.event;
-  if (BookingData?.event) payload["ticket"] = generateBookingNumber();
-  const day = moment(payload?.date).format("dddd");
+  if (payload?.event === 'null') delete payload.event;
+  if (BookingData?.event) payload['ticket'] = generateBookingNumber();
+  const day = moment(payload?.date).format('dddd');
   if (Number(payload?.seats) > 10) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
-      "If you want to book more than 10 seats, please contact the restaurant owner."
+      'If you want to book more than 10 seats, please contact the restaurant owner.'
     );
   }
   const restaurant: any = await Restaurant.findById(payload?.restaurant);
@@ -557,9 +558,9 @@ const bookAtableForEvent = async (BookingData: TBook) => {
   const expireHours = calculateEndTime(payload?.time);
   // retrive book tables
   const bookedTables: any = await Booking.find({
-    date: moment(payload?.date).format("YYYY-MM-DD"),
+    date: moment(payload?.date).format('YYYY-MM-DD'),
     restaurant: payload?.restaurant,
-    status: "active",
+    status: 'active',
     time: { $lt: expireHours },
     endTime: { $gt: payload?.time },
   });
@@ -567,7 +568,7 @@ const bookAtableForEvent = async (BookingData: TBook) => {
   if (bookedTables?.length >= totalTables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "No tables avilable for booking during this time. please choose different time and seats"
+      'No tables avilable for booking during this time. please choose different time and seats'
     );
   }
 
@@ -592,7 +593,7 @@ const bookAtableForEvent = async (BookingData: TBook) => {
   //
   const data = {
     ...payload,
-    date: moment(payload?.date).format("YYYY-MM-DD"),
+    date: moment(payload?.date).format('YYYY-MM-DD'),
     table: findTable[0]?._id,
     endTime: calculateEndTime(payload?.time),
     restaurant: payload?.restaurant,
@@ -601,10 +602,10 @@ const bookAtableForEvent = async (BookingData: TBook) => {
 
   // find user
   const user = await User.findById(payload?.user).select(
-    "fullName phoneNumber email"
+    'fullName phoneNumber email'
   );
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
   const result = await Unpaidbooking.create(data);
   // const notificationData = [
@@ -676,12 +677,12 @@ const bookAtableForEvent = async (BookingData: TBook) => {
 const getSingleUnpaiEventBooking = async (id: string) => {
   const result = await Unpaidbooking.findById(id)
     .populate({
-      path: "table",
-      select: "tableNo seats",
+      path: 'table',
+      select: 'tableNo seats',
     })
     .populate({
-      path: "event",
-      select: "title entryFee",
+      path: 'event',
+      select: 'title entryFee',
     });
   return result;
 };
