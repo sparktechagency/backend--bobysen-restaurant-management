@@ -1,35 +1,41 @@
-import bcrypt from "bcrypt";
-import httpStatus from "http-status";
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-import moment from "moment";
+import bcrypt from 'bcrypt';
+import httpStatus from 'http-status';
+import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
+import moment from 'moment';
 
-import config from "../../config";
-import AppError from "../../error/AppError";
-import { sendEmail } from "../../utils/mailSender";
-import { generateOtp } from "../../utils/otpGenerator";
-import { User } from "../user/user.model";
-import { TchangePassword, Tlogin, TresetPassword } from "./auth.interface";
-import { createToken, verifyToken } from "./auth.utils";
+import config from '../../config';
+import AppError from '../../error/AppError';
+import { sendEmail } from '../../utils/mailSender';
+import { generateOtp } from '../../utils/otpGenerator';
+import { User } from '../user/user.model';
+import { TchangePassword, Tlogin, TresetPassword } from './auth.interface';
+import { createToken, verifyToken } from './auth.utils';
 const login = async (payload: Tlogin) => {
   const user = await User.isUserExist(payload?.email);
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+    throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
   }
-  if (user?.status === "pending") {
-    await User.findByIdAndDelete(user?._id);
-    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+  if (user?.status === 'pending') {
+    if (user?.type == 'mobile_website') {
+      await User.findByIdAndDelete(user?._id);
+    }
+    throw new AppError(httpStatus.NOT_FOUND, 'User Not Found!!');
   }
-  if (user?.status === "blocked") {
-    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked ! !");
+  if (user?.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
   }
   if (user?.isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !");
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
+  }
+
+  if (user?.type == 'widget') {
+    throw new AppError(httpStatus.NOT_FOUND, 'User Not Found!!');
   }
 
   // throw new AppError(httpStatus.BAD_REQUEST, "user is not verified");
 
   if (!(await User.isPasswordMatched(payload.password, user.password))) {
-    throw new AppError(httpStatus.BAD_REQUEST, "password do not match");
+    throw new AppError(httpStatus.BAD_REQUEST, 'password do not match');
   }
   const jwtPayload = {
     userId: user?._id,
@@ -58,16 +64,16 @@ const login = async (payload: Tlogin) => {
 const changePassword = async (id: string, payload: TchangePassword) => {
   const user = await User.IsUserExistbyId(id);
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found");
+    throw new AppError(httpStatus.NOT_FOUND, 'user not found');
   }
 
   if (!(await User.isPasswordMatched(payload?.oldPassword, user.password))) {
-    throw new AppError(httpStatus.FORBIDDEN, "old password do not match!");
+    throw new AppError(httpStatus.FORBIDDEN, 'old password do not match!');
   }
   if (payload?.newPassword !== payload?.confirmPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "old password and new password do not match"
+      'old password and new password do not match'
     );
   }
   const hashedPassword = await bcrypt.hash(
@@ -92,24 +98,24 @@ const forgotPassword = async (email: string) => {
   const user = await User.isUserExist(email);
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found ");
+    throw new AppError(httpStatus.NOT_FOUND, 'user not found ');
   }
   if (user?.isDeleted) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found");
+    throw new AppError(httpStatus.NOT_FOUND, 'user not found');
   }
-  if (user?.status === "blocked") {
-    throw new AppError(httpStatus.FORBIDDEN, "your account is inactive");
+  if (user?.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'your account is inactive');
   }
   const jwtPayload = {
     email: email,
     id: user?._id,
   };
   const token = jwt.sign(jwtPayload, config.jwt_access_secret as Secret, {
-    expiresIn: "2m",
+    expiresIn: '2m',
   });
   const currentTime = new Date();
   const otp = generateOtp();
-  const expiresAt = moment(currentTime).add(2, "minute");
+  const expiresAt = moment(currentTime).add(2, 'minute');
   await User.findByIdAndUpdate(user?._id, {
     verification: {
       otp,
@@ -118,7 +124,7 @@ const forgotPassword = async (email: string) => {
   });
   await sendEmail(
     email,
-    "Welcome to Bookatable – Your Smart Dining Experience Awaits!",
+    'Welcome to Bookatable – Your Smart Dining Experience Awaits!',
     `<div style="font-family: Arial, sans-serif; text-align: center;">
       <a href="YOUR_LOGO_LINK_HERE">
         <img src="https://i.ibb.co.com/HfDrLRrK/1024x1024bb.png" alt="Bookatable Logo" style="width: 150px; height: auto;">
@@ -153,24 +159,24 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
   } catch (err) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      "Session has exipired. please try again"
+      'Session has exipired. please try again'
     );
   }
-  const user = await User.findById(decode?.id).select("isDeleted verification");
+  const user = await User.findById(decode?.id).select('isDeleted verification');
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found");
+    throw new AppError(httpStatus.NOT_FOUND, 'user not found');
   }
   if (new Date() > user?.verification?.expiresAt) {
-    throw new AppError(httpStatus.FORBIDDEN, "sessions expired");
+    throw new AppError(httpStatus.FORBIDDEN, 'sessions expired');
   }
   if (!user?.verification?.status) {
-    throw new AppError(httpStatus.FORBIDDEN, "Otp is not verified yet!");
+    throw new AppError(httpStatus.FORBIDDEN, 'Otp is not verified yet!');
   }
   if (payload?.newPassword !== payload?.confirmPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "New password and Confirm password do not match!"
+      'New password and Confirm password do not match!'
     );
   }
   const hashedPassword = await bcrypt.hash(
@@ -197,18 +203,18 @@ const refreshToken = async (token: string) => {
   const user = await User.IsUserExistbyId(userId);
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "This user is not found !");
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
   const isDeleted = user?.isDeleted;
 
   if (isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !");
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
   // checking if the user is blocked
   const userStatus = user?.status;
 
-  if (userStatus === "blocked") {
-    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked ! !");
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
   }
 
   const jwtPayload = {

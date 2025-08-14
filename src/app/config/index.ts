@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
-import path from "path";
-dotenv.config({ path: path.join((process.cwd(), ".env")) });
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.join((process.cwd(), '.env')) });
 export default {
   NODE_ENV: process.env.NODE_ENV,
   port: process.env.PORT,
@@ -14,6 +14,7 @@ export default {
   nodemailer_host_email: process.env.NODEMAILER_HOST_EMAIL,
   nodemailer_host_pass: process.env.NODEMAILER_HOST_PASS,
   socket_port: process.env.SOCKET_PORT,
+  widgetPassword: process.env.widgetPassword,
   stripe_secret: process.env.STRIPE_SECRET,
   whatsapp_auth_key: process.env.WHATSAPP_AUTH_KEY,
   whatsapp_sms_number: process.env.WHATSAPP_SMS_NUMBER,

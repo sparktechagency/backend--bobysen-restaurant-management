@@ -1,8 +1,8 @@
-import bcrypt from "bcrypt";
-import { Schema, model } from "mongoose";
-import config from "../../config";
-import { UserStatus } from "./user.constant";
-import { TUser, UserModel } from "./user.interface";
+import bcrypt from 'bcrypt';
+import { Schema, model } from 'mongoose';
+import config from '../../config';
+import { UserStatus } from './user.constant';
+import { TUser, UserModel } from './user.interface';
 const userSchema = new Schema<TUser, UserModel>(
   {
     // userName: {
@@ -11,20 +11,20 @@ const userSchema = new Schema<TUser, UserModel>(
     // },
     fullName: {
       type: String,
-      required: [true, "fullName is required"],
+      required: [true, 'fullName is required'],
     },
     image: {
       type: String,
-      default: "",
+      default: '',
     },
     email: {
       type: String,
-      required: [true, "email is required"],
+      required: [true, 'email is required'],
       // unique: true,
     },
     password: {
       type: String,
-      required: [true, "password is required"],
+      required: [true, 'password is required'],
       select: 0,
     },
     passwordChangedAt: {
@@ -36,17 +36,17 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ["admin", "vendor", "user"],
+      enum: ['admin', 'vendor', 'user'],
     },
     status: {
       type: String,
       enum: UserStatus,
-      default: "active",
+      default: 'active',
     },
     type: {
       type: String,
-      enum: ["website_mobile", "widget"],
-      default: "website_mobile",
+      enum: ['website_mobile', 'widget'],
+      default: 'website_mobile',
     },
 
     isDeleted: {
@@ -59,12 +59,12 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     countryCode: {
       type: String,
-      required: [true, "countryCode is required"],
-      default: "MU",
+      // required: [true, "countryCode is required"],
+      default: 'MU',
     },
     phoneNumber: {
       type: String,
-      required: [true, "phoneNumber is required"],
+      required: [true, 'phoneNumber is required'],
     },
     verification: {
       otp: {
@@ -87,7 +87,7 @@ const userSchema = new Schema<TUser, UserModel>(
   }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre('save', async function (next) {
   const user = this;
   user.password = await bcrypt.hash(
     user.password,
@@ -97,32 +97,32 @@ userSchema.pre("save", async function (next) {
 });
 
 // set '' after saving password
-userSchema.post("save", function (doc, next) {
-  doc.password = "";
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
   next();
 });
 // filter out deleted documents
-userSchema.pre("find", function (next) {
+userSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-userSchema.pre("findOne", function (next) {
+userSchema.pre('findOne', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-userSchema.pre("aggregate", function (next) {
+userSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
 
 userSchema.statics.isUserExist = async function (email: string) {
-  return await User.findOne({ email }).select("+password");
+  return await User.findOne({ email }).select('+password');
 };
 
 userSchema.statics.IsUserExistbyId = async function (id: string) {
-  return await User.findById(id).select("+password");
+  return await User.findById(id).select('+password');
 };
 userSchema.statics.isPasswordMatched = async function (
   plainTextPassword,
@@ -131,4 +131,4 @@ userSchema.statics.isPasswordMatched = async function (
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
-export const User = model<TUser, UserModel>("User", userSchema);
+export const User = model<TUser, UserModel>('User', userSchema);

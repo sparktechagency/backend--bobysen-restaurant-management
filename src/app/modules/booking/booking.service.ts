@@ -210,15 +210,15 @@ const getAllBookingsForAdmin = async (query: Record<string, any>) => {
     Booking.find()
       .populate({
         path: 'user',
-        select: 'fullName', // Select only the fullname field from the user
+        select: 'fullName', 
       })
       .populate({
         path: 'restaurant',
-        select: 'name', // Select only the name field from the restaurant
+        select: 'name', 
       })
       .populate({
         path: 'table',
-        select: 'tableNo seats', // Select only the table_name field from the table
+        select: 'tableNo seats'
       }),
     payload
   )
