@@ -1,16 +1,16 @@
-import { Request, Response } from "express";
-import httpStatus from "http-status";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { uploadToSpaces } from "../../utils/spaces";
-import { restaurantServices } from "./restaurant.service";
+import { Request, Response } from 'express';
+import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { uploadToSpaces } from '../../utils/spaces';
+import { restaurantServices } from './restaurant.service';
 const insertRestaurantIntDb = catchAsync(
   async (req: Request, res: Response) => {
     const images = [];
 
     if (req?.files instanceof Array) {
       for (const file of req?.files) {
-        images.push({ url: await uploadToSpaces(file, "restaurant") });
+        images.push({ url: await uploadToSpaces(file, 'restaurant') });
       }
     }
     req.body.owner = req?.user?.userId;
@@ -19,7 +19,7 @@ const insertRestaurantIntDb = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurant added successfully",
+      message: 'Restaurant added successfully',
       data: result,
     });
     return result;
@@ -27,23 +27,27 @@ const insertRestaurantIntDb = catchAsync(
 );
 const getAllRestaurants = catchAsync(async (req: Request, res: Response) => {
   const query = { ...req.query };
-  query["owner"] = req?.user?.userId;
+  query['owner'] = req?.user?.userId;
   const result = await restaurantServices.getAllRestaurant(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurants retrieved successfully",
+    message: 'Restaurants retrieved successfully',
     data: result,
   });
   return result;
 });
 const getAllRestaurantsForUser = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await restaurantServices.getAllRestaurantsForUser(req.query);
+    const query: any = { ...req.query };
+    if (!req?.query?.limit) {
+      query['limit'] = 99;
+    }
+    const result = await restaurantServices.getAllRestaurantsForUser(query);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurants retrieved successfully",
+      message: 'Restaurants retrieved successfully',
       data: result?.data,
       meta: result?.meta,
     });
@@ -55,7 +59,7 @@ const getSingleRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurant retrieved successfully",
+    message: 'Restaurant retrieved successfully',
     data: result,
   });
   return result;
@@ -64,7 +68,7 @@ const updateRestaurant = catchAsync(async (req: Request, res: Response) => {
   const images = [];
   if (req?.files instanceof Array) {
     for (const file of req?.files) {
-      images.push({ url: await uploadToSpaces(file, "restaurant") });
+      images.push({ url: await uploadToSpaces(file, 'restaurant') });
     }
   }
   req.body.images = images;
@@ -75,7 +79,7 @@ const updateRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurant updated successfully",
+    message: 'Restaurant updated successfully',
     data: result,
   });
   return result;
@@ -85,7 +89,7 @@ const deleteRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurant deleted successfully",
+    message: 'Restaurant deleted successfully',
     data: result,
   });
   return result;
@@ -95,7 +99,7 @@ const deleteFiles = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Image deleted successfully",
+    message: 'Image deleted successfully',
     data: result,
   });
   return result;
@@ -108,7 +112,7 @@ const getSingleRestaurantForOwner = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurant retrieved successfully",
+      message: 'Restaurant retrieved successfully',
       data: result,
     });
     return result;
@@ -120,7 +124,7 @@ const getAllRestaurantForAdmin = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurant retrieved successfully",
+      message: 'Restaurant retrieved successfully',
       data: result,
     });
     return result;
@@ -131,22 +135,22 @@ const nearByRestaurant = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurant retrieved successfully",
+    message: 'Restaurant retrieved successfully',
     data: result,
   });
   return result;
 });
 const getAllRestaurantId = catchAsync(async (req: Request, res: Response) => {
   const query = { ...req.query };
-  query["owner"] = req.user.userId;
+  query['owner'] = req.user.userId;
   const result = await restaurantServices.getAllRestaurantId({
     ...query,
-    status: "active",
+    status: 'active',
   });
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Restaurant retrieved successfully",
+    message: 'Restaurant retrieved successfully',
     data: result,
   });
   return result;
@@ -160,7 +164,7 @@ const changeRestaurantStatus = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Restaurant status changed successfully",
+      message: 'Restaurant status changed successfully',
       data: result,
     });
     return result;
