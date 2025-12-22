@@ -17,19 +17,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //parsers
 app.use(
   cors({
-    origin: ['https://mybookatable.mu', 'https://bookatable.mu'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    origin: ['https://mybookatable.mu', 'https://bookatable.mu'], // Allow all originss
+    // credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })
 );
 
 app.use(express.json());
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-  })
-);
+app.use(helmet());
 app.use(cookieParser());
 
 const limiter = rateLimit({
