@@ -15,9 +15,6 @@ const app: Application = express();
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 //parsers
-app.use(express.json());
-app.use(helmet());
-app.use(cookieParser());
 app.use(
   cors({
     origin: ['https://mybookatable.mu', 'https://bookatable.mu'], // Allow all originss
@@ -25,6 +22,10 @@ app.use(
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })
 );
+
+app.use(express.json());
+app.use(helmet());
+app.use(cookieParser());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
