@@ -20,15 +20,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      'https://mybookatable.mu',
-      'https://bookatable.mu',
-      'https://socket.bookatable.mu',
-      // 'http://localhost:5173',
-      'http://10.10.10.78:5173',
-      // 'http://localhost:3000',
-      'https://reservation.bookatable.mu',
-    ], // Allow all originss
+    origin: ['http://10.10.10.106:5173'], // Allow all originss
     // credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })
