@@ -26,6 +26,17 @@ export const blockedDomains = [
   'mailcatch.com',
   'mailnesia.com',
   'spamgourmet.com',
+  'mailinator.com',
+  'rosuper.com',
+  'cropimage.me',
+  'zongusa.com',
+  'supdrop.com',
+  'ssgperf.com',
+  'screwingpuzzle.com',
+  'videnox.com',
+  'delaeb.com',
+  'eryod.com',
+  'mcpservers.one',
 ];
 
 // reCAPTCHA v3 configuration constants
