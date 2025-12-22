@@ -1,56 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
-import rateLimit from 'express-rate-limit';
 import httpStatus from 'http-status';
-import parsePhoneNumberFromString, { CountryCode } from 'libphonenumber-js';
-import fetch from 'node-fetch';
-import AppError from '../../error/AppError';
-import config from '../../config';
+import config from '../config';
+import AppError from '../error/AppError';
 import {
-  blockedDomains,
-  RECAPTCHA_MIN_SCORE,
   RECAPTCHA_EXPECTED_ACTION,
-} from './user.constant';
-import { RecaptchaResponse } from './user.interface';
-export const validatePhoneNumber = (
-  phoneNumber: string,
-  countryCode: CountryCode = 'MU'
-) => {
-  const number = parsePhoneNumberFromString(phoneNumber, countryCode);
-  return number && number.isValid() ? true : false;
-};
-export const signupLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // max 5 signups per IP per hour
-  message: {
-    success: false,
-    message: 'Too many signup attempts. Please try again later.',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+  RECAPTCHA_MIN_SCORE,
+} from '../modules/user/user.constant';
+import { RecaptchaResponse } from '../modules/user/user.interface';
 
-export const validateEmailDomain = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { email } = req.body;
-  const domain = email.split('@')[1];
-
-  if (blockedDomains.includes(domain)) {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      'Disposable email addresses are not allowed'
-    );
-  }
-
-  next();
-};
-
-/**
- * Middleware to verify Google reCAPTCHA v3 token
- * Expects the token to be in req.body.captchaToken
- */
 export const verifyCaptchaToken = async (
   req: Request,
   res: Response,
@@ -61,10 +18,7 @@ export const verifyCaptchaToken = async (
 
     // Check if token is provided
     if (!captchaToken) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'Captcha token is required'
-      );
+      throw new AppError(httpStatus.BAD_REQUEST, 'Captcha token is required');
     }
 
     // Check if secret key is configured

@@ -1,4 +1,5 @@
 import { Model } from "mongoose";
+
 export interface TUser {
   [x: string]: any;
   id: string;
@@ -28,4 +29,13 @@ export interface UserModel extends Model<TUser> {
     plainTextPassword: string,
     hashedPassword: string
   ): Promise<boolean>;
+}
+
+export interface RecaptchaResponse {
+  success: boolean;
+  score?: number;
+  action?: string;
+  challenge_ts?: string;
+  hostname?: string;
+  'error-codes'?: string[];
 }

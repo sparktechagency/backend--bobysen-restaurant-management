@@ -20,7 +20,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ['http://10.10.10.106:5173'], // Allow all originss
+    origin: ['https://mybookatable.mu', 'https://bookatable.mu'], // Allow all originss
     // credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })

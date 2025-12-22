@@ -2,6 +2,7 @@ import { Router } from 'express';
 import auth from '../../middleware/auth';
 import { upload } from '../../middleware/fileUpload';
 import parseData from '../../middleware/parseData';
+import { verifyCaptchaToken } from '../../middleware/verifyCaptchaHandlers';
 import { USER_ROLE } from './user.constant';
 import { userControllers } from './user.controller';
 import { signupLimiter, validateEmailDomain } from './user.utils';
@@ -11,6 +12,7 @@ router.post(
   '/create-user',
   signupLimiter,
   validateEmailDomain,
+  verifyCaptchaToken,
   // upload.single("file"),
   // parseData(),
   userControllers.insertuserIntoDb

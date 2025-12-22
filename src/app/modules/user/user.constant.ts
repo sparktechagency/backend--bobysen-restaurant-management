@@ -4,7 +4,9 @@ export const USER_ROLE = {
   user: 'user',
   all: ['admin', 'vendor', 'user'].join(','),
 };
+
 export const UserStatus = ['pending', 'active', 'blocked'];
+
 export const blockedDomains = [
   'yerato.com',
   'mcpservers.one',
@@ -25,3 +27,7 @@ export const blockedDomains = [
   'mailnesia.com',
   'spamgourmet.com',
 ];
+
+// reCAPTCHA v3 configuration constants
+export const RECAPTCHA_MIN_SCORE = 0.5; // Adjust based on your security needs (0.0 - 1.0)
+export const RECAPTCHA_EXPECTED_ACTION = 'submit'; // Should match the action in your frontend
