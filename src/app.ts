@@ -17,7 +17,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //parsers
 app.use(
   cors({
-    origin: ['https://mybookatable.mu', 'https://bookatable.mu'], // Allow all originss
+    // origin: ['https://mybookatable.mu', 'https://bookatable.mu'], // Allow all originss
+    origin: '*',
     // credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })

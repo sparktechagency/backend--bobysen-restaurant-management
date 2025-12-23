@@ -15,7 +15,6 @@ export const verifyCaptchaToken = async (
 ): Promise<void> => {
   try {
     const { captchaToken } = req.body;
-
     // Check if token is provided
     if (!captchaToken) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Captcha token is required');
