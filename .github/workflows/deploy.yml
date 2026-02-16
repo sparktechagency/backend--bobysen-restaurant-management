@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: opuopu/bookatable-backend
+  IMAGE_NAME: sparktechagency/bookatable-backend
 
 jobs:
   build-and-deploy:
