@@ -57,12 +57,27 @@ const getAllRestaurant = (query) => __awaiter(void 0, void 0, void 0, function* 
             },
         },
         {
+            $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "category",
+            },
+        },
+        {
+            $unwind: {
+                path: "$category",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
             $project: {
                 name: 1,
                 location: 1,
                 tables: { $size: "$tables" }, // Count total tables
                 menus: { $size: "$menus" },
                 address: 1, // Count total menus
+                category: 1,
             },
         },
     ]);
@@ -95,15 +110,25 @@ const getAllRestaurantsForUser = (query) => __awaiter(void 0, void 0, void 0, fu
                         parseFloat(query === null || query === void 0 ? void 0 : query.longitude),
                         parseFloat(query === null || query === void 0 ? void 0 : query.latitude),
                     ],
-                    // coordinates: [90.42308159679541, 23.77634120911962],
                 },
                 key: "location",
-                // query: {},
                 maxDistance: parseFloat(10000) * 1609,
                 distanceField: "dist.calculated",
                 spherical: true,
             },
         });
+    }
+    // Only handle category here, and exclude from dynamic filter
+    if ((query === null || query === void 0 ? void 0 : query.category) && query.category !== "null" && query.category !== "") {
+        try {
+            const catId = new mongoose_1.default.Types.ObjectId(query.category);
+            pipeline.push({
+                $match: { category: catId },
+            });
+        }
+        catch (e) {
+            pipeline.push({ $match: { _id: null } });
+        }
     }
     // search term
     if (query === null || query === void 0 ? void 0 : query.searchTerm) {
@@ -115,16 +140,14 @@ const getAllRestaurantsForUser = (query) => __awaiter(void 0, void 0, void 0, fu
             },
         });
     }
-    // // get all current restaurant as well
     pipeline.push({
         $match: {
             isDeleted: false,
             status: "active",
         },
     });
-    // console.log(pipeline);
-    // // Dynamic filter stage
-    const filterConditions = Object.fromEntries(Object.entries(query).filter(([key]) => !restaurant_constant_1.restaurantExcludeFields.includes(key)));
+    // Dynamic filter stage, but exclude 'category' to avoid double filtering
+    const filterConditions = Object.fromEntries(Object.entries(query).filter(([key]) => !restaurant_constant_1.restaurantExcludeFields.includes(key) && key !== "category"));
     if (Object.keys(filterConditions).length > 0) {
         pipeline.push({
             $match: filterConditions,
@@ -132,10 +155,14 @@ const getAllRestaurantsForUser = (query) => __awaiter(void 0, void 0, void 0, fu
     }
     pipeline.push({ $skip: skip });
     pipeline.push({ $limit: limit });
+    // Debug: log the pipeline
     // Fetch the data
     const data = yield restaurant_model_1.Restaurant.aggregate(pipeline);
     // Fetch the total count for pagination meta
-    const total = yield restaurant_model_1.Restaurant.countDocuments(data);
+    const total = yield restaurant_model_1.Restaurant.countDocuments({
+        isDeleted: false,
+        status: "active",
+    });
     const totalPage = Math.ceil(total / limit);
     return {
         data,
@@ -181,6 +208,7 @@ const getSingleRestaurant = (id) => __awaiter(void 0, void 0, void 0, function* 
                 helpLineNumber2: 1,
                 images: 1,
                 reviewStatus: 1,
+                category: 1,
                 map: 1,
                 days: {
                     $map: {
@@ -226,7 +254,7 @@ const updateRestaurant = (id, payload) => __awaiter(void 0, void 0, void 0, func
             images: {
                 $each: images,
             },
-        } }, update), { new: true });
+        } }, update), { new: true, upsert: true });
     return result;
 });
 // common function for delete files from restaurants

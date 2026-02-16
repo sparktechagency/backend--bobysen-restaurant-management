@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.categoryService = exports.updateCategory = exports.getSingleCategory = exports.getAllCategories = exports.createCategory = void 0;
+exports.categoryService = exports.deleteCategory = exports.updateCategory = exports.getSingleCategory = exports.getAllCategories = exports.createCategory = void 0;
 const category_model_1 = require("./category.model");
 // Create a new category
 const createCategory = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,9 +35,16 @@ const updateCategory = (id, payload) => __awaiter(void 0, void 0, void 0, functi
     return updated;
 });
 exports.updateCategory = updateCategory;
+// Delete category by id
+const deleteCategory = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const deleted = yield category_model_1.Category.findByIdAndDelete(id);
+    return deleted;
+});
+exports.deleteCategory = deleteCategory;
 exports.categoryService = {
     createCategory: exports.createCategory,
     getAllCategories: exports.getAllCategories,
     getSingleCategory: exports.getSingleCategory,
     updateCategory: exports.updateCategory,
+    deleteCategory: exports.deleteCategory,
 };

@@ -20,8 +20,9 @@ const user_constant_1 = require("../user/user.constant");
 const booking_service_1 = require("./booking.service");
 const bookAtable = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    req.body.user = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
-    const result = yield booking_service_1.bookingServies.bookAtable(req.body);
+    const data = Object.assign({}, req.body);
+    data["user"] = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const result = yield booking_service_1.bookingServies.bookAtable(data);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -31,8 +32,9 @@ const bookAtable = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 }));
 const bookAtableForEvent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    req.body.user = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
-    const result = yield booking_service_1.bookingServies.bookAtableForEvent(req.body);
+    const data = Object.assign({}, req.body);
+    data["user"] = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const result = yield booking_service_1.bookingServies.bookAtableForEvent(data);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

@@ -15,8 +15,8 @@ const updateCategoryValidation = zod_1.z.object({
         isDeleted: zod_1.z.boolean().optional(),
     }),
 });
-const getCategoryValidation = {
+const categoryValidation = {
     createCategoryValidation,
     updateCategoryValidation,
 };
-exports.default = getCategoryValidation;
+exports.default = categoryValidation;

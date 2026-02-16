@@ -22,17 +22,22 @@ const insertTopRestaurantIntoDb = (0, catchAsync_1.default)((req, res) => __awai
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurants added successfully",
+        message: 'Restaurants added successfully',
         data: result,
     });
     return result;
 }));
 const getAllTopRestaurants = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield TopRestaurant_service_1.topRestaurantServices.getAllTopRestaurants(req.query);
+    var _a;
+    const query = Object.assign({}, req.query);
+    if (!((_a = req === null || req === void 0 ? void 0 : req.query) === null || _a === void 0 ? void 0 : _a.limit)) {
+        query['limit'] = 99;
+    }
+    const result = yield TopRestaurant_service_1.topRestaurantServices.getAllTopRestaurants(query);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurants retrieved successfully",
+        message: 'Restaurants retrieved successfully',
         data: result === null || result === void 0 ? void 0 : result.data,
         meta: result === null || result === void 0 ? void 0 : result.meta,
     });
@@ -43,7 +48,7 @@ const getAllTopRestaurantForTable = (0, catchAsync_1.default)((req, res) => __aw
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurants retrieved successfully",
+        message: 'Restaurants retrieved successfully',
         data: result === null || result === void 0 ? void 0 : result.data,
         meta: result === null || result === void 0 ? void 0 : result.meta,
     });
@@ -54,7 +59,7 @@ const getSingleTopRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant retrieved successfully",
+        message: 'Restaurant retrieved successfully',
         data: result,
     });
     return result;
@@ -64,7 +69,7 @@ const updateTopRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant updated successfully",
+        message: 'Restaurant updated successfully',
         data: result,
     });
     return result;
@@ -74,7 +79,7 @@ const deleteTopRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant deleted successfully",
+        message: 'Restaurant deleted successfully',
         data: result,
     });
     return result;

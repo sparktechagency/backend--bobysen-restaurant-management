@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
-dotenv_1.default.config({ path: path_1.default.join((process.cwd(), ".env")) });
+dotenv_1.default.config({ path: path_1.default.join((process.cwd(), '.env')) });
 exports.default = {
     NODE_ENV: process.env.NODE_ENV,
     port: process.env.PORT,
@@ -19,6 +19,7 @@ exports.default = {
     nodemailer_host_email: process.env.NODEMAILER_HOST_EMAIL,
     nodemailer_host_pass: process.env.NODEMAILER_HOST_PASS,
     socket_port: process.env.SOCKET_PORT,
+    widgetPassword: process.env.widgetPassword,
     stripe_secret: process.env.STRIPE_SECRET,
     whatsapp_auth_key: process.env.WHATSAPP_AUTH_KEY,
     whatsapp_sms_number: process.env.WHATSAPP_SMS_NUMBER,
@@ -26,6 +27,7 @@ exports.default = {
     otp_url: process.env.OTP_URL,
     verify_otp_url: process.env.VERIFY_OTP_URL,
     otp_tempalte_id: process.env.OTP_TEMPLATE_ID,
+    google_captcha_secret_key: process.env.GOOGLE_CAPTCHA_SECRET_KEY,
     spaces: {
         url: process.env.SPACES_API,
         image_url: process.env.SPACES_IMAGE_API,

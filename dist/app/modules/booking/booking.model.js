@@ -56,6 +56,10 @@ const unpaidBookingSchema = new mongoose_1.Schema({
         enum: ["active", "cancelled", "completed"],
         default: "active",
     },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    }
 }, {
     timestamps: true,
 });
@@ -108,6 +112,10 @@ const bookingSchema = new mongoose_1.Schema({
         enum: ["active", "cancelled", "completed"],
         default: "active",
     },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    }
 }, {
     timestamps: true,
 });

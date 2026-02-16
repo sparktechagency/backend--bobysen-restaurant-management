@@ -45,6 +45,9 @@ app.use('/api/v1', router);
 app.get('/', (req: Request, res: Response) => {
   res.send('server is running');
 });
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 app.use(globalErrorHandler);
 
 //Not Found

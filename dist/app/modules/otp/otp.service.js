@@ -23,19 +23,19 @@ const booking_service_1 = require("../booking/booking.service");
 const user_model_1 = require("../user/user.model");
 const verifyOtp = (token, otp) => __awaiter(void 0, void 0, void 0, function* () {
     if (!token) {
-        throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "you are not authorized!");
+        throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'you are not authorized!');
     }
     let decode;
     try {
         decode = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
     }
     catch (err) {
-        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "session has expired.please try to submit otp withing 5 minute");
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'session has expired.please try to submit otp withing 5 minute');
     }
-    const user = yield user_model_1.User.findById(decode === null || decode === void 0 ? void 0 : decode.id).select("verification status phoneNumber");
+    const user = yield user_model_1.User.findById(decode === null || decode === void 0 ? void 0 : decode.id).select('verification status phoneNumber');
     console.log(user);
     if (!user) {
-        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "user not found");
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'user not found');
     }
     // if (new Date() > user?.verification?.expiresAt) {
     //   throw new AppError(
@@ -47,29 +47,29 @@ const verifyOtp = (token, otp) => __awaiter(void 0, void 0, void 0, function* ()
     //   throw new AppError(httpStatus.BAD_REQUEST, "otp did not match");
     // }
     const options = {
-        method: "GET",
+        method: 'GET',
         url: config_1.default.verify_otp_url,
         params: { otp: otp, mobile: user === null || user === void 0 ? void 0 : user.phoneNumber },
         headers: { authkey: config_1.default.whatsapp_auth_key },
     };
     // console.log(options);
     const { data } = yield axios_1.default.request(options);
-    if ((data === null || data === void 0 ? void 0 : data.message) === "OTP expired") {
+    if ((data === null || data === void 0 ? void 0 : data.message) === 'OTP expired') {
         throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, data === null || data === void 0 ? void 0 : data.message);
     }
-    else if ((data === null || data === void 0 ? void 0 : data.message) === "OTP not match") {
+    else if ((data === null || data === void 0 ? void 0 : data.message) === 'OTP not match') {
         throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, data === null || data === void 0 ? void 0 : data.message);
     }
-    else if ((data === null || data === void 0 ? void 0 : data.message) === "Mobile no. already verified") {
+    else if ((data === null || data === void 0 ? void 0 : data.message) === 'Mobile no. already verified') {
         throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, data === null || data === void 0 ? void 0 : data.message);
     }
     else {
         const updateUser = yield user_model_1.User.findByIdAndUpdate(user === null || user === void 0 ? void 0 : user._id, {
             $set: {
-                status: (user === null || user === void 0 ? void 0 : user.status) === "active" ? user === null || user === void 0 ? void 0 : user.status : "active",
+                status: (user === null || user === void 0 ? void 0 : user.status) === 'active' ? user === null || user === void 0 ? void 0 : user.status : 'active',
                 verification: {
                     otp: 0,
-                    expiresAt: (0, moment_1.default)().add(5, "minute"),
+                    expiresAt: (0, moment_1.default)().add(5, 'minute'),
                     status: true,
                 },
             },
@@ -79,7 +79,7 @@ const verifyOtp = (token, otp) => __awaiter(void 0, void 0, void 0, function* ()
             id: user === null || user === void 0 ? void 0 : user._id,
         };
         const jwtToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
-            expiresIn: "5m",
+            expiresIn: '5m',
         });
         return { user: updateUser, token: jwtToken };
     }
@@ -87,7 +87,7 @@ const verifyOtp = (token, otp) => __awaiter(void 0, void 0, void 0, function* ()
 const resendOtp = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email });
     if (!user) {
-        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "user not found");
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'user not found');
     }
     // const otp = generateOtp();
     // const expiresAt = moment().add(2, "minute");
@@ -118,7 +118,7 @@ const resendOtp = (email) => __awaiter(void 0, void 0, void 0, function* () {
         id: user === null || user === void 0 ? void 0 : user._id,
     };
     const token = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
-        expiresIn: "5m",
+        expiresIn: '5m',
     });
     // await sendEmail(
     //   user?.email,
@@ -134,10 +134,11 @@ const resendOtp = (email) => __awaiter(void 0, void 0, void 0, function* () {
     return { token };
 });
 const sendotpforverification = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(payload);
     const options = {
-        method: "POST",
+        method: 'POST',
         url: config_1.default.otp_url,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         params: {
             mobile: payload === null || payload === void 0 ? void 0 : payload.mobile,
             otp_expiry: 5,
@@ -151,16 +152,16 @@ const sendotpforverification = (payload) => __awaiter(void 0, void 0, void 0, fu
         return data;
     }
     catch (error) {
-        console.error("Error Sending OTP:", 
+        console.log('Error Sending OTP:', 
         // @ts-ignore
         error.response ? error.response.data : error.message);
     }
 });
 const sendOtpForWidget = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const options = {
-        method: "POST",
+        method: 'POST',
         url: config_1.default.otp_url,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         params: {
             mobile: payload === null || payload === void 0 ? void 0 : payload.mobile,
             otp_expiry: 5,
@@ -174,23 +175,23 @@ const sendOtpForWidget = (payload) => __awaiter(void 0, void 0, void 0, function
         return data;
     }
     catch (error) {
-        console.error("Error Sending OTP:", 
+        console.error('Error Sending OTP:', 
         // @ts-ignore
         error.response ? error.response.data : error.message);
     }
 });
 const verifyOtpForWidget = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const options = {
-        method: "GET",
+        method: 'GET',
         url: config_1.default.verify_otp_url,
         params: { otp: payload === null || payload === void 0 ? void 0 : payload.otp, mobile: payload === null || payload === void 0 ? void 0 : payload.mobile },
         headers: { authkey: config_1.default.whatsapp_auth_key },
     };
     const { data } = yield axios_1.default.request(options);
-    if ((data === null || data === void 0 ? void 0 : data.message) === "OTP expired") {
+    if ((data === null || data === void 0 ? void 0 : data.message) === 'OTP expired') {
         throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, data === null || data === void 0 ? void 0 : data.message);
     }
-    else if ((data === null || data === void 0 ? void 0 : data.message) === "OTP not match") {
+    else if ((data === null || data === void 0 ? void 0 : data.message) === 'OTP not match') {
         throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, data === null || data === void 0 ? void 0 : data.message);
     }
     else {

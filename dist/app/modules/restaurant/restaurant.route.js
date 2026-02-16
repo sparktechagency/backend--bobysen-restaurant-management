@@ -29,5 +29,5 @@ restaurant_controller_1.restauranntControllers.getSingleRestaurant);
 router.patch("/:id", fileUpload_1.upload.array("files"), (0, parseData_1.default)(), (0, auth_1.default)(user_constant_1.USER_ROLE.vendor, user_constant_1.USER_ROLE.admin), restaurant_controller_1.restauranntControllers.updateRestaurant);
 router.delete("/:id", (0, auth_1.default)(user_constant_1.USER_ROLE.vendor, user_constant_1.USER_ROLE.admin), restaurant_controller_1.restauranntControllers.deleteRestaurant);
 router.patch("/files/delete", (0, auth_1.default)(user_constant_1.USER_ROLE.vendor, user_constant_1.USER_ROLE.admin), restaurant_controller_1.restauranntControllers.deleteFiles);
-router.patch("/status/:id", (0, auth_1.default)(user_constant_1.USER_ROLE.admin), restaurant_controller_1.restauranntControllers.changeRestaurantStatus);
+router.patch("/status/:id", (0, auth_1.default)(user_constant_1.USER_ROLE.vendor, user_constant_1.USER_ROLE.admin), restaurant_controller_1.restauranntControllers.changeRestaurantStatus);
 exports.restaurantRoutes = router;

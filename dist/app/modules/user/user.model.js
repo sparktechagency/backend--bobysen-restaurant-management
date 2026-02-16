@@ -24,20 +24,20 @@ const userSchema = new mongoose_1.Schema({
     // },
     fullName: {
         type: String,
-        required: [true, "fullName is required"],
+        required: [true, 'fullName is required'],
     },
     image: {
         type: String,
-        default: "",
+        default: '',
     },
     email: {
         type: String,
-        required: [true, "email is required"],
+        required: [true, 'email is required'],
         // unique: true,
     },
     password: {
         type: String,
-        required: [true, "password is required"],
+        required: [true, 'password is required'],
         select: 0,
     },
     passwordChangedAt: {
@@ -49,17 +49,17 @@ const userSchema = new mongoose_1.Schema({
     },
     role: {
         type: String,
-        enum: ["admin", "vendor", "user"],
+        enum: ['admin', 'vendor', 'user'],
     },
     status: {
         type: String,
         enum: user_constant_1.UserStatus,
-        default: "active",
+        default: 'active',
     },
     type: {
         type: String,
-        enum: ["website_mobile", "widget"],
-        default: "website_mobile",
+        enum: ['website_mobile', 'widget'],
+        default: 'website_mobile',
     },
     isDeleted: {
         type: Boolean,
@@ -71,12 +71,12 @@ const userSchema = new mongoose_1.Schema({
     },
     countryCode: {
         type: String,
-        required: [true, "countryCode is required"],
-        default: "MU",
+        // required: [true, "countryCode is required"],
+        default: 'MU',
     },
     phoneNumber: {
         type: String,
-        required: [true, "phoneNumber is required"],
+        required: [true, 'phoneNumber is required'],
     },
     verification: {
         otp: {
@@ -96,7 +96,7 @@ const userSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
-userSchema.pre("save", function (next) {
+userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = this;
         user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
@@ -104,31 +104,31 @@ userSchema.pre("save", function (next) {
     });
 });
 // set '' after saving password
-userSchema.post("save", function (doc, next) {
-    doc.password = "";
+userSchema.post('save', function (doc, next) {
+    doc.password = '';
     next();
 });
 // filter out deleted documents
-userSchema.pre("find", function (next) {
+userSchema.pre('find', function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
-userSchema.pre("findOne", function (next) {
+userSchema.pre('findOne', function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
-userSchema.pre("aggregate", function (next) {
+userSchema.pre('aggregate', function (next) {
     this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
     next();
 });
 userSchema.statics.isUserExist = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findOne({ email }).select("+password");
+        return yield exports.User.findOne({ email }).select('+password');
     });
 };
 userSchema.statics.IsUserExistbyId = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findById(id).select("+password");
+        return yield exports.User.findById(id).select('+password');
     });
 };
 userSchema.statics.isPasswordMatched = function (plainTextPassword, hashedPassword) {
@@ -136,4 +136,4 @@ userSchema.statics.isPasswordMatched = function (plainTextPassword, hashedPasswo
         return yield bcrypt_1.default.compare(plainTextPassword, hashedPassword);
     });
 };
-exports.User = (0, mongoose_1.model)("User", userSchema);
+exports.User = (0, mongoose_1.model)('User', userSchema);

@@ -28,7 +28,8 @@ const createCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     });
 }));
 const getAllCategories = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield category_service_1.categoryService.getAllCategories(req.query);
+    const query = Object.assign(Object.assign({}, req.query), { isActive: true });
+    const result = yield category_service_1.categoryService.getAllCategories(query);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -54,9 +55,19 @@ const updateCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const deleteCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield category_service_1.categoryService.deleteCategory(req.params.id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Category deleted successfully",
+        data: result,
+    });
+}));
 exports.categoryController = {
     createCategory,
     getAllCategories,
     getSingleCategory,
     updateCategory,
+    deleteCategory,
 };

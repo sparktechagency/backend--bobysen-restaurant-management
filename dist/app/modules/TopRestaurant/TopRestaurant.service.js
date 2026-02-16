@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.topRestaurantServices = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const moment_1 = __importDefault(require("moment"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const AppError_1 = __importDefault(require("../../error/AppError"));
 const restaurant_model_1 = require("../restaurant/restaurant.model");
 const TopRestaurant_model_1 = require("./TopRestaurant.model");
@@ -62,7 +63,6 @@ const getAllTopRestaurants = (query) => __awaiter(void 0, void 0, void 0, functi
                         parseFloat(query === null || query === void 0 ? void 0 : query.longitude),
                         parseFloat(query === null || query === void 0 ? void 0 : query.latitude),
                     ],
-                    // coordinates: [90.42308159679541, 23.77634120911962],
                 },
                 key: "location",
                 query: {},
@@ -85,7 +85,7 @@ const getAllTopRestaurants = (query) => __awaiter(void 0, void 0, void 0, functi
             as: "restaurant",
         },
     }, { $unwind: "$restaurant" });
-    // dynamic search
+    // Dynamic search
     if (query === null || query === void 0 ? void 0 : query.searchTerm) {
         pipeline.push({
             $match: {
@@ -95,8 +95,20 @@ const getAllTopRestaurants = (query) => __awaiter(void 0, void 0, void 0, functi
             },
         });
     }
-    // Dynamic filter stage
-    const filterConditions = Object.fromEntries(Object.entries(query).filter(([key]) => !topRestaurant_constant_1.topRestaurantExcludeFileds.includes(key)));
+    // Category filter (with ObjectId validation)
+    if ((query === null || query === void 0 ? void 0 : query.category) && query.category !== "null" && query.category !== "") {
+        try {
+            const catId = new mongoose_1.default.Types.ObjectId(query.category);
+            pipeline.push({
+                $match: { "restaurant.category": catId },
+            });
+        }
+        catch (e) {
+            pipeline.push({ $match: { _id: null } });
+        }
+    }
+    // Dynamic filter stage, but exclude 'category' to avoid double filtering
+    const filterConditions = Object.fromEntries(Object.entries(query).filter(([key]) => !topRestaurant_constant_1.topRestaurantExcludeFileds.includes(key) && key !== "category"));
     if (Object.keys(filterConditions).length > 0) {
         pipeline.push({
             $match: filterConditions,
@@ -107,7 +119,10 @@ const getAllTopRestaurants = (query) => __awaiter(void 0, void 0, void 0, functi
     // Fetch the data
     const data = yield TopRestaurant_model_1.TopRestaurant.aggregate(pipeline);
     // Fetch the total count for pagination meta
-    const total = yield TopRestaurant_model_1.TopRestaurant.countDocuments(data);
+    const total = yield TopRestaurant_model_1.TopRestaurant.countDocuments({
+        isExpired: false,
+        isDeleted: false,
+    });
     const totalPage = Math.ceil(total / limit);
     return {
         data,

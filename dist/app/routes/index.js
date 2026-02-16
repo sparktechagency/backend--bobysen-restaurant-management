@@ -5,6 +5,7 @@ const auth_route_1 = require("../modules/auth/auth.route");
 const banner_route_1 = require("../modules/banner/banner.route");
 const booking_route_1 = require("../modules/booking/booking.route");
 const cart_route_1 = require("../modules/cart/cart.route");
+const category_route_1 = require("../modules/category/category.route");
 const coins_route_1 = require("../modules/coins/coins.route");
 const content_route_1 = require("../modules/content/content.route");
 const event_route_1 = require("../modules/event/event.route");
@@ -100,6 +101,10 @@ const moduleRoutes = [
     {
         path: "/events",
         route: event_route_1.eventsRoutes,
+    },
+    {
+        path: "/categories",
+        route: category_route_1.categoryRoutes,
     },
     {
         path: "/coin",

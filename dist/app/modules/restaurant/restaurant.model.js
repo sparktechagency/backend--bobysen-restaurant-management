@@ -34,6 +34,11 @@ const RestaurantSchema = new mongoose_1.Schema({
         ref: "User",
         required: [true, "owner id is required"],
     },
+    category: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Category",
+        required: [true, "category id is required"],
+    },
     status: {
         type: String,
         enum: ["active", "inactive"],

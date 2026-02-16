@@ -74,15 +74,17 @@ const EventsSchema = new mongoose_1.Schema({
     },
 });
 EventsSchema.pre("find", function (next) {
-    this.find({ isDeleted: { $ne: true } });
+    this.find({ isDeleted: { $ne: true }, isActive: true });
     next();
 });
 EventsSchema.pre("findOne", function (next) {
-    this.find({ isDeleted: { $ne: true } });
+    this.find({ isDeleted: { $ne: true }, isActive: true });
     next();
 });
 EventsSchema.pre("aggregate", function (next) {
-    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+    this.pipeline().unshift({
+        $match: { isDeleted: { $ne: true }, isActive: true }
+    });
     next();
 });
 exports.Event = (0, mongoose_1.model)("Event", EventsSchema);

@@ -23,7 +23,7 @@ const insertRestaurantIntDb = (0, catchAsync_1.default)((req, res) => __awaiter(
     const images = [];
     if ((req === null || req === void 0 ? void 0 : req.files) instanceof Array) {
         for (const file of req === null || req === void 0 ? void 0 : req.files) {
-            images.push({ url: yield (0, spaces_1.uploadToSpaces)(file, "restaurant") });
+            images.push({ url: yield (0, spaces_1.uploadToSpaces)(file, 'restaurant') });
         }
     }
     req.body.owner = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
@@ -32,29 +32,35 @@ const insertRestaurantIntDb = (0, catchAsync_1.default)((req, res) => __awaiter(
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant added successfully",
+        message: 'Restaurant added successfully',
         data: result,
     });
     return result;
 }));
 const getAllRestaurants = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    req.query.owner = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
-    const result = yield restaurant_service_1.restaurantServices.getAllRestaurant(req.query);
+    const query = Object.assign({}, req.query);
+    query['owner'] = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const result = yield restaurant_service_1.restaurantServices.getAllRestaurant(query);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurants retrieved successfully",
+        message: 'Restaurants retrieved successfully',
         data: result,
     });
     return result;
 }));
 const getAllRestaurantsForUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield restaurant_service_1.restaurantServices.getAllRestaurantsForUser(req.query);
+    var _a;
+    const query = Object.assign({}, req.query);
+    if (!((_a = req === null || req === void 0 ? void 0 : req.query) === null || _a === void 0 ? void 0 : _a.limit)) {
+        query['limit'] = 99;
+    }
+    const result = yield restaurant_service_1.restaurantServices.getAllRestaurantsForUser(query);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurants retrieved successfully",
+        message: 'Restaurants retrieved successfully',
         data: result === null || result === void 0 ? void 0 : result.data,
         meta: result === null || result === void 0 ? void 0 : result.meta,
     });
@@ -65,7 +71,7 @@ const getSingleRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant retrieved successfully",
+        message: 'Restaurant retrieved successfully',
         data: result,
     });
     return result;
@@ -74,7 +80,7 @@ const updateRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     const images = [];
     if ((req === null || req === void 0 ? void 0 : req.files) instanceof Array) {
         for (const file of req === null || req === void 0 ? void 0 : req.files) {
-            images.push({ url: yield (0, spaces_1.uploadToSpaces)(file, "restaurant") });
+            images.push({ url: yield (0, spaces_1.uploadToSpaces)(file, 'restaurant') });
         }
     }
     req.body.images = images;
@@ -82,7 +88,7 @@ const updateRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant updated successfully",
+        message: 'Restaurant updated successfully',
         data: result,
     });
     return result;
@@ -92,7 +98,7 @@ const deleteRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant deleted successfully",
+        message: 'Restaurant deleted successfully',
         data: result,
     });
     return result;
@@ -102,7 +108,7 @@ const deleteFiles = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Image deleted successfully",
+        message: 'Image deleted successfully',
         data: result,
     });
     return result;
@@ -112,7 +118,7 @@ const getSingleRestaurantForOwner = (0, catchAsync_1.default)((req, res) => __aw
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant retrieved successfully",
+        message: 'Restaurant retrieved successfully',
         data: result,
     });
     return result;
@@ -122,7 +128,7 @@ const getAllRestaurantForAdmin = (0, catchAsync_1.default)((req, res) => __await
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant retrieved successfully",
+        message: 'Restaurant retrieved successfully',
         data: result,
     });
     return result;
@@ -132,19 +138,19 @@ const nearByRestaurant = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant retrieved successfully",
+        message: 'Restaurant retrieved successfully',
         data: result,
     });
     return result;
 }));
 const getAllRestaurantId = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const query = Object.assign({}, req.query);
-    query["owner"] = req.user.userId;
-    const result = yield restaurant_service_1.restaurantServices.getAllRestaurantId(Object.assign(Object.assign({}, query), { status: "active" }));
+    query['owner'] = req.user.userId;
+    const result = yield restaurant_service_1.restaurantServices.getAllRestaurantId(Object.assign(Object.assign({}, query), { status: 'active' }));
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant retrieved successfully",
+        message: 'Restaurant retrieved successfully',
         data: result,
     });
     return result;
@@ -155,7 +161,7 @@ const changeRestaurantStatus = (0, catchAsync_1.default)((req, res) => __awaiter
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Restaurant status changed successfully",
+        message: 'Restaurant status changed successfully',
         data: result,
     });
     return result;
